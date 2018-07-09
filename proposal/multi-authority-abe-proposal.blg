@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: multi-authority-abe-proposal.aux
+The style file: ieeetr.bst
+Database file #1: multi-authority-abe-proposal.bib
+Warning--I didn't find a database entry for "BB"
+Warning--I didn't find a database entry for "Figueredo:2009dg"
+You've used 4 entries,
+            1876 wiz_defined-function locations,
+            506 strings with 4247 characters,
+and the built_in function-call counts, 1417 in all, are:
+= -- 147
+> -- 31
+< -- 0
++ -- 12
+- -- 8
+* -- 87
+:= -- 179
+add.period$ -- 4
+call.type$ -- 4
+change.case$ -- 4
+chr.to.int$ -- 0
+cite$ -- 4
+duplicate$ -- 84
+empty$ -- 149
+format.name$ -- 8
+if$ -- 355
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 4
+newline$ -- 15
+num.names$ -- 4
+pop$ -- 24
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 62
+stack$ -- 0
+substring$ -- 128
+swap$ -- 36
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 16
+width$ -- 5
+write$ -- 42
+(There were 2 warnings)

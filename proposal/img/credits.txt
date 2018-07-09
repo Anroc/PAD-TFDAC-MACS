@@ -1,0 +1,6 @@
+key.svg
+file.svg
+database.svg:
+server.svg: 	Smashicons
+filekey.svg: 	
+laptop.svg: 	Freepik
