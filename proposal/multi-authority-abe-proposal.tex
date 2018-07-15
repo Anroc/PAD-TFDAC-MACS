@@ -149,6 +149,7 @@ It is also possible to do it the other way arround: Associate the user’s key w
 %------------------------------------------------
 
 \section{Security Requirements}
+\label{sec:securityRequirements}
 The core security requirements regarding Bdrive in the context of a multi-authority ABE scheme are the following:
 \begin{itemize}
 \item \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archive a higher level 
@@ -175,6 +176,41 @@ The next step would be to implement the key-revocation, which is not trivial in 
 %------------------------------------------------
 
 \section{Concept}
+The basic idea is, as proposed in \cite{chase2007multi}, to construct for each users a polynom of degree $d-1$, where $d$ donates the number of attributes in our system. 
+
+To prevent collusion between user in a multi authority setting, the challange for each user needs to be individuell. But we still need to ensure that the encryption of message is indepenent of any user specific identifier, since the encryption progress should sourly depent on the attribute set known to the system.
+To mitigate this problem a global identifier (GID) per users was introduced that is shown to each attribute authority (AA) to receive the corresponding private key for the users attributes. 
+The central authority (CA) now has to make sure that the user dependent challange results in a global decryption key to decrypt the message.
+In the fact that the CA has to be trusted since it computes the users private keys in such a way that on decyrption it reveals the global decryption key. 
+
+In \cite{case2007multi} the CA generated random seeds that are distributed to the Attribute Authorities. Each authority uses this seed to deterministically create the users private key. Since the CA persesses the same seed and knows the users GID, it can also create the same private key and ensure that on decyrption the keys add up to reveal the global decyrption key.
+
+We set the multi-authority scheme proposed by Chase 2007 as a baseline for the building block of the concept. It is defined in figure \ref{fig:chase-multi-auth}. $g^{y_{k,u}s}$ is the user depending blinded point of interesset, which is derivated from the pheudo random function $F(GID)$ with seed $s_k$. This seed is choosen by the CA in advance to ensure that the challanges for each authorities $k$ add up in $g^{y_0 - \sum^K_{k=0} y_{k,u}}$ to reveal the blinded master secret $g^{y_0 s}$. 
+
+\begin{figure*}[!ht]
+\begin{itemize}
+	\item \textbf{System}:\\
+	\textbf{Init}: Fix prime order groups $G$, $G_1$, bilinear map $e: G \rightarrow G_1$, and generator $g \in G$. Choose seeds $s_1, \dots, s_K$ for all authorities. Also choose $y_0 , \{t_{k,i}\}_{k=1...K,i=1\dots n} \leftarrow Z_q$. \\
+	\textbf{System Public Key}: $Y_0 = e(g, g)^{y_0}$
+	\item \textbf{Attribute Authority} $k$: \\
+	\textbf{Auhtority Secret Key}: $s_k, t_{k, 1} \dots t_{k,n} $ \\
+	\textbf{Authority Public Key}: $ T_{k, 1} \dots T_{k, n}$ where $T_{k, i} = g^{t_{k,i}} $\\
+	\textbf{Secret Key for User } $u$: Let $y_{k,u} = F_{s_k}(GID)$. Choose random $d - 1$ degree polynomial $p$ with $p(0) = y_{k,u}$. Secret Key: $\{D_{k,i} = g^{p(i)/t_{k,i}} \}i \in A_u $.
+	\item \textbf{Central Authority}:\\
+	\textbf{Central Authority Secret Key}: $s_k$ for all authorities $k, y_0$.  \\
+	\textbf{Secret Key for User} $u$: Let $y_{k,u} = F_{s_k}(GID)$ for all $k$. Secret Key: $D_{CA} = g^{y_0 - \sum^K_{k=0} y_{k,u}}$
+	\item \textbf{Encryption for attributes set } $A_C$: \\
+	Choose random $s \leftarrow Z_q$. $E = Y_0^s m$, $E_{CA} = g^s$, $\{E_{k,i} = T^s_{k,i}\}_{i \in A^k_C, \forall k}$
+	\item \textbf{Decryption}:\\
+	For each authority $k$, for $d$ attributes $i \in A^k_C \cap A_u$, compute $e(E_{k,i}, D_{k,i}) = e(g,g)^{p(i)s} = e(g,g)^{y_{k,u}s}$.  Interpolate to find $Y^s_{k,u} = e(g, g)^{p(0)s} = e(g,g)^{y_{k,u}s}$ for each authority $k$. Compute $Y^s_{CA} = e(E_{CA} , D_{CA})$. Combine these values to obtain $Y^s_{CA} * \prod^K_{k=1} Y^s_{k,u} = Y^s_0$. Then $m = E/Y_0^s$
+\end{itemize}
+\caption{Multi-Authority scheme as proposed by Chase 2007 in \cite{chase2007multi}. $A_u$ donates the attributes of user $u$. $A_C$ donates the attributes of the cipher text.}
+\label{fig:chase-multi-auth}
+\end{figure*}
+
+
+However, as discussed in \ref{sec:securityRequirements} we want the company domain to remain sealed. That means that we don't want to have a global trusted authority that has global decyrption power. 
+Chase addressed this issue in \cite{chase2009improving}, where she proposed the usage of an seeding network. Here every two AA's exchange seeds than combine them with the pheudorandom functions to produce the users private key. 
 
 %------------------------------------------------
 
