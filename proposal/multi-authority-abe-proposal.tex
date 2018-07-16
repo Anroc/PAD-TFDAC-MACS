@@ -185,9 +185,9 @@ In the fact that the CA has to be trusted since it computes the users private ke
 
 In \cite{case2007multi} the CA generated random seeds that are distributed to the Attribute Authorities. Each authority uses this seed to deterministically create the users private key. Since the CA persesses the same seed and knows the users GID, it can also create the same private key and ensure that on decyrption the keys add up to reveal the global decyrption key.
 
-We set the multi-authority scheme proposed by Chase 2007 as a baseline for the building block of the concept. It is defined in figure \ref{fig:chase-multi-auth}. $g^{y_{k,u}s}$ is the user depending blinded point of interesset, which is derivated from the pheudo random function $F(GID)$ with seed $s_k$. This seed is choosen by the CA in advance to ensure that the challanges for each authorities $k$ add up in $g^{y_0 - \sum^K_{k=0} y_{k,u}}$ to reveal the blinded master secret $g^{y_0 s}$. 
+We set the multi-authority scheme proposed by Chase 2007 as a baseline for the building block of the concept. It is defined in figure \ref{fig:chase-multi-auth}. $g^{y_{k,u}s}$ is the user depending blinded point of interesset, which is derivated from the pheudo random function $F(GID)$ with seed $s_k$. This seed is choosen by the CA in advance to ensure that the challanges for each authorities $k$ add up in $g^{y_0 - \sum^K_{k=0} y_{k,u}}$ to reveal the blinded master secret $g^{y_0 s}$, which is than used for decryption of the ciphertext. This step is nessecary to a) prevent collusion between users (so making the challange user dependent) and b) to make the encryption indepent of the user's GID (only use the systems public key). The authories should not know the secrets (seeds) of the other AAs so that it can not issue attributes without of its domain. So the CA needs to be trusted and honest since it generates the master secret ($g^{y_0}$) and distributes the secret seeds ($s_k$) and has global decryption power.  
 
-\begin{figure*}[!ht]
+\begin{figure*}[!h]
 \begin{itemize}
 	\item \textbf{System}:\\
 	\textbf{Init}: Fix prime order groups $G$, $G_1$, bilinear map $e: G \rightarrow G_1$, and generator $g \in G$. Choose seeds $s_1, \dots, s_K$ for all authorities. Also choose $y_0 , \{t_{k,i}\}_{k=1...K,i=1\dots n} \leftarrow Z_q$. \\
@@ -211,6 +211,50 @@ We set the multi-authority scheme proposed by Chase 2007 as a baseline for the b
 
 However, as discussed in \ref{sec:securityRequirements} we want the company domain to remain sealed. That means that we don't want to have a global trusted authority that has global decyrption power. 
 Chase addressed this issue in \cite{chase2009improving}, where she proposed the usage of an seeding network. Here every two AA's exchange seeds than combine them with the pheudorandom functions to produce the users private key. 
+
+In the first step the master secret key $Y_0$ needs to be split apart the authorities. Each authority chooses independent a $y_k$ and sends $Y_k = e(g_1, g_2)^{y_k}$ to each other authority. Every authority than computes the global master public key $Y_0 = \prod Y_k = e(g_1, g_2)^{\sum y_k}$.
+
+For every user the authority $k$ computes a random polynomial $p_k$ with the point of interest defined as $p_k(0) = y_k - \sum_{j \in \{1 \dots N\} \backslash \{k\}} R_{kj}$.
+
+To build up our secret-seeding network, let $s_{kj}$ be the seed exchanged by authority $k$ with authority $j$ ($k \neq j$). For the user now to receive its decryption keys for authority $k$, he requests 
+$Q_{kj} = g_1^{R_{kj}} * F_{s_{kj}}(GID)^{\delta_{kj}}$ for each authority $j, j \neq k$. $R_{kj}$ is choosen randomly by the authority $k$. The clue is to set $\delta_{kj}$ to either $-1$ if $j<k$ otherwise $1$. The user combines all collected $Q_{kj}$ decryption keys form each AA to compute his own unique, global decryption key $Q_u = \prod_{(j,k) \in \{1 \dots N\} \times (\{1 \dots N\} \backslash \{k\})} Q_{kj} = g_1^{\sum_{(j,k) \in \{1 \dots N\} \times (\{1 \dots N\} \backslash \{k\})} R_{kj}} = g_1^{R_u}$. Since all pheudo random functions are canceling out each other (depending on $\delta_{kj}$). Encryption happens in the same way as described in \ref{fig:chase-multi-auth}. 
+
+The decryption part is also adapted in the way that each $p_k(0)$ that was found using interpolation, is multiplied together to that the user ends up with a global point of interest for this user. 
+
+The full descritpion of this scheme and the adaption to the previous presented trused-CA setup is decribed in \ref{fig:chase-multi-auth-without-trusted-CA}.
+
+We now successfully eliminated the trusted CA. However, several problems remain. How to add authorities? How to change attributes and revoke users from the system?
+
+\todo{clarify $g_1$ stuff}
+\begin{figure*}[!h]
+\begin{itemize}
+	\item \textbf{System}:\\
+	\textbf{Init}: Fix prime order groups $G$, $G_1$, bilinear map $e: G \rightarrow G_1$, and generator $g \in G$.
+
+	\item \textbf{Attribute Authority} $k$: \\
+	\textbf{Auhtority Secret Key}: $y_k \leftarrow Z_q$ (only used once), $s_{kj} = s_{jk}$ as exchanged with each authority $(k,j) \in (\{1 \dots N\} \backslash \{k\}), t_{k, i} \leftarrow Z_q \forall i \in A_k$ \\
+	\textbf{Authority Public Key}: $Y_k = e(g,g)^{y_k}$, $ T_{k, 1} \dots T_{k, n}$ where $T_{k, i} = g^{t_{k,i}} $\\
+	\textbf{System Public Key}: Each authority computes $Y_0 = \prod Y_k = e(g, g)^{\sum y_k}$\\
+	\textbf{Secret Key for User } $u$: For $j \in \{1 \dots N\}\backslash \{k\}$: 
+	$Q_{kj} = g_1^{R_{kj}} * F_{s_{kj}}(GID)^{\delta_{kj}}$, $R_{kj} \leftarrow Z_q$ and set $\delta_{kj}$ to either $-1$ if $j<k$ otherwise $1$.
+
+	Choose random $d - 1$ degree polynomial $p$ with $p_k(0) = y_k - \sum_{j \in \{1 \dots N\} \backslash \{k\}} R_{kj}$. 
+
+	Secret Key: $\{D_{k,i} = g^{p(i)/t_{k,i}} \}i \in A_u $.
+
+	User computes: $Q_u = \prod_{(j,k) \in \{1 \dots N\} \times (\{1 \dots N\} \backslash \{k\})} Q_{kj} = g_1^{\sum_{(j,k) \in \{1 \dots N\} \times (\{1 \dots N\} \backslash \{k\})} R_{kj}} = g_1^{R_u}$
+
+	\item \textbf{Central Authority}:\\
+	Issues unique $GID$ for user $u$.
+	\item \textbf{Encryption for attributes set } $A_C$: \\
+	Choose random $s \leftarrow Z_q$. $E = Y_0^s m$, $E_{1} = g^s$, $\{E_{k,i} = T^s_{k,i}\}_{i \in A^k_C, \forall k}$
+	\item \textbf{Decryption}:\\
+	For each authority $k$, for $d$ attributes $i \in A^k_C \cap A_u$, compute $e(E_{k,i}, D_{k,i}) = e(g,g)^{p(i)_{k}s}$.  Interpolate to find $P_k = e(g, g)^{p(0)_{k}s} = e(g,g)^{s(y_k - \sum_{j \neq k} R_{kj})}$. Multiply $P_k$ together to get $V = e(g,g)^{s(\sum\{y_k\} -R_u)} = Y_0^s / e(g^{R_u}, g^{s})$. Compute $e(Q_u, E_1) * V = e(g^{R_u}, g^s) * V = Y_0^s$. Recover $m$ by $E/ Y_0^s$.
+\end{itemize}
+\caption{Multi-Authority scheme as proposed by Chase 2007 in \cite{chase2007multi}. $A_u$ donates the attributes of user $u$. $A_C$ donates the attributes of the cipher text.}
+\label{fig:chase-multi-auth-without-trusted-CA}
+\end{figure*}
+
 
 %------------------------------------------------
 
