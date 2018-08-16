@@ -155,7 +155,7 @@ In \cite{chase2007multi} this is done by the CA generating random seeds that are
 
 Chase notices this problem as well and tried to mitigate it by decentrializing the seed generation \cite{chase2009improving}. However, since the global master secret still has to be the result of the addition of all independent AA secrets, this scheme suffers from major scalability problems. First user attributes could not easly be revoked\footnote{Chase proposed to assign each user a range of GIDs, so that a user can migrate to the next GID on revocation. Since the GID range is finite, this solution does not scale.}. Second AA's cant be added on runtime without reissuing each user his keys. And last, the attribute universe is finite (no large-universe). Further we noticed that if a failure of one AA renders the system unresponsible, since a cyphertext includes attributes from each authority. 
 
-Access control for multiauthority cloud storage (DAC-MACS) \cite{yang2013dac} introduced a scheme that tackels each of the above issues. They do not relay anymore on interpolation. Here a CP-ABE scheme was used to model the access control to the cyphertext. Furhter, each authority recieves its own ciphertext that depndens only on the attribute keys issed by this domain. While chase managed to maintain "one-plaintext-one-ciphertext", DAMACS needs to created $k$ ciphertext: One per attribute authority.\footnote{If the ciphertext does not require any attribute of an specific authority it does not have to create a ciphertext for this domain.} Since, we don't need any additional coordination between the authorities we are free to add new authorities on runtime without reissuing the user keys. DAC-MACS also includes features for efficient revocation while maintaining forward and backward secrecy. Collusion restiance is again ensured by the usage of a central authority which only purpose is to create the users identifier.   
+Access control for multiauthority cloud storage (DAC-MACS) \cite{yang2013dac} introduced a scheme that tackels each of the above issues. They do not relay anymore on interpolation. Here a CP-ABE scheme was used to model the access control to the cyphertext. Furhter, each authority recieves its own ciphertext that depndens only on the attribute keys issed by this domain. While chase managed to maintain "one-plaintext-one-ciphertext", DAMACS needs to created $k$ ciphertext: One per attribute authority.\footnote{If the ciphertext does not require any attribute of an specific authority it does not have to create a ciphertext for this domain.} Since, we don't need any additional coordination between the authorities we are free to add new authorities on runtime without reissuing the user keys. DAC-MACS also includes features for efficient revocation while maintaining forward and backward secrecy. Collusion restiance is again ensured by the usage of a central authority which only purpose is to create the users identifier. Since DAC-MACS was not collusion resistance on attribute revocation as shown by \cite{wu2017security}, a new scheme called NEDAC-MACS (New Extended DAC-MACS) was introduced. Recent studies introduced a more efficient, scalabe and secure approach such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factory DAC-MACS)\cite{li2017two}.   
 
 %------------------------------------------------
 
@@ -206,6 +206,7 @@ DAC-MACS fits the security requirements of BDrive quite well. In the following e
 
 The main scope is to reduce the number of rekeys that are used on scaling number of user and devices that access this file key. As mentioned before chase proposed a scheme that only needs to maintain one ciphertext per plaintext. But to act dynamically regarding Attribute Authorities additions, reduce the number of affected ciphertext re-encryptions, and provide an encryption process that does not need to involve all AAs known to the system, we need to split up the ciphertext per AA domain. Furhter, in chase scheme, we would also encounter the problem of DoS attacks where an AA can simply deny requrest and render the whole system unusable.  
 
+\todo[inline]{Explain how to evaluate and compare the ABE paper}
 
 %\begin{figure*}[!h]
 %\begin{itemize}
@@ -290,6 +291,8 @@ As introduced in section \ref{sec:introduction} the main target is to make BDriv
 
 Since computing pairing requires a bigger overhead then RSA, we need to compare the time it takes to encryt the file key. To show that MB-ABE is indeed faster we would compare this time for an increasing number of devices. While we expect to DAC-MACS's comuting time to remain constant on encrypting for a increasing number of devices, we expect a linear increasing function for RSA. 
 
+\section{Conclusion}
+With increasing number of users and devices, BDrive and any common cloud storage system faces scalability issues that are automatically givne when using RSA cryptography. While using end-to-end encryption it is hard to hold different file sin sync. \todo[inline]{short conclusion}
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
