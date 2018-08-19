@@ -25,7 +25,7 @@
 
 \usepackage[sc]{mathpazo} % Use the Palatino font
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
-\linespread{1.04} % Line spacing - Palatino needs more space between lines
+\linespread{1.035} % Line spacing - Palatino needs more space between lines
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 
 
@@ -54,7 +54,7 @@
 \pagestyle{fancy} % All pages have headers and footers
 \fancyhead{} % Blank out the default header
 \fancyfoot{} % Blank out the default footer
-\fancyhead[C]{Multi-Authority ABE for Bdrive$\bullet$ August 2018 $\bullet$ Vol. I, No. 1} % Custom header text
+\fancyhead[C]{MA-ABE for BDrive$\bullet$ August 2018 $\bullet$ Vol. I, No. 1} % Custom header text
 \fancyfoot[EL]{\thepage} % Custom footer text
 
 \usepackage{titling} % Customizing the title section
@@ -73,7 +73,7 @@
 
 \pretitle{\begin{center}\Huge\bfseries} % Article title formatting
 \posttitle{\end{center}} % Article title closing formatting
-\title{Multi-Authority Attribute Base Encyrption Scheme for Bdrive } % Article title
+\title{Multi-Authority Attribute-Based Encyrption Scheme for BDrive } % Article title
 \author{%
 \textsc{Marvin Petzolt}\\[1ex] % Your name
 \normalsize TU Berlin \\ % Your institution
@@ -86,7 +86,7 @@
 \date{\today} % Leave empty to omit a date
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-If a group of user want to share a ciphertext, they need to agree on a shared key. On each user leave and join this shared key needs to be updated for each user to ensure forward secrecy. Classical encryption reaches the point where this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption will be analysed to solve this issue for a secure could storage environment (BDrive). Different ABE and MA-ABE schemes will be compared and analyed for their applayablity in BDrive. In the end a practical implementation of the resulting scheme will be given and evaluted for the pracical usage.
+If a group of users want to share a ciphertext, they need to agree on a shared key. On each leave or join of a user this shared key needs to be updated for each user to ensure forward secrecy. Classical encryption reaches the point where this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure could storage environment (BDrive). Different ABE schemes will be compared and analyzed for their applicability in BDrive. In the end the implementation of the resulting scheme will be evaluated for performance, scalability and practical usage.
 \end{abstract}
 }
 
@@ -108,111 +108,112 @@ If a group of user want to share a ciphertext, they need to agree on a shared ke
 \label{sec:introduction}
 
 \lettrine[nindent=0em,lines=3]{B}
-drive is a secure cloud storage where files get split up in smaller chunks that are saved separately on different storage provider. To ensure end-to-end encryption a Bdrive client encrypts each of his chunks with the a one-time symmetric key that is then encrypted under his own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely. 
+drive is a secure cloud storage where files get split up in smaller chunks that are saved separately on different storage provider. To ensure end-to-end encryption a BDrive client encrypts each of his chunks with an one-time symmetric key that is than encrypted under his own public key. This encrypted key is called a file key and it is uploaded to the BDrive server where it is stored securely. 
 
-Since each device of the same user has a different private-public key pair, the client is in charge of making the file keys available for the new client. This is done by downloading each file key for the receptive file, receiving the public key of the new client, decrypting the file key with his own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server.
+Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys available for a new device. This is done by downloading each file key for the receptive file, receiving the public key of the new device, decrypting the file key with his own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the BDrive server. This process will be called re-keying. 
 
-The number of file keys that need to be maintained raises linearly with the number of clients. In addition Bdrive allows to share files between different users. For each device of each user involved in the sharing a new file key has to be created and maintained. We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to have an encryption scheme which has a contant number of file keys regardless of the number of clients.
+The number of file keys that need to be maintained raises linearly with the number of devices. In addition BDrive allows to share files between different users. For each device of each user involved in the sharing a new file key has to be created and maintained. We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to employ an encryption scheme which has a constant number of file keys regardless of the number of clients.
 
-%The formula \ref{eq:rekey} describes the number of file keys Bdrive that need to be stored for each shared files between $U$ users, where each user $u_{i \in U}$ has $u_d$ devices.
+%The formula \ref{eq:rekey} describes the number of file keys BDrive that need to be stored for each shared files between $U$ users, where each user $u_{i \in U}$ has $u_d$ devices.
 
 %\begin{equation}
 %n = \sum_{i}{d_i}
 %\label{eq:rekey} 
 %\end{equation}
 
-%Lets construct an example where the manager of a company wants to create a shared folder with all company employees. It is a medium sized company with $50$ employees. Lets assume that at least haft of them have two Bdrive clients running. The manager wants to upload the $250$ photos of the last company trip.
+%Lets construct an example where the manager of a company wants to create a shared folder with all company employees. It is a medium sized company with $50$ employees. Lets assume that at least haft of them have two BDrive clients running. The manager wants to upload the $250$ photos of the last company trip.
 %We end up by computing $3/2 * 50 * 250 = 18750$ file keys and for every new file uploaded $75$ new file keys need to be uploaded. 
 
 
 
 \section{Related Work}
-
-Attribute Based Encryption (ABE), first introduced by Sahai and Waters \cite{sahai2005fuzzy}, is a cryptographic encryption scheme which encrypts under attributes that describe a user. This enables the encryptor to craft a cypher text over chosen attributes that can only be decrypted by any entity that holds a super set of matching attributes. Further, it is possible to embed an complex access structure (e.g. access trees) inside the cipher text, where each node contains "AND" or "OR" treshhold gates. This approach is known as Ciphertext-policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. 
+Attribute Based Encryption (ABE), first introduced by Sahai and Waters \cite{sahai2005fuzzy}, is a cryptographic encryption scheme which encrypts under attributes that describe a user. This enables the data owner to craft a ciphertext over chosen attributes that can only be decrypted by any entity that holds a super set of matching attributes. Further, it is possible to embed an complex access structure (e.g. access trees) inside the cipher text, where each node contains \textit{AND} or \textit{OR} threshold gates. This approach is known as Ciphertext-Policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. 
 It is also possible to do it the other way around: Associate the user's key with an access policy. Formally known as Key-Policy Attribute Based Encryption (KP-ABE).\cite{goyal2006attribute}. 
 %Now the encryptor needs only to encrypt a given plain text with the public key of specific attributes so that only users who hold the right keys are able to decrypt the cipher text.
 
-Both approaches are limited to one attribute authority. So only one trusted entity is in charge of issuing attributes and their matching key pairs. However, in the real world we would like to distribute the issuing of attributes over different domains. A new scheme is needed where different attribute authorities cooperate and communicate across different domain.  
+Both approaches are limited to one attribute authority (AA). So only one trusted entity is in charge of issuing attributes and their matching key pairs. However, in the real world we would like to distribute the issuing of attributes over different domains. A new scheme is needed where different attribute authorities cooperate and communicate across different domain.  
 
 % The basic idea is, as proposed in \cite{chase2007multi}, to construct for each users a polynomial of degree $d-1$, where $d$ donates the number of attributes in our system. 
 
-Multi-Authority Attribute Based Encryption (MA-ABE), first proposed by Chase 2007 \cite{chase2007multi}, allows to multibe attribute authorities to maintain different attribute domains. To ensure collusion restiance between users, a central trusted authoritiy (CA) was introduced to assign each user a unique identifier (UID). The disadventage this scheme came along was that the CA had global decryption power and so has to remain trusted. 
+Multi-Authority Attribute Based Encryption (MA-ABE), first proposed by Chase 2007 \cite{chase2007multi}, allows multiple attribute authorities to maintain different attribute domains. To ensure collusion resistance between users, a trusted  central authority (CA) was introduced to assign each user an unique identifier (UID) and making the decryption process depending on this UID. The disadvantage of this scheme was that the CA had global decryption power and so has to remain trusted. 
 %To prevent collusion between user in a multi authority setting, the challenge for each user needs to be individual. But it still needs to be ensured that the encryption of a message is independent of any user specific identifier, since the encryption progress should sourly depend on the attribute set known to the system.
 %To mitigate this problem a global identifier (GID or UID) per users was introduced that is shown to each attribute authority (AA) to receive the corresponding private key for the users attributes. 
 %The central authority (CA) now has to make sure that the user dependent challenge results in a global decryption key to decrypt the message.
 %In fact the CA has to be trusted since it computes the users private keys in such a way that on decryption it reveals the global decryption key. 
-Chase addressed this issue in \cite{chase2009improving} by distributing the global master secret key generation over the AAs. However, since the global master secret is computed on system inizialiation, no more AAs can be added afterwards without rebooting the system. Also the scheme did not support attribute revocation which renders it practical not applicable. 
+Chase addressed this issue in \cite{chase2009improving} by distributing the global secret  master key generation over the AAs. However, since the global master secret is computed on system initialization, no more AAs can be added afterwards without rebooting the system. Also the scheme did not support attribute revocation which rendered it practical not applicable.
 % Each authority uses this seed in combination with a pseudo random function to deterministically create the users private key. Since the CA possesses the same seed, same pseudo random function and issues the users GID, it can also compute the same private key as issued by the corresponding AA. So it can ensure that on decryption the keys add up to reveal the global decryption key. This scheme has a major issue: The CA has global decryption power. 
 
 % Chase notices this problem as well and tried to mitigate it by decentrializing the seed generation \cite{chase2009improving}.  First user attributes could not easly be revoked\footnote{Chase proposed to assign each user a range of GIDs, so that a user can migrate to the next GID on revocation. Since the GID range is finite, this solution does not scale.}. Second AA's cant be added on runtime without reissuing each user his keys. And last, the attribute universe is finite (no large-universe). Further we noticed that if a failure of one AA renders the system unresponsible, since a cyphertext includes attributes from each authority. 
 
-Data access control for multi-authority cloud storage systems (DAC-MACS) \cite{yang2013dac} is a scheme that tackels both of this issues. Each authority recieves its own ciphertext that depndens only on the attributes issed by this domain. While Chase managed to maintain "one-plaintext-one-ciphertext", DAC-MACS needs to created $k$ ciphertexts: One per attribute authority.\footnote{If the ciphertext does not require any attribute of an specific authority it does not have to create a ciphertext for this domain.} DAC-MACS does not require any coordination between the authorities which enables to add new authorities at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claimed to maintain forward and backward secrecy. As it turned out DAC-MACS was not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) showed and solved the vulnerability \cite{wu2017security}. Recent studies introduced a more efficient, scalabe and secure approach such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factory DAC-MACS)\cite{li2017two}. The DAC-MACS family is further know for the proxy decryption technique, first introduced by \cite{li2013matrix}, where a honest-but-curiuos server helps the user for decryption.
+Data Access Control for Multi-Authority Cloud Storage systems (DAC-MACS) \cite{yang2013dac} is a scheme that tackles both of this issues. Each authority receives its own ciphertext that dependents solely on the attributes issued in this domain. While Chase managed to maintain "one-plaintext-one-ciphertext", DAC-MACS needs to create $k$ ciphertexts: One per attribute authority.\footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} DAC-MACS does not require any coordination between authorities which enables to add new authorities at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claimed to maintain forward and backward secrecy. 
 
-Also honorable is the work of Priscilla and Nagarajan 2018 \cite{nagarajan2018overview}, who conducted an overview and reseach anaylis of the DAC-MACS family for secure could storage systems. In addition to that work, this thesis will focus on alternative approaches to ABE to improve scalability of secure cloud storage systems and anaylse the field of ABE and MA-ABE more deeply.    
+As it turned out DAC-MACS was not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) showed and solved the vulnerability \cite{wu2017security}. Recent studies introduced a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factory DAC-MACS)\cite{li2017two}. The DAC-MACS family is further known for the proxy decryption technique, first introduced by \cite{li2013matrix}, where a honest-but-curious server helps the user on decryption.
+
+Also honorable is the work of Priscilla and Nagarajan 2018 \cite{nagarajan2018overview}, who conducted an overview and research analysis of the DAC-MACS family for secure could storage systems. In addition to that work, this thesis will focus on alternative approaches to ABE to improve scalability of secure cloud storage systems and analyse the field of ABE and MA-ABE more deeply.   
 
 %------------------------------------------------
 
 \section{Security Requirements}
 \label{sec:securityRequirements}
-The core security requirements regarding BDrive in the context of a multi-authority ABE scheme are the following:
+The core security requirements regarding BDrive in the context of an MA-ABE scheme are the following:
 \begin{itemize}
 \item \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archive a higher level of decryption power.
-\item \textbf{Inter-Company Sharing:} Each company is only responsible for its own domain. This includes attribute and user administration, which implies as secret key generation and revocation. %Since Bdrive would need to consider a multi-authority ABE scheme, it should not be possible for a company to decrypt or issue files of other companies if no explicit exception is given for certain files by a trusted company relationship. A companies attribute authority (AA) should be responsible for its domain. In the case of an inter company relationship, attributes needs to be issued across different companies. 
-\item \textbf{Central Authority:} The CA shall not have global decryption power. At most the an AA can decrypt user files of its domain.  
+\item \textbf{Inter-Company Sharing:} Each company is only responsible for its own domain. This includes attribute and user administration, which translates to secret key generation and revocation. %Since BDrive would need to consider a multi-authority ABE scheme, it should not be possible for a company to decrypt or issue files of other companies if no explicit exception is given for certain files by a trusted company relationship. A companies attribute authority (AA) should be responsible for its domain. In the case of an inter company relationship, attributes needs to be issued across different companies. 
+\item \textbf{Central Authority:} The CA shall not have global decryption power. At most an AA can decrypt user files of its own domain.  
 \item \textbf{Secret Master key (if any):} Key recovery requires a secret and securely stored master key. It should solely function in the company domain and not globally. 
 \item \textbf{Large Attribute and Key Universe:} The number of attributes and users shall not be restricted.
 \item \textbf{Adding new Attribute Authorities:} It should be possible to add new attribute authorities at runtime. Without either shutting down the system or recreating each key.
-\item \textbf{Key and Attribute revocation:} Attribute or key revocation should be possible to handle user management in terms of attribute promotion, attribute demotion and key revocation. Forward secrecy should be provided. 
+\item \textbf{Key and Attribute revocation:} Revocation is needed to handle user management in terms of attribute promotion, attribute demotion and key revocation. Forward secrecy should be provided. 
 \end{itemize}
 
 \noindent Other (optional) requirements are: 
 \begin{itemize}
-	\item \textbf{Traidor tracing:} A user in ABE is decribed by his attribute set and is anynoum in this set. Missbehaving users, that sell thier attribute keys to create a decryption blackbox, should be found and identified. \cite{liu2016practical}
+	\item \textbf{Traitor tracing:} A user in ABE is described by his attribute set and is anonymous in this set. Misbehaving users, that sell their attribute keys to create a decryption black box, should be identifyable. \cite{liu2016practical}
 	\item \textbf{Fine-granted access control:} The user shall not be bounded on defining fine-granted access policies which requires either an access tree \cite{bethencourt2007ciphertext} \cite{yang2013dac} \cite{wu2017security} \cite{li2013matrix} or an linear secret sharing scheme (LSSS) \cite{liu2016practical}.
 	%Some schemes restrict the user to threshhold access policies, where an user needs at least $n$ of $m$ attributes to encrypt the cipher text. \cite{chase2007multi} \cite{chase2009improving} Other approaches are restriced to $AND$ gates which would translate to $m$ of $m$ threshhold gates. \cite{li2017two}
 \end{itemize}
 
 \section{Targets}
-The target of this work splits into two sections. In the theoretical part (minimal requirement), related work is analyzed if it fits BDrives security requirements. It will be evaluted, whether Attribute-Based Encryption is the best solution to the scalability problem of BDrive and ABE will be compared to other alternative candidates. More deeply will the topic of ABE be analysed. Here is the goal to find or construct the best maching scheme for BDrive. This approaches will be evaluted with respect of scalability, performance and security. The security requirements of section \ref{sec:securityRequirements} need to be satisfied by the selected or contructed approach.
+The target of this work splits into two sections. In the theoretical part (minimal requirement) related work is analyzed with respect to BDrives security requirements. It will be evaluated, whether ABE is the best solution currently available to the scalability problem of BDrive and how other solutions perform. More deeply will the topic of ABE be analyzed. Here the goal is to find or construct the best matching scheme for BDrive. This approaches will be evaluated with respect of scalability, performance and security. The security requirements of section \ref{sec:securityRequirements} need to be satisfied by the selected or constructed approach.
 
-For the pratical part several options exist. Depending on the result of the theoretical work, either the contructed or selected scheme should be implemented in a propotype in a BDrive related environment. The performance and scalability of this system should be evaluted against the current employed BDrive scheme. If an practial and usable implementation for this scheme already exists, ABE will be evaluated for practical usage. Recent paper anayzed practical ABE in the medical domain. \cite{thatmann2016please} \cite{li2013scalable} \cite{akinyele2011securing} Similar research shall be done for the secure cloud storage domain. It should be evaluted where to extract the attributes from to solve the bootstrapping problem and how end users benefit from the new security scheme.
-
+For the practical part several options exist. Depending on the result of the theoretical work, either the constructed or selected scheme should be implemented in a prototype with a BDrive related environment. The performance and scalability of this system should be evaluated against the current employed BDrive scheme. If an practical and usable implementation for this scheme already exists, ABE will be evaluated for practical usage. Recent paper analyzed practical ABE in the medical domain. \cite{thatmann2016please} \cite{li2013scalable} \cite{akinyele2011securing} Similar research shall be done for the secure cloud storage domain. It should be evaluated where to extract the attributes to solve the bootstrapping problem and how end users benefit from the new security scheme.
 %------------------------------------------------
  
 \section{Concept}
-To extract the best security scheme for BDrive several points need to satisfied: Performance, Scalability, Security and fitting the Security-Requirements. If no matching related work is found, that fully statisfy the requirements, differesnt appraoches need to be combined to create a new security scheme.\\
+To extract the best security scheme for BDrive several points need to satisfied: Performance, Scalability, Security and fitting the Security-Requirements. If no matching related work is found, that fully satisfy the requirements, different approaches need to be combined to create a new security scheme.\\
 
 \noindent \textbf{Theoretical part:}
 \begin{enumerate}
-	\item\textbf{Evaluation of the alternative security schemes.} \textit{(2 weeks)} \\
-		  First it needs to be clarified, if ABE is the right tool to contermeasure the scalability problem of BDrive. Hence, different related security schemes shall be evaluated and compare to each other. This techniques can be for example speeding up the encryption throuput by using EC encryption instead of RSA. The scalability issue for large group communication is not new. Several approaches exist to make the re-keying process for group members more efficient. This schemes are called secure group communications and will be used to create a more efficient rekeying scheme.\cite{wong2000secure}
-		  On computing the number of resulting file keys and the maintaining overhead of the rekeying process could be compared to evaluate the different schemes against each other. 
+	\item\textbf{Evaluation of alternative security schemes.} \textit{(2 weeks)} \\
+		  First it needs to be clarified, if ABE is the right tool to countermeasure the scalability problem of BDrive. Hence, different related security schemes shall be evaluated and compare to each other. The scalability issue for large group communication is not new. Several approaches exist to make the re-keying process for group members more efficient. This schemes are called secure group communications and will be used to create a more efficient re-keying scheme.\cite{wong2000secure}
+		  To compare the different approaches the number of resulting file keys and the maintaining overhead of the re-keying process could be compared. 
 
 	%\makebox[\columnwidth]{$\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$  Option 1. $\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$}
 	\item\textbf{Evaluation of ABE schemes.} \textit{(5 weeks)} \\
-		  To compare different ABE approaches, a homogeneuos platform needs to be created. Here tools like CloudSim\footnote{\url{http://www.cloudbus.org/cloudsim/}} or docker\footnote{\url{https://www.docker.com/}} may help on simulating the different use cases. With this platform the different approaches can be implemented and compared regarding scalability (number of users, number of attributes, number of resulting cipher texts, number of keys that need to be stored). To reduce the number of possible candidates, the ABE paper will be clustered into topics and a representing candidate will be choosen. If an reference implementation is given this implementation will be translated into the homogenous environment. Other wise an implementation has to be written. 
-		  The target of this section will be to construct a comparable metric of different ABE approaches and to construct an overview table containing different features and the matching requirements. 
+		  To compare different ABE approaches, a homogeneous platform needs to be created. With this platform the different approaches can be implemented and compared regarding scalability (number of users, number of attributes, number of resulting ciphertexts, number of keys that need to be stored). Here tools like CloudSim\footnote{\url{http://www.cloudbus.org/cloudsim/}} or docker\footnote{\url{https://www.docker.com/}} may help on simulating the different scenarios. To reduce the number of possible candidates, the ABE paper will be clustered into topics and a representing candidate will be chosen. If an reference implementation is given this implementation will be translated into the homogeneous environment. Otherwise an implementation has to be written. 
+		  The target of this section will be to construct a comparable environment of different ABE approaches and to create an overview table containing different features and the matching requirements.
 
 	\item\textbf{Evaluation of MA-ABE schmes.} \textit{(5 weeks)} \\  
-		  If the result of the previous section would be that MA-ABE schemes fit best, the next step would be to construct an deeply analysis of the different MA-ABE schemes. This will happen in the same way as in the previous section. Here can also the number of attribute authorities can be varied to evalaute the scalability of the respectiv scheme. 
-		  In the conclusion should be a either a well argumented approach extracted from an paper or an self designed scheme if the related work leaks some requirements. In the case this section yields an own constructed scheme, this scheme needs to be proofen secure. 
+		  If the result of the previous section would be that MA-ABE schemes fit best, the next step would be to construct an deeply analysis of the different MA-ABE schemes. This will happen in the same way as in the previous section. Here can also the number of attribute authorities be varied to evaluate the scalability of the respective scheme. 
+		  The conclusion describes either a well argued approach extracted from a paper or a self designed scheme if the related work leaks some requirements. In the case this section yields an own constructed scheme, this scheme needs to be proven secure.  
 \end{enumerate}
-If in an early stage of anaylsis leads to contructing an own approach the theoretical part will be rescheduled as following: Evaluation of alternative security schemes (2 weeks), Evaluation of ABE and MA-ABE schmes (4 weeks) and Contructing, proofing, comparing and evaluating the new security scheme aginast related schemes (6 weeks). \\
+If an early stage of analysis leads to constructing an own approach the theoretical part will be reordered as following: Evaluation of alternative security schemes (2 weeks), evaluation of ABE and MA-ABE schemes (4 weeks) and finally constructing, proofing, comparing and evaluating the new security scheme against related schemes (6 weeks). 
+The last part will be done in similar ways as described above: A homogeneous platform will be created where a prototype of this approach can be compared against existing, related schemes. Especially performance can be evaluated by varying the number of AAs, the number of attributes and measuring the time for en- and decryption.  \\
 	%\makebox[\columnwidth]{$\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$  Option 2. $\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$}
 
 \noindent \textbf{Practical part:}
 \begin{enumerate}
 	\item\textbf{Implementation of selected scheme} \textit{(4 weeks)}\\
-		  The extracted scheme of the theoretical part will be implemented. If an reference implementation is given this implementation will be used. If no implementation is given the goal is to create a prototype cryptographic library. To contruct a comparable scheme like BDrive a prototype file sharing system needs to be implemented that acts in an similar same way as BDrive does (regarding (inter-company) sharing and file key creation). 
-		  If an working implemenation is already provided in an similar environment, this implementation will be used in a user study to evaluate whether users even benefit from the new security scheme. This scheme will be tested for usability, performance, real-world scalability. The central question would be if real-world use-cases exist where ABE can clearly out-perform classical public-key encryption.
+		  The extracted scheme of the theoretical part will be implemented in detail. If an reference implementation is given this implementation will be used. If no implementation is given the goal is to create a prototype cryptographic library. To construct a comparable scheme like BDrive a prototype file sharing system needs to be implemented that acts in an similar way as BDrive does (regarding (inter-company) sharing and file key creation). 
+		  If an working implementation is already provided in an similar environment, this implementation will be used in an user study to evaluate whether users even benefit from the new security scheme. This scheme will be tested for usability, performance, real-world scalability. The central question would be if real-world use-cases exist where ABE can clearly out-perform classical public-key encryption.
 
 	\item\textbf{Evaluation of implementation} \textit{(2 weeks)}\\
-		  Finally we want to compare the new implemenation to the existing one in BDrive. Here statements about the number of file keys, the computing time for en- and decryption as well as attribute revocation shell be compaired to the classical re-keying scheme.
+		  Finally we want to compare the new implementation to the existing one in BDrive. Here statements about the number of file keys, the computing time for en- and decryption as well as attribute revocation shell be compared to the classical re-keying scheme.
 		  % As introduced in section \ref{sec:introduction} the main target is to make BDrive more scalable. This will be done by evaluating a new crytographic scheme that reduces the number of file keys that need to be maintained per file. 
 		  %With MA-ABE we expect to reduce the number of file keys per file to at least $n = k$. Where $k$ is the number of attribute authorities and assuming that we don't have revoced attributes yet. 
-		  %Since computing pairing requires a bigger overhead then computing the power of a prime as in RSA, we need to compare the time it takes to encryt the file key. To show that MB-ABE is indeed faster we would compare this time for an increasing number of devices. While we expect to DAC-MACS's comuting time to remain constant on encrypting for a increasing number of devices, we expect a linear increasing function for RSA. 
+		  %Since computing pairing requires a bigger overhead than computing the power of a prime as in RSA, we need to compare the time it takes to encryt the file key. To show that MB-ABE is indeed faster we would compare this time for an increasing number of devices. While we expect to DAC-MACS's comuting time to remain constant on encrypting for a increasing number of devices, we expect a linear increasing function for RSA. 
 		  
-	\item\textbf{Summarzing results and concluding thesis.} \textit{(6 weeks)}\footnote{Master thesis are restircted to 26 weeks in total. The remaining two weeks are reserved for unexpected difficulties or delays.}\\
+	\item\textbf{Summarzing results} \textit{(6 weeks)}\footnote{The master thesis is restricted to 26 weeks in total. The remaining two weeks are mend as a buffer for unexpected difficulties or delays.}\\
 		  The remaining time will be used to write the thesis and collect the results.   
 \end{enumerate}
 
@@ -223,7 +224,7 @@ If in an early stage of anaylsis leads to contructing an own approach the theore
 %\begin{itemize}
 %\item \textbf{Certificate Authority (CA)}: Issues users global identifier (UID) to make the user distinglishable and prevent collusion. It signs the users arttibutes such as the Public key, UID and other user specific security paramter. 
 %\item \textbf{Server}: The server helps the user by decryption the cyphertext and re-encryption his cyphertexts on attribute revocation. The server does not have global knowledge over the ciphertext, since it decrypts first to a decryption token, that can only be decyrpted by the users privat key. 
-%\item \textbf{Attribute authority (AA)}: Each AA is responsible for their own domain attributes. They generate independenlty thier own secret and public key components and issue the user his attributes. Each attribute key is verioned, so that for revocation the AA simply needs to increase the version number and reissue the user his keys. The user hisself need then to update the cyphertexts. 
+%\item \textbf{Attribute authority (AA)}: Each AA is responsible for their own domain attributes. They generate independenlty thier own secret and public key components and issue the user his attributes. Each attribute key is verioned, so that for revocation the AA simply needs to increase the version number and reissue the user his keys. The user hisself need than to update the cyphertexts. 
 %\end{itemize}
 
 %DAC-MACS fits the security requirements of BDrive quite well. In the following each requirement will be analysed and dicussed how DAC-MACS solves this problem. 
@@ -324,7 +325,7 @@ If in an early stage of anaylsis leads to contructing an own approach the theore
 %-----------------------------------------------
 
 \section{Conclusion}
-With increasing number of users and devices, BDrive and any common cloud storage system faces scalability issues that are automatically given when using a rekeying scheme. While using end-to-end encryption it is hard to hold different files in sync. This work should find or contruct the solution to this scalability problem. In the theoretical part the state of the art will be anaylzed and compared to find the best or closest scheme. In the practical part this scheme will be implemented and evaluated against the current implemented security scheme in BDrive. In the end it will be evaluated if ABE is practical appliable to solve the scalability problem.    
+With increasing number of users and devices, BDrive and any common cloud storage system faces scalability issues that are automatically given when using a re-keying scheme. While enforcing end-to-end encryption it is hard to hold different files in sync. This work should find or construct the solution to this scalability problem. In the theoretical part the related work will be analyzed and compared to extract the best matching scheme that will than be adapted to fit the security requirements of BDrive. In the practical part this scheme will be implemented and evaluated against the current implemented security scheme in BDrive. In the end it will be evaluated if ABE is practical applicable to solve the scalability problem. 
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
