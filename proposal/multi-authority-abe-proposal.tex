@@ -131,7 +131,7 @@ The number of file keys, that need to be maintained in Bdrive, grows linearly wi
 %Lets construct an example where the manager of a company wants to create a shared folder with all company employees. It is a medium sized company with $50$ employees. Lets assume that at least haft of them have two Bdrive clients running. The manager wants to upload the $250$ photos of the last company trip.
 %We end up by computing $3/2 * 50 * 250 = 18750$ file keys and for every new file uploaded $75$ new file keys need to be uploaded. 
 
-
+\clearpage
 
 
 \subsection{Attribute-Based Encryption}
@@ -172,6 +172,7 @@ The general requirements of this thesis will be summarized by two major points:
 	\item \textbf{Scalability:} The system should scale better than the current encryption scheme with respect to the number of file keys. 
 \end{itemize}
 
+\clearpage
 In addition, the core security requirements in the context of an MA-ABE scheme are the following:
 \begin{itemize}
 \item \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archive a higher level of decryption power.
@@ -208,27 +209,27 @@ In detail this work splits into two parts. In the theoretical part (minimal requ
 		  %This schemes are called secure group communications and create a more efficient re-keying scheme.
 		  Argumentatively ABE will be compared to different promising schemes (e.g. secure group communications \cite{wong2000secure}) (at most 2) and based on scalability, performance and security a decision should be made. 
 		  Other compare metrics could be the number of resulting file keys and the maintaining overhead of the re-keying process. 
-
+\clearpage
 	%\makebox[\columnwidth]{$\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$  Option 1. $\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$}
 	\item\textbf{Evaluation of ABE schemes.} \textit{(5 weeks)} \\
-		  To compare different ABE approaches, a homogeneous platform needs to be created. With this platform the different approaches can be implemented and compared regarding scalability (number of users, number of attributes, number of resulting ciphertexts, number of keys that need to be stored). Here tools like CloudSim\footnote{\url{http://www.cloudbus.org/cloudsim/}} or docker\footnote{\url{https://www.docker.com/}} may help on simulating the different scenarios. To reduce the number of possible candidates, the ABE paper will be clustered into topics and a representing candidate will be chosen. If an reference implementation is given this implementation will be translated into the homogeneous environment. Otherwise an implementation has to be written. 
+		  To compare different ABE approaches, a homogeneous platform needs to be created. With this platform, the different approaches can be implemented and compared regarding scalability (number of users, number of attributes, number of resulting ciphertexts, number of keys that need to be stored). Here tools like CloudSim\footnote{\url{http://www.cloudbus.org/cloudsim/}} or Docker\footnote{\url{https://www.docker.com/}} may help with simulating the different scenarios. To reduce the number of possible candidates, the ABE paper will be clustered into topics and a representative candidate will be chosen. If a reference implementation is given this implementation will be translated into the homogeneous environment. Otherwise an implementation has to be written. 
 		  The target of this section will be to construct a comparable environment of different ABE approaches and to create an overview table containing different features and the matching requirements.
 
 	\item\textbf{Evaluation of MA-ABE schmes.} \textit{(5 weeks)} \\  
-		  If the result of the previous section would be that MA-ABE schemes fit best, the next step would be to construct an deeply analysis of the different MA-ABE schemes. This will happen in the same way as in the previous section. Here can also the number of attribute authorities be varied to evaluate the scalability of the respective scheme. 
-		  The conclusion describes either a well argued approach extracted from a paper or a self designed scheme if the related work is missing some requirements. In the case this section yields an own constructed scheme, this scheme needs to be proven secure.  
+		  If the result of the previous section would be that MA-ABE schemes fit best, the next step would be to construct an deep analysis of the different MA-ABE schemes. This will happen in the same way as in the previous section. Here, the number of attribute authorities can also be varied to evaluate the scalability of the respective scheme. 
+		  The conclusion describes either a well founded approach extracted from a paper or a self designed scheme if the related work is missing some requirements. In case this section yields a scheme that was developed in this thesis the security of this scheme needs to be proven.  
 \end{enumerate}
 
-If an early stage of analysis leads to constructing an own approach the theoretical part will be reordered as following: Evaluation of alternative security schemes (2 weeks), evaluation of ABE and MA-ABE schemes (4 weeks\footnote{Evaluation time will be shortened to leave more space to construct a new scheme}) and finally constructing, proofing, comparing and evaluating the new security scheme against related schemes (6 weeks). 
-The last part will be done in similar ways as described above: A homogeneous platform will be created where a prototype of this approach can be compared against existing, related schemes. Especially performance can be evaluated by varying the number of AAs, the number of attributes and measuring the time for en- and decryption.\\
+If an early stage of analysis leads to constructing an own approach the theoretical part will be reordered as following: Evaluation of alternative security schemes (2 weeks), evaluation of ABE and MA-ABE schemes (4 weeks\footnote{Evaluation time will be shortened to leave more space to construct a new scheme}) and finally constructing, proving, comparing and evaluating the new security scheme against related schemes (6 weeks). 
+The last part will be done in a similar way as described above: A homogeneous platform will be created where a prototype of this approach can be compared against existing, related schemes. Especially performance can be evaluated by varying the number of AAs or the number of attributes and measuring the time for en- and decryption.\\
 	%\makebox[\columnwidth]{$\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$  Option 2. $\vcenter{\hbox{\rule{0.38\columnwidth}{0.7pt}}}$}
 
 \noindent \textbf{Practical part:}
 \begin{enumerate}
 	\item\textbf{Implementation of selected scheme} \textit{(4 weeks)}\\
-		  The extracted scheme of the theoretical part will be implemented in detail. If an reference implementation is given this implementation will be used. If no implementation is given the goal is to create a prototype cryptographic library. To construct a comparable scheme like Bdrive a prototype file sharing system needs to be implemented that acts in an similar ways as Bdrive does (regarding (inter-company) sharing and file key creation). 
+		  The extracted scheme of the theoretical part will be implemented in detail. If an reference implementation is given this implementation will be used. If no implementation is given the goal is to create a prototype cryptographic library. To construct a scheme that can be compared to Bdrive a prototype file sharing system needs to be implemented that acts in an similar ways as Bdrive does (regarding (inter-company) sharing and file key creation). 
 
-		  If an practical and usable implementation for this scheme already exists, ABE will be evaluated for practical usage. Recent paper analyzed practical ABE in the medical domain. \cite{thatmann2016please} \cite{li2013scalable} \cite{akinyele2011securing} Similar research shall be done for the secure cloud storage domain. It should be evaluated where to extract the attributes to solve the bootstrapping problem and how end users benefit from the new security scheme. Further, this scheme will be tested for usability, performance, real-world scalability. The central question would be if real-world use-cases exist where ABE can clearly out-perform classical public-key encryption.
+		  If an practical and usable implementation for this scheme already exists, ABE will be evaluated for practical usage. Recent papers analyzed practical ABE in the medical domain. \cite{thatmann2016please} \cite{li2013scalable} \cite{akinyele2011securing} Similar research shall be done for the secure cloud storage domain. It should be evaluated where to extract the attributes to solve the bootstrapping problem and how end users benefit from the new security scheme. Further, this scheme will be tested for usability, performance and real-world scalability. The central question would be if real-world use-cases exist where ABE can clearly out-perform classical public-key encryption.
 
 	\item\textbf{Evaluation of implementation} \textit{(2 weeks)}\\
 		  Finally we want to compare the new implementation to the existing one in Bdrive. Here performance and scalability evaluations about the number of file keys, the computing time for en- and decryption as well as attribute revocation will be conducted and compared to the classical re-keying scheme.
@@ -236,10 +237,10 @@ The last part will be done in similar ways as described above: A homogeneous pla
 		  %With MA-ABE we expect to reduce the number of file keys per file to at least $n = k$. Where $k$ is the number of attribute authorities and assuming that we don't have revoced attributes yet. 
 		  %Since computing pairing requires a bigger overhead than computing the power of a prime as in RSA, we need to compare the time it takes to encryt the file key. To show that MB-ABE is indeed faster we would compare this time for an increasing number of devices. While we expect to DAC-MACS's comuting time to remain constant on encrypting for a increasing number of devices, we expect a linear increasing function for RSA. 
 		  
-	\item\textbf{Summarzing results} \textit{(6 weeks)}\footnote{The master thesis is restricted to 26 weeks in total. The remaining two weeks are mend as a buffer for unexpected difficulties or delays.}\\
+	\item\textbf{Summarizing results} \textit{(6 weeks)}\footnote{The master thesis is restricted to 26 weeks in total. The remaining two weeks are meant as a buffer to compensate for unexpected difficulties or delays.}\\
 		  The remaining time will be used to write the thesis and collect the results.   
 \end{enumerate}
-
+\clearpage
 % --------------------------- DAC-MACS -------------------------
 
 %For the design of the Bdrive MA-ABE scheme the paper \cite{yang2013dac} will be used. Here the encryptor encrypts for each attribute authority the ciphertext with the required attributes, so that he endups with $k$ cyphertext, one for each authority. So DAC-MACS breaks the "one-plaintext-one-ciphertext" contains, but makes the AAs independent from each other. This is the mayjor difference between DAC-MACS (\cite{yang2013dac}) and chases multi-authority proposals (\cite{chase2007multi}, \cite{chase2009improving}). DAC-MACS comes also with a handfull of security features that are requirements of Bdrive as proposed in section \ref{sec:requirements}. The scheme consist of three entities:
