@@ -2,5 +2,7 @@ key.svg
 file.svg
 database.svg:
 server.svg: 	Smashicons
+housekey.svg:
 filekey.svg: 	
 laptop.svg: 	Freepik
+lock.svg:		SimpleIcon
