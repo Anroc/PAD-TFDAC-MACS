@@ -70,7 +70,7 @@
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\setlength{\droptitle}{-4\baselineskip} % Move the title up
+\setlength{\droptitle}{-5\baselineskip} % Move the title up
 
 \pretitle{\begin{center}\Huge\bfseries} % Article title formatting
 \posttitle{\end{center}} % Article title closing formatting
@@ -87,7 +87,7 @@
 \date{\today} % Leave empty to omit a date
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-If a group of users want to share a ciphertext, they need to agree on a shared key. In order to ensure forward and backward secrecy, this shared key needs to be updated for every member everytime a user leaves or joins the group. Classical encryption methods encounter their limits, in which this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure cloud storage environment (Bdrive). Different ABE schemes will be compared for their applicability in Bdrive. Finally, the implementation of the resulting scheme will be evaluated for performance, scalability and security.
+If a group of users want to share a ciphertext, they need to agree on a shared key. In order to ensure forward and backward secrecy, this shared key needs to be updated and distributed to every member everytime a user leaves or joins the group. Classical encryption methods encounter their limits, in which this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure cloud storage environment (Bdrive). Different ABE schemes will be compared for their applicability in Bdrive. Finally, the implementation of the resulting scheme will be evaluated for performance, scalability and security.
 \end{abstract}
 }
 
@@ -117,7 +117,7 @@ In the following we will describe the encryption scheme currently enrolled in Bd
 \subsection{Background}
 Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (CSP). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is then encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
 
-Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys available for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying. (see figure \ref{fig:rekey})
+Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys accessible for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying. (see figure \ref{fig:rekey})
 
 The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in a share a new file key has to be created and maintained. 
 
@@ -192,7 +192,7 @@ The target of this work is to find a more scalable solution to the currently enr
 %------------------------------------------------
  
 \section{Concept}
-In detail this work splits into two parts. In the theoretical part (minimal requirement) related work is analyzed with respect to the requirements. It will be evaluated, whether ABE is the best solution currently available to the scalability problem in the secure cloud storage domain. The topic of ABE will be more deeply analyzed. The goal here is to find or construct the best matching security scheme. These approaches will be evaluated with respect to scalability, performance and security. The security requirements of section \ref{sec:requirements} need to be satisfied by the selected approach. If no matching related work is found, that fully satisfies the requirements, different approaches will be combined to create a new security scheme.\\
+In detail this work splits into two parts. In the theoretical part related work is analyzed with respect to the requirements. It will be evaluated, whether ABE is the best solution currently available to the scalability problem in the secure cloud storage domain. Further, the topic of ABE will be more deeply analyzed. The goal here is to find or construct the best matching security scheme. Different approaches will be evaluated with respect to scalability, performance and security. The security requirements of section \ref{sec:requirements} need to be satisfied by the resulting scheme.\\ % If no matching related work is found, that fully satisfies the requirements, different approaches will be combined to create a new security scheme.\\
 
 \noindent \textbf{Theoretical part:}
 \begin{enumerate}
