@@ -87,7 +87,7 @@
 \date{\today} % Leave empty to omit a date
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-If a group of users want to share a ciphertext, they need to agree on a shared key. On each leave or join of a user this shared key needs to be updated for each user to ensure forward secrecy. Classical encryption reaches the point where this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure cloud storage environment (Bdrive). Different ABE schemes will be compared and analyzed for their applicability in Bdrive. In the end the implementation of the resulting scheme will be evaluated for performance, scalability and security.
+If a group of users want to share a ciphertext, they need to agree on a shared key. In order to ensure forward and backward secrecy, this shared key needs to be updated for every member everytime a user leaves or joins the group. Classical encryption methods encounter their limits, in which this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure cloud storage environment (Bdrive). Different ABE schemes will be compared for their applicability in Bdrive. Finally, the implementation of the resulting scheme will be evaluated for performance, scalability and security.
 \end{abstract}
 }
 
@@ -112,14 +112,14 @@ If a group of users want to share a ciphertext, they need to agree on a shared k
 We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to employ an encryption scheme which has a constant number of access keys regardless of the number of participants.
 
 \section{Related Work}
-In the following we will describe the encryption scheme currently enrolled in Bdrive and give an rough overview of the existing solutions in the attribute-based encryption domain.
+In the following we will describe the encryption scheme currently enrolled in Bdrive and give a rough overview of the existing solutions in the attribute-based encryption domain.
 
 \subsection{Background}
-Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (CSP). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is than encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
+Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (CSP). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is then encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
 
-Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys available for a new device. This is done by downloading each file key for the respectiv file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying. (see figure \ref{fig:rekey})
+Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys available for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying. (see figure \ref{fig:rekey})
 
-The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in the sharing a new file key has to be created and maintained. 
+The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in a share a new file key has to be created and maintained. 
 
 %The formula \ref{eq:rekey} describes the number of file keys Bdrive that need to be stored for each shared files between $U$ users, where each user $u_{i \in U}$ has $u_d$ devices.
 
@@ -130,9 +130,6 @@ The number of file keys, that need to be maintained in Bdrive, grows linearly wi
 
 %Lets construct an example where the manager of a company wants to create a shared folder with all company employees. It is a medium sized company with $50$ employees. Lets assume that at least haft of them have two Bdrive clients running. The manager wants to upload the $250$ photos of the last company trip.
 %We end up by computing $3/2 * 50 * 250 = 18750$ file keys and for every new file uploaded $75$ new file keys need to be uploaded. 
-
-\clearpage
-
 
 \subsection{Attribute-Based Encryption}
 Attribute Based Encryption (ABE), first introduced by Sahai and Waters \cite{sahai2005fuzzy}, is a cryptographic encryption scheme which uses attributes of a user as keys for encryption. This enables the data owner to craft a ciphertext over chosen attributes that can only be decrypted by any entity that holds a super set of matching attributes. Further, it is possible to embed a complex access structure (e.g. access trees) inside the cipher text, where each node contains \textit{AND} or \textit{OR} threshold gates. This approach is known as Ciphertext-Policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. 
