@@ -117,7 +117,7 @@ In the following we will describe the encryption scheme currently enrolled in Bd
 \subsection{Background}
 Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (CSP). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is then encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
 
-Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys accessible for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying. (see figure \ref{fig:rekey})
+Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys accessible for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying (see figure \ref{fig:rekey}).
 
 The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in a share a new file key has to be created and maintained. 
 
@@ -136,7 +136,7 @@ Attribute Based Encryption (ABE), first introduced by Sahai and Waters \cite{sah
 It is also possible to do it the other way around: Associate the user's key with an access policy, formally known as Key-Policy Attribute Based Encryption (KP-ABE).\cite{goyal2006attribute}. 
 %Now the encryptor needs only to encrypt a given plain text with the public key of specific attributes so that only users who hold the right keys are able to decrypt the cipher text.
 
-Both approaches are limited to one attribute authority (AA). So only one trusted entity is in charge of issuing attributes and their matching key pairs. However, in the real world we would like to distribute the issuing of attributes over different domains. A new scheme is needed where different attribute authorities cooperate and communicate across different domains.  
+Both approaches are limited to one attribute authority (AA). So only one trusted entity is in charge of issuing attributes and their matching key pairs. However, in the real world we would like to distribute the issuing of attributes over different authorities. A new scheme is needed where different attribute authorities cooperate and communicate across different domains.  
 
 % The basic idea is, as proposed in \cite{chase2007multi}, to construct for each users a polynomial of degree $d-1$, where $d$ donates the number of attributes in our system. 
 
@@ -145,12 +145,12 @@ Multi-Authority Attribute Based Encryption (MA-ABE), first proposed by Chase 200
 %To mitigate this problem a global identifier (GID or UID) per users was introduced that is shown to each attribute authority (AA) to receive the corresponding private key for the users attributes. 
 %The central authority (CA) now has to make sure that the user dependent challenge results in a global decryption key to decrypt the message.
 %In fact the CA has to be trusted since it computes the users private keys in such a way that on decryption it reveals the global decryption key. 
-Chase addressed this issue in \cite{chase2009improving} by distributing the global secret  master key generation over the AAs. However, since the global master secret is computed on system initialization, no further AAs can be added afterwards without rebooting the system. Also the scheme did not support attribute revocation which rendered it practical not applicable.
+Chase \textit{et al.} addressed this issue in \cite{chase2009improving} by distributing the global secret  master key generation over the AAs. However, since the global master secret is computed on system initialization, no further AAs can be added afterwards without rebooting the system. Also the scheme did not support attribute revocation which rendered it practical not applicable.
 % Each authority uses this seed in combination with a pseudo random function to deterministically create the users private key. Since the CA possesses the same seed, same pseudo random function and issues the users GID, it can also compute the same private key as issued by the corresponding AA. So it can ensure that on decryption the keys add up to reveal the global decryption key. This scheme has a major issue: The CA has global decryption power. 
 
 % Chase notices this problem as well and tried to mitigate it by decentrializing the seed generation \cite{chase2009improving}.  First user attributes could not easly be revoked\footnote{Chase proposed to assign each user a range of GIDs, so that a user can migrate to the next GID on revocation. Since the GID range is finite, this solution does not scale.}. Second AA's cant be added on runtime without reissuing each user his keys. And last, the attribute universe is finite (no large-universe). Further we noticed that if a failure of one AA renders the system unresponsible, since a cyphertext includes attributes from each authority. 
 
-Data Access Control for Multi-Authority Cloud Storage systems (DAC-MACS) \cite{yang2013dac} is a scheme that tackles both of this issues. Each authority receives its own ciphertext that depends solely on the attributes issued in this domain. While Chase managed to maintain the "one-plaintext-one-ciphertext" ratio, DAC-MACS needs to create $k$ ciphertexts: One per AA.\footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new AAs at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy. 
+Data Access Control for Multi-Authority Cloud Storage Systems (DAC-MACS) \cite{yang2013dac} is a scheme that tackles both of this issues. Each authority receives its own ciphertext that depends solely on the attributes issued in this domain. While Chase managed to maintain the "one-plaintext-one-ciphertext" ratio, DAC-MACS needs to create $k$ ciphertexts: One per AA.\footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new AAs at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy. 
 
 DAC-MACS is not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factor DAC-MACS)\cite{li2017two}. The DAC-MACS family is further known for the proxy decryption technique, first introduced by \cite{li2013matrix}, where a honest-but-curious server helps the user on decryption.
 
@@ -359,7 +359,7 @@ The last part will be done in a similar way as described above: A homogeneous pl
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=0.8\linewidth]{img/bdrive1.png}\par 
-    \caption{Client uploads an encrypted file to CSP, the file key and public key to Bdrive.}
+    \caption{Client uploads an encrypted file to the CSPs and the file key and public key to Bdrive.}
     \label{fig:filekey}
 \end{figure*}
 \begin{figure*}[!ht]
