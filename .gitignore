@@ -1,6 +1,10 @@
+# latex output files 
 *.aux
 *.bbl
 *.log
 *.pdf
 *.out
 *.blg
+
+# due to legal reasons I am not allowed to upload the related work papers
+related_work 
