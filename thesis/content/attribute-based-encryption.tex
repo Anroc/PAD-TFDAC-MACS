@@ -1,0 +1,9 @@
+\section{Goining Beyond the limitations: An introduction to Attribute-Based Encryption}
+
+To go beyond the limitations of secure group communications a different approach to this problem is needed. Lets take a step back and look at groups communications from another perspective then from the cryptographic side. How are groups composed? How are they formed and how is chosen who participates? 
+
+\subsection{Relationship between groups and attributes}
+Group in general summarize a specific group of individuals. Specific in that kind, that key share a common feature. In a company, for example, groups are based on shared attributes such as "working in the same team", "working in the same company" or "devices beloning to the same user". The more common use case, at least in the businesss area, is that users want to share files which groups rather then people. This means that if Alice wants to send a file to the police deparment she does not care which officer is able to decrypt her file. Everyone in the deparment should be able to do so.  
+
+We can exploit this observation to create a new cytrographic scheme where each user is identified by a set of attributes and each attribute is bound to a secret. Lets setup a basic attribute authority which suerly served the purpose of administrating users and their attributes. In the very simplest form each attribute is directly bound to a secret key, known to each user persessing this attribute. 
+

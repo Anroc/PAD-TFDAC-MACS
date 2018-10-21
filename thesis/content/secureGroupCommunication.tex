@@ -59,10 +59,7 @@ Lets assume user H joined the group in figure \ref{fig:lkh} and given a crypogra
 
 
 \subsection{Comparison}
-\todo[inline]{find better title}
-The following table will compare the discussed schemes against each other regarding number of keys, messages, and ecnryptions on inizialisation of the group, when a member joins or leaves and on addition of a new file. 
-
-It is assumped that clients already downloaded the public keys of their desired group members. Backward and forward secrecy need to be ensured every time a member leaves or joins the group. 
+\todo[inline]{find better title}  
 
 \begin{table*}[!ht]
 \centering
@@ -87,13 +84,22 @@ messages (unicast)		& $0$						& $n$			 				& $2(n - 1)$ 				& $0$	  					& $2(n
 messages (multicast)	& $0$						& $n$			 				& $2 log_2(n)$				& $log_2(n)$				& $2(n-1)$		\\ 
 encryptions 			& $0$						& $f + n$ 						& $f + 2 (log_2(n))$ 		& $f + log_2(n)$	 		& $f+n$			\\
 \hline	
-\textbf{addition of file}																																	\\
+\textbf{addition of filekey}																																\\
 keys 					& $n$		 				& $0$							& $0$	 					& $0$		 				& $0$			\\
 messages (unicast)		& $n$		 				& $0$	 						& $0$ 						& $0$		 				& $0$			\\
 messages (multicast)	& $n$ 						& $0$ 							& $0$ 						& $0$	 					& $0$			\\
 encryptions				& $n$ 						& $1$ 							& $1$ 						& $1$		 				& $1$			\\
 \hline
 \end{tabular}
-\caption{Comparison of secure group communication schemes. $n$ donates the number of members, $f$ the number of file keys. Forward and backward secrecy is ensured in each scheme.}
-
+\caption{Comparison of secure group communication schemes. $n$ donates the number of members, $f$ the number of file keys. Forward and backward secrecy is ensured in each scheme. Assuming a balanced binary tree as in figure \ref{fig:lkh}}
+\label{tab:comparisons}
 \end{table*}
+
+The following table will compare the discussed schemes against each other regarding number of keys, messages, and ecnryptions on inizialisation of the group, when a member joins or leaves and on addition of a new file. 
+
+It is assumped that clients already downloaded the public keys of their desired group members. Backward and forward secrecy need to be ensured every time a member leaves or joins the group.
+Further, messages in table \ref{tab:comparisons} are transmissions that contain a key. There are also meta messages that nodify the members about a new file upload or the removal of a member, etc. They are left out since they add a contant overhead to all schemes.  If a message could be processed by multible communication partners we only need to send the message once, in a multicast transmission.
+
+Some cloud clearly see that Bdrives scheme is not optimal at all compared to the different approaches. In fact Bdrive has the worst perforamnce on inizialisation, addition of a filekey and on average also on member join. In general we can assume that $f > n$ since people tend to have more files then members in a share. However, Bdrive has great performance on member leave since client simply don't encrypt anymore for the left member.
+
+It is hard to extract a clear winner. Each of the schemes have their own strength and weaknesses. GKMP has the best inizialisation overhead and OWFT the best rekeying overhead. We can clearly extract from the table that all secure group schmes perform better on filekey upload. Bdrive needs to distribute the new key encryption filekey to $n$ devices. On the other hand the GK only needs to encrypt the filekey once. Automatically all members have access to the new filekey. 
