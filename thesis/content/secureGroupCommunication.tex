@@ -74,7 +74,7 @@ encryptions				& $nf$	 					& $f + n$ 						& $f + n -1$				& $f + n -1$				& $f
 \hline
 \textbf{member join} 																																		\\
 keys 					& $f$   					& $1$  							& $3 log_2(n)$				& $log_2(n)$				& $1$			\\
-messages (unicast)		& $f$  						& $n$			 				& $2(n - 1)$				& $1$  						& $2(n - 1)$	\\
+messages (unicast)		& $f$  						& $n$			 				& $2(n - 1)$				& $n$  						& $2(n - 1)$	\\
 messages (multicast) 	& $f$ 	 					& $2$ 		 					& $2 log_2(n)$				& $log_2(n)$				& $2(n - 1)$	\\
 encryptions				& $f$  						& $f + 2$		 				& $f + 2(log_2(n))$ 		& $f + log_2(n)$			& $f + 2$	 	\\
 \hline
@@ -103,3 +103,5 @@ Further, messages in table \ref{tab:comparisons} are transmissions that contain 
 Some cloud clearly see that Bdrives scheme is not optimal at all compared to the different approaches. In fact Bdrive has the worst perforamnce on inizialisation, addition of a filekey and on average also on member join. In general we can assume that $f > n$ since people tend to have more files then members in a share. However, Bdrive has great performance on member leave since client simply don't encrypt anymore for the left member.
 
 It is hard to extract a clear winner. Each of the schemes have their own strength and weaknesses. GKMP has the best inizialisation overhead and OWFT the best rekeying overhead. We can clearly extract from the table that all secure group schmes perform better on filekey upload. Bdrive needs to distribute the new key encryption filekey to $n$ devices. On the other hand the GK only needs to encrypt the filekey once. Automatically all members have access to the new filekey. 
+
+\todo[inline]{why is OWFT the best candidate}
