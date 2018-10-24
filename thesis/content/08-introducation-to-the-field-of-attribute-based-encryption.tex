@@ -1,15 +1,11 @@
-\section{Goining Beyond the limitations: An introduction to Attribute-Based Encryption}
-
+\section{An introduction to the field of Attribute-Based Encryption}
 To go beyond the limitations of secure group communications a different approach to this problem is needed. Lets take a step back and look at groups communications from another perspective then from the cryptographic side. How are groups composed? How are they formed and how is chosen who participates? 
 
 \subsection{Relationship between groups and attributes}
 Group in general summarize a specific group of individuals. Specific in that kind, that key share a common feature. In a company, for example, groups are based on shared attributes such as "working in the same team", "working in the same company" or "dinkes coffee". The more common use case, at least in the businesss area, is that users want to distribute content to groups rather then people. This means that if Alice wants to send an encrypted file to the management office she does not care which manager decrypts her file. Everyone in the deparment should be able to do so. 
 
-\subsection{Comparing SGC to ABE}
-Comparing SGC to ABE is non tivial. 
-
-
-We can not simply compare the numbers of keys, or messages that are exchanged between client and server. This is due to a different encryption technique used by ABE: paring. Pairing scales more or less with the overhead of RSA rather then ECC or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings} resulting in bad\todo[inline]{bader?} performance compared to SGC.  But in specific scenarios ABE use less keys to setup the group communication. In the following thouse secnarios will be described and analysed where this schemes differe and what use-cases both schemes address.
+\subsection{Comparing Secure Group Communication to Attribute-Based encryption}
+Comparing SGC to ABE is non tivial. This is due to a different encryption technique used by ABE: paring. Pairing scales more or less with the overhead of RSA rather then ECC or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings} resulting in bad\todo[inline]{bader?} performance compared to SGC. But in specific scenarios ABE uses less keys to setup the group communication. In the following thouse secnarios will be described and analysed where this schemes differe and what use-cases ABE schemes address.
 
 In a RSA sharing scheme, each user has his own public key which needs to be transmitted to a thrid party to establish a secret connection. Creating a group under this scheme will implicitly force the data owner to retrieve all $n$ public keys of all $n$ group members. The central server needs to provide a PKI together with the public keys of each registered user to proof their identity. Thus follows the contrain that the central server needs to be available all the time to provide public keys for new registered users. Each member in the group receives an encrypted copy of the group key. The number of keys in SGC scales at least linearly. 
 
@@ -17,7 +13,7 @@ ABE breaks the contrains that the central server has to be available at all time
 
 Given this observation we can state that ABE is adventagious on scenarios where users address an unknown group of individuals. This can be some departments (e.g. police department of New York), colloquiums (e.g. faculity for Secure network communications), or general user groups (all employees working in the security research team).
 
-To better clarify the scalaing adventage of ABE lets take table \ref{table:comparisons} translate it to big $O(\dot)$ and compare it to ABE in general. Further we use OWFT because it got good overall performance.
+To better clarify the scalaing adventage of ABE lets take table \ref{tab:comparisons} translate it to big $O$-notation and compare it to ABE in general. Further we use OWFT because it got good overall performance.
 
 \begin{table*}[!ht]
 \centering
@@ -53,7 +49,7 @@ encryptions				& $O(n)$ 					& $O(1)$					& $O(1)$			\\
 \label{tab:comparisonsOWFTtoABE}
 \end{table*}
 
-Note that we assume the destribution of $a < n < f$ (number of attributes in the system is smaller then the number of devices which is maller then the number of file keys) with growing number of users. While this assumption does not nesscarly hold true on average it this constratin will be satisfied. Under this assumption we can extract from table \ref{tab:comparisonsOWFTtoABE}, that ABE indeed scales better then OWFT or Bdrive on inizialisation and member join. On Member leave, however, is difficult in ABE. Most likly the member leave would describe a degregation or revoking of an attribute. ABE sufferes from additional due to updating the attribut key for each user owning this old attribute ($N(a^{-1}$) and additionally updating all cipher text that were encrypted with the attribute ($F(a^{-1}$).
+Note that we assume the destribution of $a < n < f$ (number of attributes in the system is smaller then the number of devices which is maller then the number of file keys) with growing number of users. While this assumption does not nesscarly hold true, on average it this constratin will be satisfied. Under this assumption we can extract from table \ref{tab:comparisonsOWFTtoABE}, that ABE indeed scales better then OWFT or Bdrive on inizialisation and member join. On Member leave, however, is difficult in ABE. Most likly the member leave would describe a degregation or revoking of an attribute. ABE sufferes from additional due to updating the attribut key for each user owning this old attribute ($N(a^{-1}$) and additionally updating all cipher text that were encrypted with the attribute ($F(a^{-1}$).
 
 On the meta level attribute-based encryption tackelts the rekeying problem by focusing on attribute and groups rather then individuals. ABE reduces the number of keys needed by resuing and combining exisiting keys. In constract, secure group communciation schemes need to create a new key per each group. Here ABE exploits the fact that groups generally can be described by an unique attribute set. Implicitlyu it follows that if another group is described by the exact same set of attributes the same keys are used. So the total number of groups is limited to all possible combinations of attributes. In contract stands secure group communication where a new group is bounded to a new group key. An unlimit number of groups can be created.
 
