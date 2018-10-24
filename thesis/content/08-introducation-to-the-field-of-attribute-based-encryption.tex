@@ -1,4 +1,14 @@
 \section{An introduction to the field of Attribute-Based Encryption}
+
+
+\subsection{Identity Based Encryption}
+The idea of using universal identifier instead of public keys to identify individuals goes back until 1984. Shamir proposed in \cite{shamir1984identity} to use a central authority to create for each newly registered user a unique universal identifer (e.g. an email address) that can be used for encyrption as we used to do with a public key. However, the difference to RSA is that since the universal identity \textit{is} the public key the use of a PKI becomes insignificant\todo[inline]{find better word to insignificant}. A central authority was introduced since the users private key are dirrived from a random seed only known to this authority. If this seed was publicly known each user could simply compute the private key from any public identifier and so confidentallity would be broken. 
+
+Since this scheme could neither be shown to be practical applicable, nor to proven secure, it was not until 2001 when Boneh and Franklin proposed in \cite{boneh2001identity} a new approach to identity based encryption. The use of the \textit{Weil pairing} revelutionzied the field of identity based encryption.\footnote{Currious reader can readup on the weil pairing here \cite{Miller2004} \cite{galbraith2008pairings} or here \url{https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627}}
+
+\todo[inline]{How does this relate to ABE. Features of ABE}
+
+
 To go beyond the limitations of secure group communications a different approach to this problem is needed. Lets take a step back and look at groups communications from another perspective then from the cryptographic side. How are groups composed? How are they formed and how is chosen who participates? 
 
 \subsection{Relationship between groups and attributes}
