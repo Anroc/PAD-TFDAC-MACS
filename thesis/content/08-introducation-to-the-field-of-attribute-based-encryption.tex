@@ -4,9 +4,9 @@ In cryptography a main challange is to connect identities with a cryptographic k
 Identity-Based encryption ties to circomvent this standard by binding identities to unique strings already associated with this identity, such as an email address. If we could encrypt directly with this identifier, we would not need an certifacte check to validate the identity. 
 
 \subsection{Identity Based Encryption}
-The idea of using universal identifier instead of public keys to identify individuals goes back until 1984. Shamir proposed the first \textit{Identity-Based Encryption} (IBE) \cite{shamir1984identity} to use a central authority to create for each newly registered user a unique universal identifer (e.g. an email address) that can be used for encyrption as we used to do with a public key. However, the difference to RSA is that since the universal identity \textit{is} the public key the use of a PKI becomes insignificant\todo[inline]{find better word to insignificant}. A central authority was introduced since the users private key are dirrived from a random seed only known to this authority. If this seed was publicly known each user could simply compute the private key from any public identifier and so confidentallity would be broken. 
+The idea of using universal identifier instead of public keys to identify individuals goes back until 1984. Shamir proposed the first \textit{Identity-Based Encryption} (IBE) \cite{shamir1984identity} to use a central authority to create for each newly registered user a unique universal identifer (e.g. an email address) that can be used for encyrption as we used to do with a public key. However, the difference to RSA is that since the universal identity \textit{is} the public key the use of a PKI becomes insignificant\todo{find better word to insignificant}. A central authority was introduced since the users private key are dirrived from a random seed only known to this authority. If this seed was publicly known each user could simply compute the private key from any public identifier and so confidentallity would be broken. 
 
-Since this scheme could neither be shown to be practical applicable, nor to proven secure, it was not until 2001 when Boneh and Franklin proposed in \cite{boneh2001identity} a new approach to identity based encryption. The use of the \textit{Weil pairing} revelutionzied the field of identity based encryption.\footnote{Currious reader can readup on the weil pairing here \cite{Miller2004} \cite{galbraith2008pairings} or here \url{https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627}} \todo[inline]{QUESTION: write how pairing or Elliptic curves work?}
+Since this scheme could neither be shown to be practical applicable, nor to proven secure, it was not until 2001 when Boneh and Franklin proposed in \cite{boneh2001identity} a new approach to identity based encryption. The use of the \textit{Weil pairing} revelutionzied the field of identity based encryption.\footnote{Currious reader can readup on the weil pairing here \cite{Miller2004} \cite{galbraith2008pairings} or here \url{https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627}} \question{write how pairing or Elliptic curves work?}
 
 \subsection{Attribute-Based encryption}
 
@@ -21,7 +21,7 @@ As we already know, content is encrypted under attributes, rather then users. Th
 Here the big adventage is that the data only need to be encrypted once: on creation. With ABE we are not able to go beyond the natural limiation of Secure Group Communication schemes which had a lower bound of one key per newly joined member.  
 
 \subsection{Comparing Secure Group Communication to Attribute-Based encryption}
-Comparing SGC to ABE is non tivial. This is due to a different encryption technique used by ABE: paring. Pairing scales more or less with the overhead of RSA rather then ECC or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings} resulting in bad\todo[inline]{bader?} performance compared to SGC. But in specific scenarios ABE uses less keys to setup the group communication. In the following thouse secnarios will be described and analysed where this schemes differe and what use-cases ABE schemes address.
+Comparing SGC to ABE is non tivial. This is due to a different encryption technique used by ABE: paring. Pairing scales more or less with the overhead of RSA rather then ECC or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings}. But to archive the same bit security computations in pairing need to happen in a much bigger bit-field rendering ABE les performant in comparison to RSA. But in specific scenarios ABE uses less keys to setup the group communication. In the following thouse secnarios will be described and analysed where this schemes differe and what use-cases ABE schemes address.
 
 In a RSA sharing scheme, each user has his own public key which needs to be transmitted to a thrid party to establish a secret connection. Creating a group under this scheme will implicitly force the data owner to retrieve all $n$ public keys of all $n$ group members. The central server needs to provide a PKI together with the public keys of each registered user to proof their identity. Thus follows the contrain that the central server needs to be available all the time to provide public keys for new registered users. Each member in the group receives an encrypted copy of the group key. The number of keys in SGC scales at least linearly. 
 
@@ -29,30 +29,30 @@ ABE breaks the contrains that the central server has to be available at all time
 
 Given this observation we can state that ABE is adventagious on scenarios where users address an unknown group of individuals. This can be some departments (e.g. police department of New York), colloquiums (e.g. faculity for Secure network communications), or general user groups (all employees working in the security research team).
 
-To better clarify the scalaing adventage of ABE lets take table \ref{tab:comparisons} translate it to big $O$-notation and compare it to ABE in general. Further we use OWFT because it got good overall performance.
+To better clarify the scalaing adventage of ABE lets take table \ref{tab:comparisons} translate it to big $O$-notation and compare it to ABE in general. Further we use GKMP because it got good overall performance.
 
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 		| l 						| l 						| l }
- 						& \textbf{Bdrive}			& \textbf{OWFT} 			& \textbf{ABE} 		\\
+ 						& \textbf{Bdrive}			& \textbf{GKMP} 			& \textbf{ABE} 		\\
 \hline
 \textbf{inizial share} 																				\\
-keys 					& $O(nf)$ 					& $O(n)$	 				& $O(1)$			\\
-messages (unicast)		& $O(nf)$  					& $O(n(log(n)))$			& $O(n)$			\\
+keys 					& $O(nf)$ 					& $O(1)$	 				& $O(1)$			\\
+messages (unicast)		& $O(nf)$  					& $O(n)$					& $O(n)$			\\
 messages (multicast) 	& $O(nf)$ 					& $O(n)$ 					& $O(1)$			\\
 encryptions				& $O(nf)$ 					& $O(f + n)$				& $O(a)$ 			\\
 \hline
 \textbf{member join} 																				\\
-keys 					& $O(f)$   					& $O(log(n))$				& $O(1)$			\\
-messages (unicast)		& $O(f)$  					& $O(n)$  					& $O(n)$ 			\\
-messages (multicast) 	& $O(f)$ 	 				& $O(log(n))$				& $O(1)$ 			\\
-encryptions				& $O(f)$  					& $O(f + log(n))$			& $O(f)$ 			\\
+keys 					& $O(f)$   					& $O(1)$					& $O(1)$			\\
+messages (unicast)		& $O(f)$  					& $O(1)$  					& $O(1)$ 			\\
+messages (multicast) 	& $O(f)$ 	 				& $O(1)$					& $O(1)$ 			\\
+encryptions				& $O(f)$  					& $O(1)$					& $O(1)$ 			\\
 \hline
 \textbf{member leave}																				\\
-keys 					& $O(0)$					& $O(log(n))$				& $O(1)$			\\
-messages (unicast)		& $O(0)$					& $O(0)$  					& $O(N(a^{-1}))$	\\
-messages (multicast)	& $O(0)$					& $O(log(n))$				& $O(1)$ 			\\ 
-encryptions 			& $O(0)$					& $O(f + log(n))$ 			& $O(F(a^{-1}))$	\\
+keys 					& $O(0)$					& $O(1)$					& $O(1)$			\\
+messages (unicast)		& $O(0)$					& $O(n)$  					& $O(N(a^{-1}))$	\\
+messages (multicast)	& $O(0)$					& $O(n)$					& $O(1)$ 			\\ 
+encryptions 			& $O(0)$					& $O(f + n)$ 				& $O(F(a^{-1}))$	\\
 \hline	
 \textbf{addition of filekey}																		\\
 keys 					& $O(n)$	 				& $O(0)$					& $O(0)$			\\
@@ -61,7 +61,7 @@ messages (multicast)	& $O(n)$ 					& $O(0)$ 					& $O(0)$			\\
 encryptions				& $O(n)$ 					& $O(1)$					& $O(1)$			\\
 \hline
 \end{tabular}
-\caption{Comparison of Bdrive, OWFT and ABE scheme. $n$ donating the number of members, $N$ the number of all users in the system, $f$ the number of file keys in the group, $F$ the number of all filekeys, $a$ the number of attributes used for this group, $A$ all attributes }
+\caption{Comparison of Bdrive, GKMP and ABE scheme. $n$ donating the number of members, $N$ the number of all users in the system, $f$ the number of file keys in the group, $F$ the number of all filekeys, $a$ the number of attributes used for this group, $A$ all attributes }
 \label{tab:comparisonsOWFTtoABE}
 \end{table*}
 

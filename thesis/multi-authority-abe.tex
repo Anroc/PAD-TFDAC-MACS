@@ -66,6 +66,15 @@
 \usepackage{caption}
 \usepackage[textsize=footnotesize]{todonotes} % for todo notes
 
+% define new command for \req (bold and italic)
+\newcommand{\req}[1]{\textbf{\textit{#1}}}
+
+% use \todo[inline] per default
+\let\originaltodo\todo
+\renewcommand{\todo}{\originaltodo[inline]}
+
+\newcommand{\question}[1]{\originaltodo[color=green, inline]{#1}}
+
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
@@ -107,7 +116,7 @@ If a group of users want to share a ciphertext, they need to agree on a shared k
 
 \section{Introduction}
 \label{sec:introduction}
-\todo[inline]{
+\todo{
 	* **Introduction**\\
 	* Ruff problem describtion\\
 	* How ABE can solve this\\
@@ -121,11 +130,15 @@ If a group of users want to share a ciphertext, they need to agree on a shared k
 We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to employ an encryption scheme which has a constant number of access keys regardless of the number of participants.
 
 \section{Related Work}
-\todo[inline]{
+\todo{
 	* **Related work**\\
 	* Of paper did something similar to this\\
 	* Comparison paper\\
 	* Not ABE paper
+}
+
+\todo{
+	Cite \cite{lee2013survey} and similar overview paper
 }
 
 \subsection{Attribute-Based Encryption}
@@ -156,7 +169,7 @@ Priscilla and Nagarajan 2018 \cite{nagarajan2018overview} conducted an analysis 
 %------------------------------------------------
 
 \section{Contribution}
-\todo[inline]{
+\todo{
 	* What are the targets\\
 	* What makes this work stand out\\
 	* What we can gain from this work
@@ -173,8 +186,12 @@ The target of this work is to find a more scalable solution to the currently enr
 % Secure group communication
 \input{./content/07-secure-group-communication}
 
-% ABE
+% solution: ABE
 \input{./content/08-introducation-to-the-field-of-attribute-based-encryption}
+
+% ABE
+\input{./content/09-basic-attribute-based-encryption}
+
 
 
 %----------------------------------------------------------------------------------------

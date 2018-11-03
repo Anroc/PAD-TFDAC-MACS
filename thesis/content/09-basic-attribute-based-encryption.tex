@@ -1,0 +1,21 @@
+\section{Basic Attribute-Based Encryption}
+In the following sections we will habe a look at the different attribute based encryption schems. We will extract characterisitics of thouse schemes to cluster them, select a repectable candidate from each of those schemes and to finally, make a practical performance anaylsis of thouse schemes. 
+
+A suitable candidate in the field of attribute based encryption scheme is a scheme that satisfies the requirements stated in section \ref{sec:requirements}. The requirements are a super set of thouse defined in \cite{lee2013survey}. For the basic ABE schemes we will focus on the requirements \req{C1}, \req{C3}, \req{C5} - \req{C8} and optional requirements \req{O1} and \req{O2}.
+The general requirements \req{B1} and \req{B2} will be evaluated by pratical a performance and scalability anaylsis.
+
+\subsection{Collusion resistance (C2 requirement)}
+Lets construct a very basic attribute based encryption scheme to clarify the importance of collusion resistance. Assume baisc RSA cryptography. We setup an AA which combines attributes to RSA public-private key pairs. Attribute "student" gets bound to $K_{PR(s)}$ for the private key and $K_{PU(s)}$ for the public key. Attribute "works at TU Berlin" gets bound to the Key $K_{PK_PR(tu)}$ and $K_{PU(tu)}$ respectivly. Now, we setup our very own first ABE scheme. The AA can pin the public keys of each attributes to its public billboard so that every entity in the system can encrypt for thouse attributes. Each user who is currently a student receives a copy of the private key $K_{PR(s)}$ and each user who is currently working at TU Berlin receives a copy of $K_{PR(tu)}$. 
+
+A user, lets call her for historical reason Alice, wants to share content with all students that are also working at TU berlin. She encrypts the plaintext $p$ with both public attribute keys $c = K_{PU(s)}(K_{PU(TU)}(P))$ and publishes the ciphertext $c$ to a public CSP so that everyone can download it. Students that are working at TU Berlin owning both private keys can decipher the ciphertext by applying both private keys in reverse order $K_{PR(TU)(K_{PR{s}}(c)}$.
+
+The attentive reader will have notice a cural security leak in this scheme. This ABE scheme is not cullusion restiant. In fact, collusion restistance is a core requirement of any attribute-based encryption schemem. On paper it is defined as the impossibility of any two attribute holder to combine their attributes to archive a higher level of encryption. Lets assume that Bob is a student and Eve is working at TU Berlin. Both users received their private key. Now they can simply exchange their attribute keys so that they are both able to decipher the ciphertext even if they severativly don't own both attributes.  
+
+Usally collusion restance is ensured by issuing each user a private key that is blinded by a random value. This random value will vanish on decryption. However, if two users collude they will mix their blinded values resulting a plaintext that is still by some unknown value. 
+
+\subsection{History of Attriubte-Based encrypttion}
+\todo{already discussed in previous section?}
+
+\subsection{CP-ABE}
+Cipher-text policy Attribute-Based Encryption (CP-ABE) is the technique were the cipher text gets encrypted with a policy. This policy describs the attributes that are reuqired to decipher the ciphertext. 
+

@@ -1,27 +1,27 @@
 \section{Requirements}
 \label{sec:requirements}
-The general requirements of this thesis will be summarized by two major points: 
+The general (\textbf{\textit{B*}}) requirements of this thesis will be summarized by two major points: 
 
 \begin{itemize}
-	\item \textbf{Performance:} Participating in the system should be possible with low-performance devices (such as smartphones). The overhead for the server on proxy decryption, attribute issuing and revocation should be reasonably low.  
-	\item \textbf{Scalability:} The system should scale better than the current encryption scheme with respect to the number of file keys. 
+	\item[\textit{\textbf{B1}}] \textbf{Performance:} Participating in the system should be possible with low-performance devices (such as smartphones). The overhead for the server on proxy decryption, attribute issuing and revocation should be reasonably low.  
+	\item[\textit{\textbf{B2}}] \textbf{Scalability:} The system should scale better than the current encryption scheme with respect to the number of file keys. 
 \end{itemize}
 
-In addition, the core security requirements in the context of an MA-ABE scheme are the following:
+In addition, the core (\textbf{\textit{C*}}) security requirements in the context of an MA-ABE scheme are the following:
 \begin{itemize}
-\item \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archieve a higher level of decryption power.
-\item \textbf{Inter-Company Sharing:} Each company is only responsible for its own domain. This includes attribute and user administration, which translates to secret key generation and revocation. %Since Bdrive would need to consider a multi-authority ABE scheme, it should not be possible for a company to decrypt or issue files of other companies if no explicit exception is given for certain files by a trusted company relationship. A companies attribute authority (AA) should be responsible for its domain. In the case of an inter company relationship, attributes needs to be issued across different companies. 
-\item \textbf{Central Authority:} The CA shall not have global decryption power. At most an AA can decrypt user files of its own domain.  
-\item \textbf{Secret Master key (if any):} Key recovery requires a secret and securely stored master key. It should solely function in the company domain and not globally. 
-\item \textbf{Large Attribute and Key Universe:} The number of attributes and users shall not be restricted.
-\item \textbf{Adding new Attribute Authorities:} It should be possible to add new attribute authorities at runtime. Without either shutting down the system or recreating each key.
-\item \textbf{Untrusted Attribute Authority:} A corrupt Attribute Authority can only harm its own domain, but can not harm the outside system in any way. It cannot gain any additional information.
-\item \textbf{Key and Attribute revocation:} Revocation is needed to handle user management in terms of attribute promotion, attribute demotion and key revocation. Forward secrecy should be provided. 
+\item[\textit{\textbf{C1}}] \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archieve a higher level of decryption power.
+\item[\textit{\textbf{C2}}] \textbf{Inter-Company Sharing:} Each company is only responsible for its own domain. This includes attribute and user administration, which translates to secret key generation and revocation. %Since Bdrive would need to consider a multi-authority ABE scheme, it should not be possible for a company to decrypt or issue files of other companies if no explicit exception is given for certain files by a trusted company relationship. A companies attribute authority (AA) should be responsible for its domain. In the case of an inter company relationship, attributes needs to be issued across different companies. 
+\item[\textit{\textbf{C3}}] \textbf{Central Authority:} The CA shall not have global decryption power. At most an AA can decrypt user files of its own domain.  
+\item[\textit{\textbf{C4}}] \textbf{Secret Master key (if any):} Key recovery requires a secret and securely stored master key. It should solely function in the company domain and not globally. 
+\item[\textit{\textbf{C5}}] \textbf{Large Attribute and Key Universe:} The number of attributes and users shall not be restricted.
+\item[\textit{\textbf{C6}}] \textbf{Adding new Attribute Authorities:} It should be possible to add new attribute authorities at runtime. Without either shutting down the system or recreating each key.
+\item[\textit{\textbf{C7}}] \textbf{Untrusted Attribute Authority:} A corrupt Attribute Authority can only harm its own domain, but can not harm the outside system in any way. It cannot gain any additional information.
+\item[\textit{\textbf{C8}}] \textbf{Key and Attribute revocation:} Revocation is needed to handle user management in terms of attribute promotion, attribute demotion and key revocation. Forward secrecy should be provided. 
 \end{itemize}
 
-\noindent Other (optional) requirements are: 
+\noindent Other (optional \textbf{\textit{O*}}) requirements are: 
 \begin{itemize}
-	\item \textbf{Traitor tracing:} A user in ABE is described by his attribute set and is anonymous in this set. Misbehaving users, who sell their attribute keys to create a decryption black box, should be identifyable. \cite{liu2016practical}
-	\item \textbf{Fine-grained access control:} The user shall not be bounded on defining fine-grained access policies which requires either an access tree \cite{bethencourt2007ciphertext} or an linear secret sharing scheme (LSSS) \cite{yang2013dac} \cite{li2016secure} \cite{wu2017security} \cite{li2013matrix} \cite{liu2016practical}.
+	\item[\textit{\textbf{O1}}] \textbf{Traitor tracing:} A user in ABE is described by his attribute set and is anonymous in this set. Misbehaving users, who sell their attribute keys to create a decryption black box, should be identifyable. \cite{liu2016practical}
+	\item[\textit{\textbf{O2}}] \textbf{Fine-grained access control:} The user shall not be bounded on defining fine-grained access policies which requires either an access tree \cite{bethencourt2007ciphertext} or an linear secret sharing scheme (LSSS) \cite{yang2013dac} \cite{li2016secure} \cite{wu2017security} \cite{li2013matrix} \cite{liu2016practical}.
 	%Some schemes restrict the user to threshhold access policies, where an user needs at least $n$ of $m$ attributes to encrypt the cipher text. \cite{chase2007multi} \cite{chase2009improving} Other approaches are restriced to $AND$ gates which would translate to $m$ of $m$ threshhold gates. \cite{li2017two}
 \end{itemize}

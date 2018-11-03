@@ -66,7 +66,7 @@ The last part will be done in a similar way as described above: A homogeneous pl
 
 %The main scope is to reduce the number of rekeys that are used on scaling number of user and devices that access this file key. As mentioned before chase proposed a scheme that only needs to maintain one ciphertext per plaintext. But to act dynamically regarding Attribute Authorities additions, reduce the number of affected ciphertext re-encryptions, and provide an encryption process that does not need to involve all AAs known to the system, we need to split up the ciphertext per AA domain. Furhter, in chase scheme, we would also encounter the problem of DoS attacks where an AA can simply deny requrest and render the whole system unusable.  
 
-%\todo[inline]{Explain how to evaluate and compare the ABE paper}
+%\todo{Explain how to evaluate and compare the ABE paper}
 
 
 
@@ -145,10 +145,10 @@ The last part will be done in a similar way as described above: A homogeneous pl
 
 %We now successfully eliminated the trusted CA. However, several problems remain. How to add authorities? And how to change or revoke attributes?
 
-%\todo[inline]{user and attribute revocation}
+%\todo{user and attribute revocation}
 
 %-----------------------------------------------
 
 %\section{Conclusion}
-%\todo[inline]{cancle conclusion or rename to summary}
+%\todo{cancle conclusion or rename to summary}
 %With increasing number of users and devices, Bdrive and any common cloud storage system faces scalability issues that are automatically given when using a re-keying scheme. While enforcing end-to-end encryption it is hard to hold different files in sync. This work should find or construct the solution to this scalability problem. In the theoretical part the related work will be analyzed and compared to extract the best matching scheme that will than be adapted to fit the security requirements of Bdrive. In the practical part this scheme will be implemented and evaluated against the current implemented security scheme in Bdrive. In the end it will be evaluated if ABE is practical applicable to solve the scalability problem. 
