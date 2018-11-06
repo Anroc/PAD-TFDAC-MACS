@@ -13,9 +13,26 @@ The attentive reader will have notice a cural security leak in this scheme. This
 
 Usally collusion restance is ensured by issuing each user a private key that is blinded by a random value. This random value will vanish on decryption. However, if two users collude they will mix their blinded values resulting a plaintext that is still by some unknown value. 
 
+\subsection{Biliniar Mappings}
+\todo{Define Biliniar mappings, how they work etc.}
+
 \subsection{History of Attriubte-Based encrypttion}
 \todo{already discussed in previous section?}
+
+\subsection{KP-ABE}
+In Key-Policy Attribute-Based Encryption (KP-ABE) \cite{goyal2006attribute}, is a ABE technique that assoizates chiphertexts with attributes that fullfill the policy embedded in the key addressed to a user. 
+
+To evaluate if a policy matches given attributes an \textit{Access Tree} is used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} treshhold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshhold gates meaning all children need to satisfy the condition. 
+
+The initial paper did leck some basic requirements that was improved by other work. Such as a fix-length cipher text, attribute revocation. Further, the authors stated that users, onces issued a policy, are able to delegate a subset of their access tree to other users. Users themself could act as a new attriubte authority to issue other uses a subset of thier access policy. While this is a nice feature for some use cases, in a cloud system the company would like to restrict this delegation or would like to be able to track traidors selling their private keys as a blackbox decryption.
+
+This encryption scheme was ment as a broadcasting encryption scheme. Used by radio providers so that they can address any user that bought a paid membership to distribute premium content. However, since the policy was bound to the users key it is not possbile to address a ciphertext to a specific user group without knowing who exaclty persesses the right policy. Only the central authority, which issued the users privayt keys in the first place, would know who could decipher the encrypted text. This fact renders KP-ABE impractical for tha application in a cloud sharing scheme. User would simply don't know who are able to decrypter the cipher text. 
+
+The certainly very specific use case of KP-ABE probably led to the circumstances that not much paper using this technique exists. Even so that we could not find any paper satisfying all requirements previously specified. We found only paper that implemented direct and indirect recovation mechanism \cite{shi2015directly}. 
 
 \subsection{CP-ABE}
 Cipher-text policy Attribute-Based Encryption (CP-ABE) is the technique were the cipher text gets encrypted with a policy. This policy describs the attributes that are reuqired to decipher the ciphertext. 
 
+\subsection{Hirachical ABE}
+
+\subsection{Non-monotonic access strcutre of ABE}
