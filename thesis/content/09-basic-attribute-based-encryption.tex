@@ -22,7 +22,7 @@ Usally collusion restance is ensured by issuing each user a private key that is 
 \subsection{KP-ABE}
 In Key-Policy Attribute-Based Encryption (KP-ABE) \cite{goyal2006attribute}, is a ABE technique that assoizates chiphertexts with attributes that fullfill the policy embedded in the key addressed to a user. 
 
-To evaluate if a policy matches given attributes an \textit{Access Tree} is used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} treshhold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshhold gates meaning all children need to satisfy the condition. 
+To evaluate if a policy matches given attributes an \textit{Access Tree} or \textit{Linear Secrect Sharing Matrix} (LSSS) is used. While both representations represent the same boolean formular a LSSS is often more efficient. For a better explanation the model of an access tree will be used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} treshhold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshhold gates meaning all children need to satisfy the condition. This approach is a monotonic access strcture and often refered as \textit{Threshhold Security} or \textit{Treshhold Access Strcutre}. 
 
 The initial paper did leck some basic requirements that was improved by other work. Such as a fix-length cipher text, attribute revocation. Further, the authors stated that users, onces issued a policy, are able to delegate a subset of their access tree to other users. Users themself could act as a new attriubte authority to issue other uses a subset of thier access policy. While this is a nice feature for some use cases, in a cloud system the company would like to restrict this delegation or would like to be able to track traidors selling their private keys as a blackbox decryption.
 
@@ -31,8 +31,27 @@ This encryption scheme was ment as a broadcasting encryption scheme. Used by rad
 The certainly very specific use case of KP-ABE probably led to the circumstances that not much paper using this technique exists. Even so that we could not find any paper satisfying all requirements previously specified. We found only paper that implemented direct and indirect recovation mechanism \cite{shi2015directly}. 
 
 \subsection{CP-ABE}
-Cipher-text policy Attribute-Based Encryption (CP-ABE) is the technique were the cipher text gets encrypted with a policy. This policy describs the attributes that are reuqired to decipher the ciphertext. 
+On the other side there is Cipher-text policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. CP-ABE assigns ciphertexts with a policy and user keys with attributes. This enables CP-ABE to be much more flexible and verbose in comparison to KP-ABE. The big adventages was (similar to KP-ABE) that the need for a central authentication server was obsulte. Each ciphertext could simple accessed by each user and only thouse who have the right attribute set present are able to decipher the ciphertext. 
 
-\subsection{Hirachical ABE}
+The lack of revocation \req{C8} and the need for a large attribute and user universe was huge \req{C5}. Revocation means that a system manager could revoke attributes from users or even the user as such. In modern company settings an required feature to ensure forward secrecy. Large attribute universe on the other hand describes that the attributes that can be distributed by the AA are somewhat so large that it is unlikly that a running system will run out of attributes to issue. 
+
+The first proposal of a revocation scheme in CP-ABE was in 2010 \cite{liang2010ciphertext}. This scheme used a similar approach like LKH to make the revocation process effient. In 2016 Lui \textit{et. al} \cite{liu2016practical} proposed a recovable ABE scheme that supported traidor tracing and large attribute universe. However, both scheme were restricted to a fix number of users or a limited attribute universe. Which rendered them pratical not applicable.  
 
 \subsection{Non-monotonic access strcutre of ABE}
+While monotonic access structures can describe \textit{AND} or \textit{OR} gates, non-monotonic access structure can also refere to \textit{NOT} gates. This adds another layer of find-ganylarity into the system. While in monotonic access strctures user get an attribute assigned they have access to all topics addressed to this attribute. In non-monotonic strctures, first intoduced by Ostrovsky \textit{et. al.} \cite{Ostrovsky:2007:AEN:1315245.1315270}, certain topics may be excluded. 
+
+Take for example Alice who wants is an intern in the Top Secret company. In monotinic access strcutre she would receive both attribute private keys from "Intern" and "working in Top Secret Company". Since than she would be able to decipher all content addressed to all employees at the Super Secret company. However, some content might be so confidential that interns shell not be able to access them. This exclusion would not be possible. With non-monotonic access structure an administrator may want to encrypt certain information with the policy "working in Top secret Company AND NOT intern".  
+
+\subsection{Hirachical ABE}
+Hirachical Attribute-Based encryption (HABE) takes the key delegation to the next level. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of this access power to new users. By nature follows a hirachical structure where each user could administrate a own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing. 
+
+A hirachical strcture and a delegation of decryption power would imply that the root node has global decryption power which is not desired \req{C4}. We want to design a system in which each domain is seperated is term of key generation from each other. That means that there is no top level domain which has global decryption power, rather we want to have a system where each subdomain creates its down keys and administrataes thier own attributes but that is still a part of a bigger system so able to interact with other domains.  
+\todo{Reformulate}
+
+\subsection{Comparison}
+\begin{figure*}[!ht]
+\centering
+    \includegraphics[width=1\linewidth]{img/basic_abe_comparisons.png}
+    \caption{Performance and scalability comparison between the chosen schemes.}
+    \label{fig:basic_abe_comparison}
+\end{figure*}

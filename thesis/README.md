@@ -84,6 +84,18 @@
 	* Implement thouse
 	* compare them on performance, scalability and requirments
 	* Draw conclusion
+	* For each different scheme (KP-ABE, CP-ABE, Hirachical, Non-Monoton and basic ABE)
+		* Check if some paper match the basic requirements
+			* Revocation
+			* Adding new attributes
+		* If a paper was found (at most 3 per subsection)
+		* Compare on feature level
+		* Evaluate performance by implementing them or using a reference implementation
+	* CP-ABE
+		* JTR framework
+		* http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.584.1010&rep=rep1&type=pdf maybe
+	* KP-ABE
+		* Non matching candidate found
 * **Multi authority attribute based encryption**
 	* *Motto: Fitting the requirements*
 	* Defining the history of MA-ABE
@@ -110,3 +122,4 @@
 
 
 
+https://docs.google.com/spreadsheets/d/1eyUhU9ZZDOYjkb7-c5kINSapmPfTSfhLcGJmxlh5nhA/edit?usp=sharing
