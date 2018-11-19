@@ -28,7 +28,7 @@ The initial paper did leck some basic requirements that was improved by other wo
 
 This encryption scheme was ment as a broadcasting encryption scheme. Used by radio providers so that they can address any user that bought a paid membership to distribute premium content. However, since the policy was bound to the users key it is not possbile to address a ciphertext to a specific user group without knowing who exaclty persesses the right policy. Only the central authority, which issued the users privayt keys in the first place, would know who could decipher the encrypted text. This fact renders KP-ABE impractical for tha application in a cloud sharing scheme. User would simply don't know who are able to decrypter the cipher text. 
 
-The certainly very specific use case of KP-ABE probably led to the circumstances that not much paper using this technique exists. Even so that we could not find any paper satisfying all requirements previously specified. We found only paper that implemented direct and indirect recovation mechanism \cite{shi2015directly}. 
+The certainly very specific use case of KP-ABE probably led to the circumstances that not much paper using this technique exists. Even so that we could not find any paper satisfying all requirements previously specified. We found only paper that implemented direct revocation using negation of attributes \cite{lewko2010revocation}. This would in turn lead to the fact that users private key sizes would grow with each revoced attribute. 
 
 \subsection{CP-ABE}
 On the other side there is Cipher-text policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. CP-ABE assigns ciphertexts with a policy and user keys with attributes. This enables CP-ABE to be much more flexible and verbose in comparison to KP-ABE. The big adventages was (similar to KP-ABE) that the need for a central authentication server was obsulte. Each ciphertext could simple accessed by each user and only thouse who have the right attribute set present are able to decipher the ciphertext. 
@@ -42,16 +42,66 @@ While monotonic access structures can describe \textit{AND} or \textit{OR} gates
 
 Take for example Alice who wants is an intern in the Top Secret company. In monotinic access strcutre she would receive both attribute private keys from "Intern" and "working in Top Secret Company". Since than she would be able to decipher all content addressed to all employees at the Super Secret company. However, some content might be so confidential that interns shell not be able to access them. This exclusion would not be possible. With non-monotonic access structure an administrator may want to encrypt certain information with the policy "working in Top secret Company AND NOT intern".  
 
+While being an imported field in the boolean formular and fine-grand access control domain, non-monotonic access structures did not gain the same attention as CP or KP-ABE did. As an candidate which shell represent this ABE topic \cite{10.1007/978-3-642-54631-0_16} CP-ABE implementation will be used. With negation of attributes revocation becomes more or less trivial. Each attribute can be versioned and simply exlcuded on encryption. While this approach is not scalable over time it is simple enough to be implemented in some schemes.   
+
 \subsection{Hirachical ABE}
 Hirachical Attribute-Based encryption (HABE) takes the key delegation to the next level. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of this access power to new users. By nature follows a hirachical structure where each user could administrate a own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing. 
+
+Hirachical ABE is the predecessor of Multi-Authority Attribute based encryption. The differences can be summarized by the following points: In MA-ABE each user is assigned to a specific attribute authority. This must not be the case in HABE. HABE is tree-like orientated. Starting from the root node each following authority will have a subset of decryption power as its respectiv parent. 
+
+\cite{Wang:2010:HAE:1866307.1866414} formalized this approach using CP-ABE, which was later extended in \cite{wang2011hierarchical}. While implementing a revocation scheme, they depend on an access policy present in DNF, which might not always be possible without using negation. 
 
 A hirachical strcture and a delegation of decryption power would imply that the root node has global decryption power which is not desired \req{C4}. We want to design a system in which each domain is seperated is term of key generation from each other. That means that there is no top level domain which has global decryption power, rather we want to have a system where each subdomain creates its down keys and administrataes thier own attributes but that is still a part of a bigger system so able to interact with other domains.  
 \todo{Reformulate}
 
+
+
 \subsection{Comparison}
+To compare the selected representived of the previous section we choose the charm framework\footnote{\url{http://charm-crypto.io/}}. Here we can already find implementations for the sutable KP-ABE candidate \cite{lewko2010revocation} and for non-monotonic CP-ABE \cite{10.1007/978-3-642-54631-0_16}. The other two schemes such as CP-ABE \cite{liu2016practical} and \cite{wang2011hierarchical} where implemented by us in a github frok of the charm repo\footnote{\url{https://github.com/Anroc/charm}}. 
+
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 					| l 				| l 				| l 				| l}
+									& \textbf{LSW 08}	& \textbf{YAHK 14}	& \textbf{LW 14}	& \textbf{WLWG 11} 	\\
+\req{Scheme}						& KP				& Non-Monotone CP 	& CP 				& Hirachical CP		\\ 
+\req{Security scheme}				& Biliniear maps 	& Binilnear maps 	& Biliniear maps 	& Biliniear maps 	\\
+\req{Expression of access policy}	& LSSS				& LSSS matrix 		& LSSS matrix 		& DNF 				\\ 
+\end{tabular}
+\caption{Scheme description. }
+\label{tab:comparison_baic_abe_overview}
+\end{table*}
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 	| l					| l 				| l 				| l}
+					& \textbf{LSW 08}	& \textbf{YAHK 14}	& \textbf{LW 14}	& \textbf{WLWG 11} 	\\
+\req{C1}			& Yes				& Yes 				& Yes 				& Yes 				\\
+\req{C2}			& No				& No 				& No 				& Yes 				\\ 
+\req{C3}			& No				& No 				& No 				& No 				\\ 
+\req{C4}			& No				& No 				& No 				& No 				\\ 
+\req{C5}			& Yes				& Yes 				& Yes 				& Yes 				\\ 
+\req{C6}			& - 				& - 				& -					& Yes				\\
+\req{C7}			& -					& - 				& - 				& No 				\\
+\req{C8}			& Yes				& Yes				& Yes				& Yes				\\
+\req{O1}			& No 				& No 				& Yes 				& No 				\\
+\req{O2}			& Yes+ 				& Yes+				& Yes				& Yes-				\\
+\end{tabular}
+\caption{}
+\label{tab:basic_abe_comparisons}
+\end{table*}
+
+In table \ref{tab:comparison_baic_abe_overview} the different scheme techniques are listed.  And in Table \ref{tab:basic_abe_comparisons} this schemes are compared to the requirements of section \ref{sec:requirements}. 
+
+From table \ref{tab:basic_abe_comparisons} it is clear that no scheme fully fulfill all the requirements. However, they reveal a good indicator where we should look next. WLWG 11 clearly makes the race here satisfying 6 of 10 of the requirements. 
+
+\req{C6} and \req{C7} could not be sutisfied by LSW08, YAHK14 or LW14 since they are not designed to support multible authorities. 
+\question{Should I respect MA-ABE also here?}
+Lets have a look at \req{O2}. LSW08 and YAHK14 both supports fine grant access controll by using a LSSS access structure. Also both implement non-monotonic access structes which give them the extra plus. LW14, on the other hand, does not support negation of attributes, but support an arbirary access strcture like LSW08 and YAHK14. WLWG11, however, does only support access strcutures in DNF form which makes this scheme somehow restriced in expressivness. 
+
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=1\linewidth]{img/basic_abe_comparisons.png}
     \caption{Performance and scalability comparison between the chosen schemes.}
     \label{fig:basic_abe_comparison}
 \end{figure*}
+
+
