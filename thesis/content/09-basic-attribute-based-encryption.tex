@@ -13,7 +13,7 @@ The attentive reader will have notice a cural security leak in this scheme. This
 
 Usally collusion restance is ensured by issuing each user a private key that is blinded by a random value. This random value will vanish on decryption. However, if two users collude they will mix their blinded values resulting a plaintext that is still by some unknown value. 
 
-\subsection{Biliniar Mappings}
+\subsection{Bilinear Mappings}
 To ensure collusion resistance bilinnear maps are comonly used. They are a tool for \textit{cytrographic pairings} and define the relationship between cyclic groups of the same (prime) order. A cyclic group $G$ is defined by an generator $g$ of that form that each $g^n \in G$ with $n \in \mathbb{Z}$ complelty desribes each element in the group $G$.
 
 A bilinear map function $e$ is now defined as the mapping between two groups of the same order $G_1$ and $G_2$ into $G_t$:
@@ -22,8 +22,9 @@ $$ e : G_1 \times G_2 \rightarrow G_t $$
 $$\text{ such that for all } g_1 \in G_1, g_2 \in G_2, a, b \in \mathbb{Z}$$
 $$e(g_1^a, g_2^b) = e(g_1, g_2)^{ab}$$
 
-In some schemes $G_1$ and $G_2$ relate to the same cyclic group. Another nice fact is that the \textit{Decisional Bilinear Diffie-Hellman Problem} becomes easy computable.
-\todo{Define it}  
+%In some schemes $G_1$ and $G_2$ relate to the same cyclic group. Another nice fact is that the \textit{Decisional Bilinear Diffie-Hellman Problem} becomes easy computable. 
+
+This contruct of pairings is used by many schmes to either distribute a secret or computing the secret without ever revealing it. To now ensure collusion resistance with this technique normally a user specific id (UID) is generated and bound to the exponent of the user's attribute private key. The decryption method will be designed in that way that the blinding of the attribute private key will vanaish.   
 
 \subsection{KP-ABE}
 In Key-Policy Attribute-Based Encryption (KP-ABE) \cite{goyal2006attribute}, is a ABE technique that assoizates chiphertexts with attributes that fullfill the policy embedded in the key addressed to a user. 
