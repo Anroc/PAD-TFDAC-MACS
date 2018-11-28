@@ -30,8 +30,23 @@ The lack of addition new attribute authorities and the missing revocation scheme
 \subsection{Decentralized attribute-based encryption}
 
 \subsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
-The most explored field in MA-ABE is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (DAC-MACS) family \cite{yang2013dac}. First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable MA-ABE scheme using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding AAs on the running system and serves with a CA that has no global decryption power. In sort DAC-MACS satisfy all the non-optional requirements.
+The most explored field in MA-ABE is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (DAC-MACS) family \cite{yang2013dac}. First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable MA-ABE scheme based on CP-ABE and using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding AAs on the running system and serves with a CA that has no global decryption power. In sort DAC-MACS satisfy all the non-optional requirements.
 
 DAC-MACS elliminates the need for the global decryption power of the CA by issuing $k$ ciphertexts: One per AA. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new AAs at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
 
-DAC-MACS is not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factor DAC-MACS)\cite{li2017two}.
+DAC-MACS is not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factor DAC-MACS)\cite{li2017two}. 
+
+All the DAC-MACS schemes are structed in the same way. They usally describe six different entities:
+
+\begin{enumerate}
+	\item \textbf{Certificate/Central Authority (CA)} The purpose of the CA is to issue user their global identifier (GID). Furhter they bootstrap the different AAs. The CA remains trusted but do not have any decryption power in the system. 
+	\item \textbf{Attribute Authority (AA)} A attribute authority administers their domain. Issues attributes and their respective privat key to the user. They only accept a user if his GID is signed by the CA. 
+	On revocation they will need to update the users secret keys as well as the ciphertext encrypted with the revoked attribute key. AAs are assumed to be trusted but can be compromised by an adversary.
+	\item \textbf{Server} The purpose of the server is to help the user with proxy re- and decryption. If an AA broadcast a revocation of an attribute, the server may download all related ciphertexts from the CSP to update them with the new attribute. 
+	Further, the user may give the server his attribute privat keys so that the server can pre compute the ciphertext. Usally the thread model for the server is honest-but-curious. Please note, that the CA and the server are two seperated entities that do not cooperate.
+	\item \textbf{Data owner} The data owner are usally users who want to encrypt content with under a specific access policy. To do so they use the publically available public keys pinned on the public bullition board of the respective AA. Data owner do not have any knowledge about GID or user groups in the system. After encryption they update the encrypted content to the CSP.
+	\item \textbf{Cloud storage provider (CSP)} The cloud storage provider are assumed to be untrusted while they still follow the protocol. That why they only receive encrypted data. They only purpose is to store the ciphertext and make them puplically available. No authentication checks are needed.
+	\item \textbf{Users} Users exist in two groups: Revoked and non-revoked. Revoked user try to collude with each other to get a higher level of decryption power. They download the files of the CSP and try to decrypter them. Only if they attribute set matches the policy of the ciphertext they will be able to decrypt the file. 
+	Revoked user on the other hand try to still decipher ciphertext. In some cases they try to collude with non-revoked user to intercept the key update key to restore their decryption rights. 
+	User are in general untrusted.
+\end{enumerate} 
