@@ -1,0 +1,77 @@
+\section{TF-DAC-MACS}
+\todo{write section}
+
+\subsection{Adaptions and Improvements}
+To make TF-DAC-MACS more pratically applicable we removed the fixed two-factor contrain from the encyrption, decryption, and cipher update part. The two factor identifier $\alpha$ is used by the data owner to restirct the access to the content to certain users. 
+
+This leads to the fact that the underlying ABE schemes looses some of it expressivness. The zero knowledge of the data owner on which invidual is able to decrypter the cipher text is broken with the two factor part. Here each user that wants to decryper the encrypted text need to make an \textit{authentication request} to the data owner to receive the corresponing decryption key. To restore the possiblity to let an unkown user group decrypter the cipher text, we removed the two factor part. To do so we adapted encryption, decryption and cipher text update. The authentication key update will be ignored since it makes no sense to apply it on a non exisiting authentication key. 
+
+\begin{itemize}
+\item \textbf{Encryption:} 
+We only need to update the $C_3$ part of the cipher text since it is the only one containing the two factor component $\alpha$.
+
+The original $C_3$:
+$$
+C_3 = \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big)^{s + \alpha} 
+$$
+is adapted to:
+$$
+\widehat{C}_3 = \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big)^s
+$$ 
+In addition we will remove $oid$ from the ciphertext describtion since it refferese to the data owner id. Which is only needed on authentication key update.
+
+\item \textbf{Decryption:}
+$SK_W = \prod_{v_{aid_i,j} \in W} SK_{v_{aid_i,j}}$ and $UPK_W = \prod_{v_{aid_i,j} \in W} UPK_{v_{aid_i,j}}$ remain defined in the same was as defined in the paper. 
+
+On decryption the user does not need to generate $UPK_W$ and $SK_{uid, oid}$ anymore. The decryption equation is updated to:
+
+$$
+m = \frac{C_1 \cdotp e(H(uid), \widehat{C}_3)}{e(C_2, SK_W)}
+$$
+
+Note that the original decryption equation results in the above equation when the two factor part is deducted.
+
+\begin{equation}
+\begin{split}
+m &= \frac{C_1 \cdotp e(H(uid), C_3)}{e(C_2, SK_W)e(SK_{uid, oid}, UPK_W)} \\
+  &= \frac{C_1 \cdotp e\Big(H(uid), \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big)^{s + \alpha} \Big)}{e(C_2, SK_W)e(H(uid)^\alpha, \prod_{v_{aid_i,j} \in W} UPK_{v_{aid_i,j}})} \\
+  &= \frac{C_1 \cdotp e\Big(H(uid), \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big)^{s + \alpha} \Big)}{e(C_2, SK_W)e(H(uid)^\alpha, \prod_{v_{aid_i,j} \in W} g^{y_{aid_i,j}})} \\
+  &= \frac{C_1 \cdotp e\Big(H(uid), \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big) \Big)^{s + \alpha}}{e(C_2, SK_W)e(H(uid), \prod_{v_{aid_i,j} \in W} g^{y_{aid_i,j}})^\alpha} \\
+  &= \frac{C_1 \cdotp e\Big(H(uid), \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big) \Big)^{s}}{e(C_2, SK_W)} \\
+  &= \frac{C_1 \cdotp e(H(uid), \widehat{C}_3)}{e(C_2, SK_W)}
+\end{split}
+\label{eq:2faRemoval}
+\end{equation}
+
+As shwon, no security is threadned since we end up at the same equation as we would if we had the two factor part included. 
+
+\item \textbf{Attribute revocation:}
+The cipher text update key is adapted from
+
+$$
+CUK^{ID_W}_{v_{aid_i,j}} = (g^s \cdotp g^\alpha)^{y'_{aid_i,j} - y_{aid_i,j}}
+$$
+
+to 
+
+$$
+\widehat{CUK}^{ID_W}_{v_{aid_i,j}} = (g^s)^{y'_{aid_i,j} - y_{aid_i,j}}
+$$
+
+$\widehat{C}'_3$ now computes as 
+
+\begin{equation}
+\begin{split}
+\widehat{C}'_3 &= \widehat{C}_3 \cdotp \widehat{CUK}^{ID_W}_{v_{aid_i,j}} \\
+&\cdotp \Big( \prod_{v_{aid_{t}, j}\in W, v_{aid_t, j} \neq v_{aid_i,j}} g^{y_{aid_{i}, j}} \Big)^{r} \cdotp (g^{y'_{aid_i,j}})^{r} \\
+&= \Big( \prod_{v_{aid_{t}, j}\in W, v_{aid_t, j} \neq v_{aid_i,j}} g^{y_{aid_{i}, j}} \Big)^{s + r} \cdotp (g^{y'_{aid_i,j}})^{s + r}
+\end{split}
+\end{equation}
+
+It can be shown that $C'_3$ computes to the message $m$ in the same way as shown in eqation \ref{eq:2faRemoval}.
+
+\item \textbf{Authentication update:}
+Nothing need to change since cipher text do not contain authentication components. 
+
+
+\end{itemize}
