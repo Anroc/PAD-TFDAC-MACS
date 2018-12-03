@@ -51,27 +51,16 @@ Take for example Alice who wants is an intern in the Top Secret company. In mono
 
 While being an imported field in the boolean formular and fine-grand access control domain, non-monotonic access structures did not gain the same attention as CP or KP-ABE did. As an candidate which shell represent this ABE topic \cite{10.1007/978-3-642-54631-0_16} CP-ABE implementation will be used. With negation of attributes revocation becomes more or less trivial. Each attribute can be versioned and simply exlcuded on encryption. While this approach is not scalable over time it is simple enough to be implemented in some schemes.   
 
-\subsection{Hirachical ABE}
+\subsection{Multi-Authority Attribute Based Encryption}
+Ontop of the previos mentioned schemes emerged a new sub topic of ABE: \textit{Multi-Authority Attribute Based Encryption} (MA-ABE). The main motivation was that a single AA is not practically applicable. In the real world we face different domain each maintaining it own attributes. 
 
-\begin{figure*}[!ht]
-\centering
-    \includegraphics[width=0.5\linewidth]{img/HABE.png}
-    \caption{Structe of hirachical attribute-based encryption systems}
-    \label{fig:habe}
-\end{figure*}
+MA-ABE while beeing a roughly young field of ABE encryption technique enjoyed a lot of attention in the research area. In addition to the normal requirements like collusion resistance and revocation mechanism, MA-ABE also deals with the question on how to deescalate the global decryption power of the central authority (CA). 
 
-Hirachical Attribute-Based encryption (HABE) takes the key delegation one step further. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of his access power to a new instance. By nature follows a hirachical structure where each user could administrate an own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing.
+A setup of a MA-ABE system looks quite similar over the field of related work. On system inizialisation we setup the CA. The purpose of the CA is to bootrap new Attribute Authoritieis (AA) which then will administer their domain. In this domain users and attributes of the AA are located. After the CA bootstraped all AAs and all users are registed it could in theority go offline. 
 
-As displayed in figure \ref{fig:habe}, which is based on the approach in \cite{wang2011hierarchical}, the root master summarized the global decryption power of the system and can set up new domain masters (attribute authorities). They on the other hand can delegate a subset of decryption power to a sub domain master. Each domain master can administer users and attributes.
+To ensure system wide collusion resistance each user usally gets a unique user identifiery (UID) assigned. This UID is issued by the CA which is the only entity having an overview about the whole system. 
 
-Hirachical ABE is the predecessor of Multi-Authority Attribute based encryption. The differences can be summarized by the following points: In MA-ABE each user is assigned to a specific attribute authority. This must not be the case in HABE. HABE is tree-like orientated. Starting from the root node each following authority will have a subset of decryption power as its respectiv parent. 
-
-\cite{Wang:2010:HAE:1866307.1866414} formalized this approach using CP-ABE, which was later extended in \cite{wang2011hierarchical}. While implementing a revocation scheme, they depend on an access policy present in DNF, which might not always be possible without using negation. 
-
-A hirachical strcture and a delegation of decryption power would, as already mentioned, imply that the root master has global decryption power which is not desired \req{C4}. We want to design a system in which each domain is seperated is term of key generation from each other. That means that there is no top level domain which has global decryption power, rather we want to have a system where each subdomain creates its down keys and administrataes thier own attributes but that is still a part of a bigger system so able to interact with other domains.  
-\todo{Reformulate}
-
-
+A suitable condidate to compare MA-ABE to the previous introduced schemes is \textit{hirachical attribute based encryption} (HABE, section \ref{sec:HABE}). In short HABE is structured around the idea of attribute administration delegation. The strcture can be imaged like the domain name system. On top level there is the root master administating the whole domain. He can delegate power in form of attribute issuing und user setup to sub entities. This sub entities can again forward a subset of their power to their childen. For a complete explenation see \ref{sec:HABE}. We will use \cite{Wang:2010:HAE:1866307.1866414} as representiv candidate for MA-ABE. 
 
 \subsection{Comparison}
 To compare the selected representived of the previous section we choose the charm framework\footnote{\url{http://charm-crypto.io/}}. Here we can already find implementations for the sutable KP-ABE candidate \cite{lewko2010revocation} and for non-monotonic CP-ABE \cite{10.1007/978-3-642-54631-0_16}. The other two schemes such as CP-ABE \cite{liu2016practical} and \cite{wang2011hierarchical} where implemented by us in a github frok of the charm repo\footnote{\url{https://github.com/Anroc/charm}}. 

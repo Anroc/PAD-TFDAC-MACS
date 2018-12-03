@@ -1,10 +1,5 @@
 \section{Multi-authority attribute based encryption}
-In this section the field of Multi-authority attribute-based encryption (MA-ABE) will be evaluated more deeply with respect to all requirements of section \ref{sec:requierements}. MA-ABE while beeing a roughly young field of ABE encryption technique enjoyed a lot of attention in the research field. 
-In addition to the normal requirements like collusion resistance and revocation mechanism, MA-ABE also deals with the question on how to deescalate the global decryption power of the central authority (CA). 
-
-A setup of a MA-ABE system looks quite similar over the field of related work. On system inizialisation we setup the CA. The purpose of the CA is to bootrap new Attribute Authoritieis (AA) which then will administer their domain. In that domain are users and attributes of this AA located. After the CA bootstraped all AAs and all users are registed it could in theority go offline. 
-
-To ensure system wide collusion resistance each user usally gets a unique user identifiery (UID) assigned. This UID is issued by the CA which is the only entity having an overview about the whole system. 
+In this section the field of Multi-authority attribute-based encryption (MA-ABE) will be evaluated more deeply with respect to all requirements of section \ref{sec:requierements}. 
 
 Another notable technique recently used by \cite{yang2013dac}, \cite{wu2017security}, \cite{li2017two} and \cite{wang2011hierarchical} is \textit{proxy de-/reencryption}. It is motivated by the fact that mobile devices often don't have much computing resources so that the server may help the clients for decryption. The main idea is that the server does the preprocessing of the encrypted text given paramteres by the user. In the end the preprocessed encrypted content will be easily computable by the edge device. The cural fact is that the server will have no knowledge about the plaintext but rather helps the user on decryption or reencryption. 
 
@@ -27,7 +22,38 @@ The other disadventage, that was will present in the updated scheme, was that no
 
 The lack of addition new attribute authorities and the missing revocation scheme made chases scheme impractical for further evaluations but give a good introduction the fitfalls of MA-ABE schemes.
 
+\subsection{Hirachical ABE}
+\label{sec:HABE}
+
+\begin{figure*}[!ht]
+\centering
+    \includegraphics[width=0.5\linewidth]{img/HABE.png}
+    \caption{Structe of hirachical attribute-based encryption systems}
+    \label{fig:habe}
+\end{figure*}
+
+Hirachical Attribute-Based encryption (HABE) takes the key delegation one step further. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of his access power to a new instance. By nature follows a hirachical structure where each user could administrate an own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing.
+
+As displayed in figure \ref{fig:habe}, which is based on the approach in \cite{wang2011hierarchical}, the root master summarized the global decryption power of the system and can set up new domain masters (attribute authorities). They on the other hand can delegate a subset of decryption power to a sub domain master. Each domain master can administer users and attributes.
+
+Hirachical ABE is the predecessor of Multi-Authority Attribute based encryption. The differences can be summarized by the following points: In MA-ABE each user is assigned to a specific attribute authority. This must not be the case in HABE. HABE is tree-like orientated. Starting from the root node each following authority will have a subset of decryption power as its respectiv parent. 
+
+\cite{Wang:2010:HAE:1866307.1866414} formalized this approach using CP-ABE, which was later extended in \cite{wang2011hierarchical}. While implementing a revocation scheme, they depend on an access policy present in DNF, which might not always be possible without using negation. 
+
+A hirachical strcture and a delegation of decryption power would, as already mentioned, imply that the root master has global decryption power which is not desired \req{C4}. We want to design a system in which each domain is seperated is term of key generation from each other. That means that there is no top level domain which has global decryption power, rather we want to have a system where each subdomain creates its down keys and administrataes thier own attributes but that is still a part of a bigger system so able to interact with other domains.  
+\todo{Reformulate}
+
 \subsection{Decentralized attribute-based encryption}
+\label{sec:DABE}
+Both issues where addressed with the sub topic of \textit{decentralized attribute based encryption} (DABE). As the name indicates DABE does not need a CA managing the setup of additional AAs. This ecosystem is self sustaining in the form that each entity can become an AA if needed and start issuing new attributes to users. 
+
+Some form of centralization must be still preserved. The global paramter for example needs to be known to each new entity and each user usally need to get a unique global identifier to be identified among the set of users. Also attributes need to be somehow syncronized since the set of attriubte identifier usally need to be non intersecting across different domains. All this information could be published by a public bullitin board and was first proposed by \cite{lewko2011decentralizing}. 
+
+Revocation in such system remains an open issue. Since no central authority manages all users, no authority can be in charge of revocing them. An authroity could revoce its issued attributes but only in an indirct fassion since decentralzied systems are build around the idea that nodes can go offline at any time. If an authority would go offline as soon at it received the revocation request the revocation procedure would never trigger. 
+
+Cui and Deng showed in \cite{cui2016revocable} that such a system could exist. Each key and ciphertext got a liveness assigned that is active for a certain time periode. After the time periode expired all keys need to be reissed by each AA. Indirect revocation happens by simply not reissuing a user certain attribute keys. This sytem is implemented in the comparison in \ref{sec:ma-comparison}.
+
+The question remains if such a system would be practically applicable since each cipher text needs to be reuploaded in each time periode. Revocation in decentralized attribute based encryption remains an open issue.
 
 \subsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
 The most explored field in MA-ABE is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (DAC-MACS) family \cite{yang2013dac}. First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable MA-ABE scheme based on CP-ABE and using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding AAs on the running system and serves with a CA that has no global decryption power. In sort DAC-MACS satisfy all the non-optional requirements.
@@ -36,7 +62,7 @@ DAC-MACS elliminates the need for the global decryption power of the CA by issui
 
 DAC-MACS is not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factor DAC-MACS)\cite{li2017two}. 
 
-All the DAC-MACS schemes are structed in the same way. They usally describe six different entities:
+All the DAC-MACS schemes are structed in roughly the same way. They usally describe six different entities:
 
 \begin{enumerate}
 	\item \textbf{Certificate/Central Authority (CA)} The purpose of the CA is to issue user their global identifier (GID). Furhter they bootstrap the different AAs. The CA remains trusted but do not have any decryption power in the system. 
@@ -51,10 +77,72 @@ All the DAC-MACS schemes are structed in the same way. They usally describe six 
 	User are in general untrusted.
 \end{enumerate} 
 
+TF-DAC-MACS counts as the most advanced DAC-MACS scheme providing non global decryption power, secure revocation channels and both backward and forward secrecy. In addition TF-DAC-MACS introducted the two factor authentication where data owner can issue and revoce \textit{authentication keys} to and from users. This adds an additional layer of security. In total TF-DAC-MACS archives still better performance then the other DAC-MACS schemes probiding constant decryption and encryption overhead. 
+
+We will compare the basic proposal of DAC-MACS with TF-DAC-MACS in the comparison. 
+
 \subsection{Comparison}
+\label{sec:ma-comparison}
+
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 					| l 									| l 									| l 					| l}
+									& \thead{LTXWC 16\\(TF-DAC-MACS)}		& \thead{YJ 14\\(DAC-MACS)}				& \thead{LW 14\\ (HABE)}	& \thead{CD 16\\(DABE)} 	\\
+\hline
+\thead{Scheme}						& \makecell{CP (DAC-MACS \\ without proxy \\ 
+									  decryption, 
+									  with \\ two-factor \\ authentication)} & \makecell{CP (DAC-MACS \\ 
+									  										  with proxy \\ decryption)} 			& CP (Hirachical) 		& CP (Dezentralized)		\\ 
+\hline
+\thead{Revocation}					& Direct 								& Direct 								& Direct 				& Indirect					\\
+\hline
+\thead{Security scheme}				& Biliniear maps 						& Binilnear maps 						& Biliniear maps 		& Biliniear maps 			\\
+\hline
+\thead{Expression of \\ access policy} & n-of-n threshhold					& LSSS		 							& DNF 					& LSSS matrix 				\\ 
+\end{tabular}
+\caption{Scheme description. }
+\label{tab:comparison_ma_abe_overview}
+\end{table*}
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 	| l										| l 									| l 					| l}
+					& \thead{LTXWC 16\\(TF-DAC-MACS)}		& \thead{YJ 14\\(DAC-MACS)}				& \thead{LW 14\\(HABE)}	& \thead{CD 16\\(DABE)} 	\\
+\req{C1}			& Yes									& No 									& Yes 					& Yes 						\\
+\req{C2}			& Yes									& Yes 									& Yes 					& Yes 						\\ 
+\req{C3}			& Yes									& Yes 									& No 					& Yes 						\\ 
+\req{C4}			& Yes									& Yes 									& No 					& Yes 						\\ 
+\req{C5}			& Yes									& Yes 									& Yes 					& Yes 						\\ 
+\req{C6}			& Yes 									& Yes 									& Yes					& Yes						\\
+\req{C7}			& Yes									& Yes 									& No 					& Yes 						\\
+\req{C8}			& Yes									& Yes									& Yes					& Yes-						\\
+\req{O1}			& No 									& No 									& No 					& No 						\\
+\req{O2}			& No 									& Yes									& Yes					& Yes						\\
+\end{tabular}
+\caption{Requirements comparison of the implemented schemes}
+\label{tab:ma_abe_comparisons}
+\end{table*}
+
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=1\linewidth]{img/maabe_comparisons.png}
-    \caption{...}
+    \caption{Performance and scalability comparison}
     \label{fig:maabe_comparison}
 \end{figure*}
+
+To compare the sub topics of MA-ABE we need to extend the charm framework with an implementation of DABE, HABE and TF-DAC-MACS. DAC-MACS on the other hand exisited in the farmework already. 
+
+In general we extracted five steps that each MA-ABE scheme need to provide in some form. 
+\begin{enumerate}
+	\item \textbf{Setup:} The global setup phase where public paramter are settled.
+	\item \textbf{Authority Setup:} AAs can register themself to the central authority (if any) and compute their secret keys. Usally, the attribute secret keys are generated as well. 
+	\item \textbf{Register User:} In the DAC-MACS schemes user receive public and private key components. They are used for proxy decryption so that the server can help the user on decryption without revealing the plaintext. To do so the server generates a \textit{decryption token} which is encrypted with the users public key. Other schemes just assign the user a GID. 
+	\item \textbf{Kegen:} Attributes are assigned to user and the respective secret keys are generated.
+	\item \textbf{Encrypt:} The cipher text is encrypted by the data owner under an access policy.
+	\item \textbf{Decrypt:} The user (with the help of the server) decrypts the cipher text and revocers the secret message m. 
+\end{enumerate}
+
+This steps are shown and compared in \ref{fig:maabe_comparison}. As it turns out no scheme can be defined as the most performant or most scalabe one. All schemes performace roughly equally good. Some could argue that DAC-MACS performed the worst, then CABE, then TF-DAC-MACS and the best performance has HABE. 
+
+However, for pratical usage especially the encryption and decryption performance is cural. There only TF-DAC-MACS has an constant overhead while all other schemes are linear. If we further have a look at the table of requirements \ref{tab:ma_abe_comparisons}, we see that only two schemes satisfy all of the requirements: TF-DAC-MACS and DABE. DABE profits also from the fact that it has a more fine grant access control then TF-DAC-MACS. However, its revocation scheme is the disadventage that leave us with TF-DAC-MACS as our final candidate. As mentioned in section \ref{sec:DABE} the implemented scheme uses indirct time-based revocation, which forces data owner to periodically reencrypt and reupload thier content. This is in a cloud storage system not really applicable. 
+
+The comparison of TF-DAC-MACS with other schemes of the DAC-MACS family was left out in this work, since it was already done in the TF-DAC-MACS paper \cite{li2017two}. Here some could easly see that TF-DAC-MACS is currently the most performant scheme in the DAC-MACS family.  
