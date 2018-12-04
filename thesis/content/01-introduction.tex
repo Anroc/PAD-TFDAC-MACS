@@ -3,9 +3,9 @@
 \todo{
     * **Introduction**\\
     * Ruff problem describtion\\
-    * How ABE can solve this\\
-    * How ABE works\\
-    * Short history summary of ABE\\
+    * How \ac{ABE} can solve this\\
+    * How \ac{ABE} works\\
+    * Short history summary of \ac{ABE}\\
     * What is expected of this work\\
     * What are the targets
 }
@@ -28,7 +28,7 @@ In the following we will describe the encryption scheme currently enrolled in Bd
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=0.8\linewidth]{img/bdrive1.png}\par 
-    \caption{Client uploads an encrypted file to the CSPs and the file key and public key to Bdrive.}
+    \caption{Client uploads an encrypted file to the \ac{CSP}s and the file key and public key to Bdrive.}
     \label{fig:filekey}
 \end{figure*}
 \begin{figure*}[!ht]
@@ -38,7 +38,7 @@ In the following we will describe the encryption scheme currently enrolled in Bd
     \label{fig:rekey}
 \end{figure*}
 
-Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (CSP). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is then encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
+Bdrive is a secure cloud storage which splits up files in smaller chunks that are saved separately on different cloud storage provider (\ac{CSP}). To ensure end-to-end encryption a Bdrive client encrypts locally each of its chunks with a one-time symmetric key that is then encrypted under its own public key. This encrypted key is called a file key and it is uploaded to the Bdrive server where it is stored securely (see figure \ref{fig:filekey}).
 
 Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys accessible for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying (see figure \ref{fig:rekey}).
 
@@ -58,7 +58,7 @@ Since each device of the same user has a different private-public key pair, the 
 \todo{find better title}
 
 % File upload and file key creation
-In Bdrive each device of a user generates a new RSA key pair on registaion. The fingerprint (hash) of the public key identifies the device uniquly. To save a file in the cloud the device fist encrypes the file symmetrically with the so called "filekey". The filekey equals the hash of the plain file content and so ensures tamperproofness and integirty on decryption. Since Bdrives supports end-to-end encryption the server should never be able to decrypt the file by itself. The device encrypts the filekey asymmetrically with its own public key and uploads the filekey to the Bdrive server were it is stored securly. The encrypted file is uploaded to the different cloud storage provider. 
+In Bdrive each device of a user generates a new \ac{RSA} key pair on registaion. The fingerprint (hash) of the public key identifies the device uniquly. To save a file in the cloud the device fist encrypes the file symmetrically with the so called "filekey". The filekey equals the hash of the plain file content and so ensures tamperproofness and integirty on decryption. Since Bdrives supports end-to-end encryption the server should never be able to decrypt the file by itself. The device encrypts the filekey asymmetrically with its own public key and uploads the filekey to the Bdrive server were it is stored securly. The encrypted file is uploaded to the different cloud storage provider. 
 
 % Access file
 If the user wants to access a file locally, the devices requests the encrypted filekey from the server, downloads the file chunks from the cloud storage providers, decrypts the file key with his privat key and finally decrypts the file with the filekey. 

@@ -1,10 +1,10 @@
-\section{Implementation: TF-DAC-MACS}
+\section{Implementation: \ac{TF-DAC-MACS}}
 
 
 \subsection{Adaptions and Improvements}
-To make TF-DAC-MACS more pratically applicable we removed the fixed two-factor contrain from the encyrption, decryption, and cipher update part. The two factor identifier $\alpha$ is used by the data owner to restirct the access to the content to certain users. 
+To make \ac{TF-DAC-MACS} more pratically applicable we removed the fixed two-factor contrain from the encyrption, decryption, and cipher update part. The two factor identifier $\alpha$ is used by the data owner to restirct the access to the content to certain users. 
 
-This leads to the fact that the underlying ABE schemes looses some of it expressivness. The zero knowledge of the data owner on which invidual is able to decrypter the cipher text is broken with the two factor part. Here each user that wants to decryper the encrypted text need to make an \textit{authentication request} to the data owner to receive the corresponing decryption key. To restore the possiblity to let an unkown user group decrypter the cipher text, we removed the two factor part. To do so we adapted encryption, decryption and cipher text update. The authentication key update will be ignored since it makes no sense to apply it on a non exisiting authentication key. 
+This leads to the fact that the underlying \ac{ABE} schemes looses some of it expressivness. The zero knowledge of the data owner on which invidual is able to decrypter the cipher text is broken with the two factor part. Here each user that wants to decryper the encrypted text need to make an \textit{authentication request} to the data owner to receive the corresponing decryption key. To restore the possiblity to let an unkown user group decrypter the cipher text, we removed the two factor part. To do so we adapted encryption, decryption and cipher text update. The authentication key update will be ignored since it makes no sense to apply it on a non exisiting authentication key. 
 
 \begin{itemize}
 \item \textbf{Encryption:} 
@@ -18,7 +18,7 @@ is adapted to:
 $$
 \widehat{C}_3 = \Big( \prod_{v_{aid_{i}, j}\in W} g^{y_{aid_{i}, j}} \Big)^s
 $$ 
-In addition we will remove $oid$ from the ciphertext describtion since it refferese to the data owner id. Which is only needed on authentication key update.
+In addition we will remove $oid$ from the ciphertext describtion since it refferese to the data owner ID. Which is only needed on authentication key update.
 
 \item \textbf{Decryption:}
 $SK_W = \prod_{v_{aid_i,j} \in W} SK_{v_{aid_i,j}}$ and $UPK_W = \prod_{v_{aid_i,j} \in W} UPK_{v_{aid_i,j}}$ remain defined in the same was as defined in the paper. 
@@ -75,4 +75,4 @@ It can be shown that $C'_3$ computes to the message $m$ in the same way as shown
 Nothing need to change since cipher text do not contain authentication components. 
 \end{itemize}
 
-Another small tweak in the TF-DAC-MACS scheme was that the attributes for each AA do not have to be known on AA inizialisation. They can be creates as well on each users key gen. This reduces the universe of possible attribute values to thouse who are actually needed.
+Another small tweak in the \ac{TF-DAC-MACS} scheme was that the attributes for each \ac{AA} do not have to be known on AA inizialisation. They can be creates as well on each users key gen. This reduces the universe of possible attribute values to thouse who are actually needed.
