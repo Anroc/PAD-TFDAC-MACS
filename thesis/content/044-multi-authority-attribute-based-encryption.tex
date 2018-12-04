@@ -1,11 +1,11 @@
-\section{Multi-authority attribute based encryption}
+\subsection{Multi-authority attribute based encryption}
 In this section the field of Multi-authority attribute-based encryption (MA-ABE) will be evaluated more deeply with respect to all requirements of section \ref{sec:requierements}. 
 
 Another notable technique recently used by \cite{yang2013dac}, \cite{wu2017security}, \cite{li2017two} and \cite{wang2011hierarchical} is \textit{proxy de-/reencryption}. It is motivated by the fact that mobile devices often don't have much computing resources so that the server may help the clients for decryption. The main idea is that the server does the preprocessing of the encrypted text given paramteres by the user. In the end the preprocessed encrypted content will be easily computable by the edge device. The cural fact is that the server will have no knowledge about the plaintext but rather helps the user on decryption or reencryption. 
 
 In the following the different sub topics of MA-ABE will be described, analyzed given the requirement set and finally evaluated based on their perforamnce and scalability. 
 
-\subsection{Introduction into Multi-Authority Attribute-based Encryption}
+\subsubsection{Introduction into Multi-Authority Attribute-based Encryption}
 Chase 2007 \cite{chase2007multi} was the frist known to introduce the first MA-ABE schemes. In her paper she describes the process on how to derrive a multi-authority attribute-based encryption scheme vom the single authrotity schemes. 
 
 The collussion resistance criteria in ABE implies that any data owner needs to encrypt under attributes in such kind that the ciphertext is independent of any users specific identifiers. Any user could in theory decrypter the ciphertext if he holds the fullfilling attribute set. While chase's scheme also used bilinear maps it main security was based on interpolation and the fact that no underdefined linaer equation system could definitly be solved\footnote{For LSSS matrix are based on the same assumption.}.  
@@ -22,7 +22,7 @@ The other disadventage, that was will present in the updated scheme, was that no
 
 The lack of addition new attribute authorities and the missing revocation scheme made chases scheme impractical for further evaluations but give a good introduction the fitfalls of MA-ABE schemes.
 
-\subsection{Hirachical ABE}
+\subsubsection{Hirachical ABE}
 \label{sec:HABE}
 
 \begin{figure*}[!ht]
@@ -43,7 +43,7 @@ Hirachical ABE is the predecessor of Multi-Authority Attribute based encryption.
 A hirachical strcture and a delegation of decryption power would, as already mentioned, imply that the root master has global decryption power which is not desired \req{C4}. We want to design a system in which each domain is seperated is term of key generation from each other. That means that there is no top level domain which has global decryption power, rather we want to have a system where each subdomain creates its down keys and administrataes thier own attributes but that is still a part of a bigger system so able to interact with other domains.  
 \todo{Reformulate}
 
-\subsection{Decentralized attribute-based encryption}
+\subsubsection{Decentralized attribute-based encryption}
 \label{sec:DABE}
 Both issues where addressed with the sub topic of \textit{decentralized attribute based encryption} (DABE). As the name indicates DABE does not need a CA managing the setup of additional AAs. This ecosystem is self sustaining in the form that each entity can become an AA if needed and start issuing new attributes to users. 
 
@@ -55,7 +55,7 @@ Cui and Deng showed in \cite{cui2016revocable} that such a system could exist. E
 
 The question remains if such a system would be practically applicable since each cipher text needs to be reuploaded in each time periode. Revocation in decentralized attribute based encryption remains an open issue.
 
-\subsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
+\subsubsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
 The most explored field in MA-ABE is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (DAC-MACS) family \cite{yang2013dac}. First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable MA-ABE scheme based on CP-ABE and using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding AAs on the running system and serves with a CA that has no global decryption power. In sort DAC-MACS satisfy all the non-optional requirements.
 
 DAC-MACS elliminates the need for the global decryption power of the CA by issuing $k$ ciphertexts: One per AA. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new AAs at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
@@ -81,7 +81,7 @@ TF-DAC-MACS counts as the most advanced DAC-MACS scheme providing non global dec
 
 We will compare the basic proposal of DAC-MACS with TF-DAC-MACS in the comparison. 
 
-\subsection{Comparison}
+\subsubsection{Comparison}
 \label{sec:ma-comparison}
 
 \begin{table*}[!ht]

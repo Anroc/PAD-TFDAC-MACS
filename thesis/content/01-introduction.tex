@@ -1,4 +1,21 @@
-\section{A secure cloud storage system: Bdrive}
+\section{Introduction}
+\label{sec:introduction}
+\todo{
+    * **Introduction**\\
+    * Ruff problem describtion\\
+    * How ABE can solve this\\
+    * How ABE works\\
+    * Short history summary of ABE\\
+    * What is expected of this work\\
+    * What are the targets
+}
+\lettrine[nindent=0em,lines=3]{I}n public-key cryptography each user is identified by his unique public and private key pair. Peer-to-peer communication works well with this scheme, but as soon as an encrypted content needs to be accessed by multiple participants, the data owner has to encrypt the content for each user explicitly. This results in many encrypted versions of the same  file, each secured by a different public key. Such scheme does not scale in the secure cloud storage domain. Here often data holders want to share the same content with many other users at the same time.
+
+We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to employ an encryption scheme which has a constant number of access keys regardless of the number of participants.
+\todo{extend}
+
+\subsection{Secure cloud storage system}
+%Objective
 \todo{	
 	* How does rekeying in bdrive work currently?\\
 	* What security targets are covered\\
@@ -25,8 +42,6 @@ Bdrive is a secure cloud storage which splits up files in smaller chunks that ar
 
 Since each device of the same user has a different private-public key pair, the device is in charge of making the file keys accessible for a new device. This will be done by downloading each file key for the respective file, receiving the public key of the new device, decrypting the file key with its own private key, encrypting it again with the public key of the new device and finally, uploading the new file key to the Bdrive server. This process will be called re-keying (see figure \ref{fig:rekey}).
 
-The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in a share a new file key has to be created and maintained. 
-
 %The formula \ref{eq:rekey} describes the number of file keys Bdrive that need to be stored for each shared files between $U$ users, where each user $u_{i \in U}$ has $u_d$ devices.
 
 %\begin{equation}
@@ -37,7 +52,9 @@ The number of file keys, that need to be maintained in Bdrive, grows linearly wi
 %Lets construct an example where the manager of a company wants to create a shared folder with all company employees. It is a medium sized company with $50$ employees. Lets assume that at least haft of them have two Bdrive clients running. The manager wants to upload the $250$ photos of the last company trip.
 %We end up by computing $3/2 * 50 * 250 = 18750$ file keys and for every new file uploaded $75$ new file keys need to be uploaded. 
 
-\section{Bdrive Rekeying scheme}
+\subsection{Problem describtion}
+% Bdrive rekeying
+% Motivation and Problem description
 \todo{find better title}
 
 % File upload and file key creation
@@ -49,10 +66,23 @@ If the user wants to access a file locally, the devices requests the encrypted f
 % Process for multibe devices
 So far we saw how the encryption process is handled for a single device. However, this process turns out to be much more complex in computation in a multible devices setting.  If a user registers more then one device the exisiting data needs to be syncronized to the new device. The server nodifies the existing device for the new registered device and the public key of the new device is downloaded. Now, each filekey for each file of the user needs to be downloaded from the server and decrypted. To make them accessable for the new devices, they are encrypted with the new devices public key and uploaded again to the server. The new device can now start to download and decrypt the filekeys as decibed previously. 
 
-% Disadventages in shares
-Notice, that this approach does not scalable for a large number of devices. In addition, a cloud storage system usally provides the possibility to share the files with other users. Which means that each device of the user invited to a share needs to have an own encrypted file key issued. This process scales with $O(n * f)$ keys. Were $n$ donates the number of devices onvolved in the sharing and $f$ the number of file versions in the share.\footnote{Each file consit of many file versions. Each file version needs an own file key since the content changes each time the file is updated.} Futher, we need to send $O(n * f)$ messages to send each device its personal filekey and we need to encrypt each filekey $n$ times which also results in $O(n * f)$ encryptions in total. 
-
 % Adventages
 If a new devices joins the share we need to make the existing file keys avaiable to the new devices which results in $O(f)$ additional encryptions, messages and keys. However, a big adventage of this scheme is that we don't have to anything if a member leaves the group. We simply remove all the filekeys belonging to the left device and do not further encrypt new uploaded files for this device. However, this scheme benefits from implicit forward secrecy and backward secrecy. This is due to each filekey is encrypted individually for each entity so for each new file a new secret is generated. Which means that new members do not have any knowledge about the previously exchanged messages until they joind the group, formally known as backward secrecy. Forward secrecy describes the process is ensured. Backwards secrecy, which desribes the process that after a member is removed or vollenturally left the group he got no further access to the group communication anymore.
 
-The backward secrecy contstain, while being an imported security feature, will explicitly be broken by clients. If a data owner invites a new member into a group he wishes that the new member receives all previous uploaded information. Bdrive is ensuring this by explicitly reencyrpting all file keys for the new device. But there are better ways to share content more efficiently while disrepecting the constrains of backward secrey but still mainting forward secrecy. 
+The backward secrecy contstain, while being an imported security feature, will explicitly be broken by clients. If a data owner invites a new member into a group he wishes that the new member receives all previous uploaded information. Bdrive is ensuring this by explicitly reencyrpting all file keys for the new device. 
+%But there are better ways to share content more efficiently while disrepecting the constrains of backward secrey but still mainting forward secrecy. 
+
+% Disadventages in shares
+Notice, that this approach does not scalable for a large number of devices. In addition, a cloud storage system usally provides the possibility to share the files with other users. Which means that each device of the user invited to a share needs to have an own encrypted file key issued. This process scales with $O(n * f)$ keys. Were $n$ donates the number of devices onvolved in the sharing and $f$ the number of file versions in the share.\footnote{Each file consit of many file versions. Each file version needs an own file key since the content changes each time the file is updated.} Futher, we need to send $O(n * f)$ messages to send each device its personal filekey and we need to encrypt each filekey $n$ times which also results in $O(n * f)$ encryptions in total. 
+
+% Problem
+The number of file keys, that need to be maintained in Bdrive, grows linearly with the number of devices. In addition Bdrive allows to share files between different users. For each device of each user involved in a share a new file key has to be created and maintained. 
+
+\subsection{Contribution}
+\todo{
+    * What are the targets\\
+    * What makes this work stand out\\
+    * What we can gain from this work
+}
+The target of this work is to find a more scalable solution to the currently enrolled re-keying scheme in Bdrive. The new scheme needs to satisfy the requirements of section \ref{sec:requirements} with respect to multi-company management (each company administrates only its own domain) and inter-company file sharing (it is possible to share files across companies), as well as it should be practically applicable in the real world.
+\todo{extend}

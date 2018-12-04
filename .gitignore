@@ -5,6 +5,13 @@
 *.pdf
 *.out
 *.blg
+*.abo
+*.acn
+*.glo
+*.ist
+*.toc
 
 # due to legal reasons I am not allowed to upload the related work papers
 related_work 
+
+

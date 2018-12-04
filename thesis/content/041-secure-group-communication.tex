@@ -1,4 +1,4 @@
-\section{Secure Group Communication}
+\subsection{Secure Group Communication}
 The most simple approach to this challange is to create a secret \textit{group key} (GK) each time multible devices need to access the same file. This schemes are called "Secure Group Communication" (SGC). The main idea is to reduce the number of filekeys by encrypting all the files with a unique GK that is only known to the members in the share. Very simple approaches use a so called \textit{Key Distribution Center} (KDC) to distribute the group keys to each member. However, while Bdrive could manage forward secrecy quite easily, this schemes suffer from additional rekeying overhead if a member leaves the group. 
 
 % Mutlicast in group communications
@@ -11,7 +11,7 @@ Schemes that extend the 2-parties Diffie-Hellman (DH) key exchange to n-party sc
 
 In the following it will widly assumed that a client is identified uniquly by its public key, which is also known by the cloud server and can be queried by other clients. 
 
-\subsection{Group Key Management Protocol}
+\subsubsection{Group Key Management Protocol}
 The Group Key Management Protocol (GKMP)\cite{harney1997group} addresses this issue in a simple but more scalable way. If a device want to share files with a group it creates the group key and encrypts all filekeys with this group key. This GK needs to be securly distributed to all members which means that the data owner needs to download and store every public key of the group members and encrypt the GK for each of them. Further, the data owner needs to encrypt all shared filekeys symmetrically with the chosen group key. 
 
 % Disadventage
@@ -20,7 +20,7 @@ To ensure forward secrecy, the GK needs to be renewed everytime a member leaves 
 % Adventage
 The big adventage of this scheme, compared to the scheme employed in Bdrive, is that it recudes the overhead of encryptions, messages and keys on new file uploads dramastically. While the data owner had to create a filekey for each member respectivly, GKMP reduces this to one filekey per upload. Additionally, since we don't have to ensure backward secrecy, we only have to distribute the GK to the new joind member.
 
-\subsection{Logical Key Hirachy}
+\subsubsection{Logical Key Hirachy}
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=0.8\linewidth]{img/LKH.png}
@@ -35,7 +35,7 @@ While in GKMP each user needs to store each members public key to eventually rek
 
 In figure \ref{fig:lkh} user H recently joined the group which means, that to ensure backward secrecy, the keys in node $GH$, $EG$ and $GK$ must be updated. The key server will choose a new $GH'$, $EG'$ and $GK'$ and encrypts and distributes them in a buttom up fashion starting by $GH'$. $GH'$ is encrypted with user Gs and user Hs public key (G-PK, H-PK) and send to them. Next, user E and F receive in a multicast transmission $EG'$, which is encrypted with EF and user G and H receive in a multicast transmission $EG'$ which is now encrypted with the newly established $GH'$ key. Finally, GK needs to be updated. $GK'$ is encrypted with AC to multicast transmit it to the users A, B, C and D. And $GK'$ is encrypted with $EG'$ to transmit it in one message to user E, F, G and H. In the similar fashion a user would be added to the tree. Forward secrecy is implicitly given and not easly to remove from this scheme.
 
-\subsection{One-way function trees}
+\subsubsection{One-way function trees}
 To reduce the transmission and encryption overhead of $2log(n)$ to even further to $log(n)$ other schemes use pheudorandom functions \cite{canetti1999multicast} or one-way functions \cite{sherman2003key} to compute the required keys in the path. This schemes are strongly related to merkel trees, since each update of the user set, will force an update of the root node, the group key.
 
 Each user stores a blinded key for each siblings node in the path to the root node. Starting from the individual key, a user can compute the blinded version of his key. To compute the next parent key, a user uses his blinded key, together with the siblings blinded key, which is feeded into a one way function to create the key for the parent node. This node needs to be blinded to serve as the input for the next level. In such way the user can compute the needed keys up to the GK. 
@@ -43,7 +43,7 @@ Each user stores a blinded key for each siblings node in the path to the root no
 Lets assume user H joined the group in figure \ref{fig:lkh} and given a crypographically secure hash function $h$. First, user H needs to receive the blinded keys, $h(AC)$, $h(EF)$ and $h(G-PK)$ which he stores locally in addition to his own public key $H-PK$. One-way function trees has the same storage overhead as LKH with $log(n) + 1$.  As already known from LKH, we need to update $GH$, $EG$ and $GK$. This nodes are computed from their children blinded values using a merging function $m$ which takes two inputs and procues one output. This could for example be the concatination of both inputs and then applying $h$ to receive a fixed length output value. Starting from the button,  $GH'$ is computed as $m(f(G-PK), f(G-PK))$, analogous $EG' = m(f(EF), f(GH'))$ and finally the updated group key $GK' = m(f(AG), f(EG')$. The new blinded keys are distributed to their respective users using multicast transmissiong, reducing the transmission and encryption overhead to $log(n)$. Again backward secrecy is implicitly given by the natural update process of each node.
 
 
-\subsection{Comparison}
+\subsubsection{Comparison}
 \todo{find better title}  
 
 \begin{table*}[!ht]

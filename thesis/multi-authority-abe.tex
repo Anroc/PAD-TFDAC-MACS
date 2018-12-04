@@ -70,6 +70,8 @@
 \usepackage{caption}
 \usepackage{amsmath}
 \usepackage[textsize=footnotesize]{todonotes} % for todo notes
+\usepackage{acro}
+\acsetup{first-style=short}
 
 % define new command for \req (bold and italic)
 \newcommand{\req}[1]{\textbf{\textit{#1}}}
@@ -106,6 +108,7 @@ If a group of users want to share a ciphertext, they need to agree on a shared k
 }
 
 %----------------------------------------------------------------------------------------
+\input{./content/acronym/list-of-acronym}
 
 \begin{document}
 
@@ -114,103 +117,45 @@ If a group of users want to share a ciphertext, they need to agree on a shared k
     \maketitle
 ]
 
+\twocolumn[
+    \tableofcontents
+]
+\clearpage
 
 %----------------------------------------------------------------------------------------
 %	ARTICLE CONTENTS
 %----------------------------------------------------------------------------------------
 
-\section{Introduction}
-\label{sec:introduction}
-\todo{
-	* **Introduction**\\
-	* Ruff problem describtion\\
-	* How ABE can solve this\\
-	* How ABE works\\
-	* Short history summary of ABE\\
-	* What is expected of this work\\
-	* What are the targets
-}
-\lettrine[nindent=0em,lines=3]{I}n public-key cryptography each user is identified by his unique public and private key pair. Peer-to-peer communication works well with this scheme, but as soon as an encrypted content needs to be accessed by multiple participants, the data owner has to encrypt the content for each user explicitly. This results in many encrypted versions of the same  file, each secured by a different public key. Such scheme does not scale in the secure cloud storage domain. Here often data holders want to share the same content with many other users at the same time.
+% Introduction / Background  / Problem description
+\input{./content/01-introduction}
 
-We reach the point where the classical public-key end-to-end encryption scheme does not scale anymore. We would like to employ an encryption scheme which has a constant number of access keys regardless of the number of participants.
+% Related overview schemes and cloud storage evaluation
+\input{./content/02-related-work}
 
-\section{Related Work}
-\todo{
-	* **Related work**\\
-	* Of paper did something similar to this\\
-	* Comparison paper\\
-	* Not ABE paper
-}
+% Requirements
+\input{./content/03-requirements}
 
-\todo{
-	Cite \cite{lee2013survey} and similar overview paper
-}
-
-\subsection{Attribute-Based Encryption}
-Attribute Based Encryption (ABE), first introduced by Sahai and Waters \cite{sahai2005fuzzy}, is a cryptographic encryption scheme which uses attributes of a user as keys for encryption. This enables the data owner to craft a ciphertext over chosen attributes that can only be decrypted by any entity that holds a super set of matching attributes. Further, it is possible to embed a complex access structure (e.g. access trees) inside the cipher text, where each node contains \textit{AND} or \textit{OR} threshold gates. This approach is known as Ciphertext-Policy Attribute-Based Encryption (CP-ABE) \cite{bethencourt2007ciphertext}. 
-It is also possible to do it the other way around: Associate the user's key with an access policy, formally known as Key-Policy Attribute Based Encryption (KP-ABE).\cite{goyal2006attribute}. 
-%Now the encryptor needs only to encrypt a given plain text with the public key of specific attributes so that only users who hold the right keys are able to decrypt the cipher text.
-
-Both approaches are limited to one attribute authority (AA). So only one trusted entity is in charge of issuing attributes and their matching key pairs. However, in the real world we would like to distribute the issuing of attributes over different authorities. A new scheme is needed where different attribute authorities cooperate and communicate across different domains.  
-
-% The basic idea is, as proposed in \cite{chase2007multi}, to construct for each users a polynomial of degree $d-1$, where $d$ donates the number of attributes in our system. 
-
-Multi-Authority Attribute Based Encryption (MA-ABE), first proposed by Chase 2007 \cite{chase2007multi}, allows multiple attribute authorities to maintain different attribute domains. To ensure collusion resistance between users, a trusted  Central Authority (CA) was introduced to assign each user an unique identifier (UID) and making the decryption process depending on this UID. Its disadvantage is the CA's global decryption power and therefore the necessity to remain trusted. 
-%To prevent collusion between user in a multi authority setting, the challenge for each user needs to be individual. But it still needs to be ensured that the encryption of a message is independent of any user specific identifier, since the encryption progress should sourly depend on the attribute set known to the system.
-%To mitigate this problem a global identifier (GID or UID) per users was introduced that is shown to each attribute authority (AA) to receive the corresponding private key for the users attributes. 
-%The central authority (CA) now has to make sure that the user dependent challenge results in a global decryption key to decrypt the message.
-%In fact the CA has to be trusted since it computes the users private keys in such a way that on decryption it reveals the global decryption key. 
-Chase \textit{et al.} addressed this issue in \cite{chase2009improving} by distributing the global secret  master key generation over the AAs. However, since the global master secret is computed on system initialization, no further AAs can be added afterwards without rebooting the system. Also the scheme did not support attribute revocation which rendered it practical not applicable.
-% Each authority uses this seed in combination with a pseudo random function to deterministically create the users private key. Since the CA possesses the same seed, same pseudo random function and issues the users GID, it can also compute the same private key as issued by the corresponding AA. So it can ensure that on decryption the keys add up to reveal the global decryption key. This scheme has a major issue: The CA has global decryption power. 
-
-% Chase notices this problem as well and tried to mitigate it by decentrializing the seed generation \cite{chase2009improving}.  First user attributes could not easly be revoked\footnote{Chase proposed to assign each user a range of GIDs, so that a user can migrate to the next GID on revocation. Since the GID range is finite, this solution does not scale.}. Second AA's cant be added on runtime without reissuing each user his keys. And last, the attribute universe is finite (no large-universe). Further we noticed that if a failure of one AA renders the system unresponsible, since a cyphertext includes attributes from each authority. 
-
-Data Access Control for Multi-Authority Cloud Storage Systems (DAC-MACS) \cite{yang2013dac} is a scheme that tackles both of this issues. Each authority receives its own ciphertext that depends solely on the attributes issued in this domain. While Chase managed to maintain the "one-plaintext-one-ciphertext" ratio, DAC-MACS needs to create $k$ ciphertexts: One per AA.\footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new AAs at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy. 
-
-DAC-MACS is not collusion resistance on attribute revocation under the active attack model. The scheme NEDAC-MACS (New Extended DAC-MACS) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as MAACS \cite{li2016secure} and TFDAC-MACS (Two-Factor DAC-MACS)\cite{li2017two}. The DAC-MACS family is further known for the proxy decryption technique, first introduced by \cite{li2013matrix}, where a honest-but-curious server helps the user on decryption.
-
-Priscilla and Nagarajan 2018 \cite{nagarajan2018overview} conducted an analysis of the DAC-MACS family. In addition to that work, this thesis will focus on alternative approaches to improve scalability of secure cloud storage systems and analyze the field of ABE and MA-ABE more deeply.
-
-%------------------------------------------------
-
-\section{Contribution}
-\todo{
-	* What are the targets\\
-	* What makes this work stand out\\
-	* What we can gain from this work
-}
-The target of this work is to find a more scalable solution to the currently enrolled re-keying scheme in Bdrive. The new scheme needs to satisfy the requirements of section \ref{sec:requirements} with respect to multi-company management (each company administrates only its own domain) and inter-company file sharing (it is possible to share files across companies), as well as it should be practically applicable in the real world.
-
-%------------------------------------------------
-
-% Background  / Problem description
-\input{./content/05-background-bdrive}
-
-\input{./content/06-requirements}
-
-% Secure group communication
-\input{./content/07-secure-group-communication}
-
-% solution: ABE
-\input{./content/08-introducation-to-the-field-of-attribute-based-encryption}
-
-% ABE
-\input{./content/09-basic-attribute-based-encryption}
-
-% MA-ABE
-\input{./content/10-multi-authority-attribute-based-encryption}
+% Concept
+\input{./content/04-concept}
 
 % Implementation
-\input{./content/11-concept-and-implementation}
+\input{./content/05-implementation}
 
+% Evaluation
+\input{./content/06-evaluation}
 
-%----------------------------------------------------------------------------------------
-%	REFERENCE LIST
-%----------------------------------------------------------------------------------------
+% Conclusion
+\input{./content/07-conclusion}
+
+% List of Acronyms
+\printacronyms
+
+% Bibliography
 \clearpage
 \bibliography{multi-authority-abe} 
 \bibliographystyle{ieeetr}
 
+% Appendix
 \clearpage
 \onecolumn
 \appendices
