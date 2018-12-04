@@ -42,6 +42,9 @@ Each user stores a blinded key for each siblings node in the path to the root no
 
 Lets assume user H joined the group in figure \ref{fig:lkh} and given a crypographically secure hash function $h$. First, user H needs to receive the blinded keys, $h(AC)$, $h(EF)$ and $h(G-PK)$ which he stores locally in addition to his own public key $H-PK$. One-way function trees has the same storage overhead as LKH with $log(n) + 1$.  As already known from LKH, we need to update $GH$, $EG$ and $GK$. This nodes are computed from their children blinded values using a merging function $m$ which takes two inputs and procues one output. This could for example be the concatination of both inputs and then applying $h$ to receive a fixed length output value. Starting from the button,  $GH'$ is computed as $m(f(G-PK), f(G-PK))$, analogous $EG' = m(f(EF), f(GH'))$ and finally the updated group key $GK' = m(f(AG), f(EG')$. The new blinded keys are distributed to their respective users using multicast transmissiong, reducing the transmission and encryption overhead to $log(n)$. Again backward secrecy is implicitly given by the natural update process of each node.
 
+\subsubsection{N-Party Diffie-Hellmann Key Exchange}
+\todo{Write}\cite{steiner1996diffie}
+
 
 \subsubsection{Comparison}
 \todo{find better title}  
@@ -49,7 +52,7 @@ Lets assume user H joined the group in figure \ref{fig:lkh} and given a crypogra
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 		| l 						| l 							| l 						| l 						| l }
- 						& \textbf{Bdrive}			& \textbf{\ac{GKMP}}					& \textbf{\ac{LKH}}				& \textbf{\ac{OWFT}} 			& \textbf{\ac{GDH}.1}\\
+ 						& \textbf{Bdrive} & \textbf{\ac{GKMP}}\cite{harney1997group} & \textbf{\ac{LKH}}\cite{wallner1999key} & \textbf{\ac{OWFT}}\cite{sherman2003key} & \textbf{\ac{GDH}.1}\cite{steiner1996diffie}\\
 \hline
 \textbf{inizial share} 																																		\\
 keys 					& $nf$	 					& $1$  							& $n-1$  					& $n$	 					& $1$ 			\\

@@ -56,7 +56,7 @@ Cui and Deng showed in \cite{cui2016revocable} that such a system could exist. E
 The question remains if such a system would be practically applicable since each cipher text needs to be reuploaded in each time periode. Revocation in decentralized attribute based encryption remains an open issue.
 
 \subsubsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
-The most explored field in \ac{MA-ABE} is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (\ac{DAC-MACS}) family \cite{yang2013dac}. First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable \ac{MA-ABE} scheme based on \ac{CP-ABE} and using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding \ac{AA}s on the running system and serves with a \ac{CA} that has no global decryption power. In sort \ac{DAC-MACS} satisfy all the non-optional requirements.
+The most explored field in \ac{MA-ABE} is the Efficient Data Access Control for Multi-Authrotity Cloud Stroage (\ac{DAC-MACS}) family \cite{yang2013dac}). First instroducted by Yang \textit{et. al.} 2013 it desribes an efficient, revocable \ac{MA-ABE} scheme based on \ac{CP-ABE} and using proxy encryption on decryption and reencryption. Furhter this scheme features a large attribute universe, adding \ac{AA}s on the running system and serves with a \ac{CA} that has no global decryption power. In sort \ac{DAC-MACS} satisfy all the non-optional requirements.
 
 \ac{DAC-MACS} elliminates the need for the global decryption power of the \ac{CA} by issuing $k$ ciphertexts: One per \ac{AA}. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new \ac{AA}s at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
 
@@ -86,7 +86,7 @@ We will compare the basic proposal of \ac{DAC-MACS} with \ac{TF-DAC-MACS} in the
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 					| l 									| l 									| l 					| l}
-									& \thead{LTXWC 16\\(TF-DAC-MACS)}		& \thead{YJ 14\\(DAC-MACS)}				& \thead{LW 14\\ (HABE)}	& \thead{CD 16\\(DABE)} 	\\
+									& \thead{LTXWC 16\\(TF-DAC-MACS)\cite{li2017two}} & \thead{YJ 14\\(DAC-MACS)\cite{yang2013dac}} & \thead{LW 14\\ (HABE)\cite{wang2011hierarchical}}	& \thead{CD 16\\(DABE)}\cite{cui2016revocable} \\
 \hline
 \thead{Scheme}						& \makecell{CP (DAC-MACS \\ without proxy \\ 
 									  decryption, 
@@ -105,7 +105,7 @@ We will compare the basic proposal of \ac{DAC-MACS} with \ac{TF-DAC-MACS} in the
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 	| l										| l 									| l 					| l}
-					& \thead{LTXWC 16\\(TF-DAC-MACS)}		& \thead{YJ 14\\(DAC-MACS)}				& \thead{LW 14\\(HABE)}	& \thead{CD 16\\(DABE)} 	\\
+					& \thead{LTXWC 16\\(TF-DAC-MACS)\cite{li2017two}} & \thead{YJ 14\\(DAC-MACS)\cite{yang2013dac}} & \thead{LW 14\\ (HABE)\cite{wang2011hierarchical}}	& \thead{CD 16\\(DABE)}\cite{cui2016revocable} \\
 \req{C1}			& Yes									& No 									& Yes 					& Yes 						\\
 \req{C2}			& Yes									& Yes 									& Yes 					& Yes 						\\ 
 \req{C3}			& Yes									& Yes 									& No 					& Yes 						\\ 
