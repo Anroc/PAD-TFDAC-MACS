@@ -1,7 +1,48 @@
-\section{Implementation: \ac{TF-DAC-MACS}}
+\section{Implementation}
+As evaluated in the last section we will proceed to implement TF-DAC-MACS with small adaptions into a practical secure cloud storage system. To do so we need to implement five entities: Server, Certificate Authority (CA), Attribute Authorities (AA), Data Owner/User and Cloud Storage Provider (CSP). Which act differently over the five phases: Setup, encrypt, decrypt, attribute revocation and authentication key revocation. 
+
+\begin{itemize}
+	\item \textbf{Server} The server will do the inital setup of the public paramter used in the later process. It will provide a public bulliton board to receive such information. Further it will trigger and permit AA creations. To do so he will create a unique \textit{Authority Identifier} (\ac{AID}) that is unique in this cloud storage universe. 
+	\item \textbf{Certificate Authority (\ac{CA})} Issues certificate for the GID of the user. This certificate can be revoced so that the user is not able to optain new secret keys from the AA oder the data owners.
+	\item \textbf{Attribute Authority (\ac{AA})} The AA creates the secret keys for its attributes. Attributes are prefixed with the \ac{AID} to ensure uniqueness among the attribute universe. The AID is assigned by the server to ensure uniqueness.
+	\item \textbf{Data owner} Data owner can issue two-factor keys to trusted user. Only users owning a secret key issues by the data owner can decipher the cipher text if secured with the two factor key (\acc{2FA}-Key).
+	\item \textbf{Cloud storage provider (\ac{CSP})} The cloud storage provider provide storage to save the encrypted files.
+	\item \textbf{Users} Users download and decipher ciphertext. They receive attribute secret keys from the AA, GID and certifidates from the server and two factor keys from the data owners.
+\end{itemize}
+
+For en- and decryption we will still use the process of encyrpting the file symetrically to create a file key which will then encrypted under the attribute policy. Please note that for any details we referre to the paper of TF-DAC-MACS \cite{li2017two}.
+
+\subsection{Setup}
+This setup summarized the steps of \cite{li2017two} setup, user registration, data owner registration, authority setup, keygen and authentication requests. 
+
+The first step in the setup is to create the public paramter on the server. Thouse public paramter are exposed on a public bulliton board and queriable for each entity in this eco system. This paramter are used in every step so it is assumed that the entity already downloaded this informaiton. 
+
+On AA setup the server frist generates a new AID. This AID will be mapped to the domain name of this entity. So for example the TU-Berlin will have as its ID: "aa.tu-berlin.de". In this way it is ensured that no AID can double. Further, it would be verifable via SSL/TLS that this AID indeed belongs to the TU-Berlin. To do so the certificate coupled with this domain can be verified and then a query to "aa.tu-berlin.de" would lead to the corresponding AA of the TU-berlin.
+
+The AA is free to generate attribute keys. Attributes also have identifier and values assigned to them. Values and attribute identifier can be any valid string as long as it does not contain any special characters such as ":" or ".". The attribute will have the form of "<AID>.attr.<Attribute_name>:<Attribute_value>". For example the major computer sience would be displayed as "aa.tu-berlin.de.attr.major:computer_sience". Each attribute-value pair gets a secret key assigned. The public component for this attribute will be published on the bulliton board of the AA. 
+
+Users are registered to the server. They receive the GID and a certificate for this GID. They can use the certificate later on to register to the AA or to authenticate themself to other users. The GID will have the form "<AID>.user.<UID>" where UID is a universal unique identifier (\ac{UUID}) in version 4.  
+User receive their secret attribute keys by retrieving them from their AA. The AA verifies the certificate and issues the user his roles.
+
+In the final setup, users can issue each other two factor keys so called \textit{authentication keys}. This authentication keys introduce a new layer of security where users can decide who exactly can decipher their plaintext. In some cases this may be needed since the data owner never knows who exactly can decipher the cipher text. 
+If Bob wants to get an authentication key from Alice he sends a authentication request to Alice containing this certificate. Alice checks the validity of the certificate and returns the Bob-specific authentication key.  
+
+\subsection{Encryption}
+To upload a file encrypted under an access policy Alice first encrypts the file symetrically to create a file key. This results in an file key and an encrypted file. The encrypted file is split up into different chunks. Alice requests from the server a signed upload URL which she can use to upload the chunks to the CSPs. 
+
+The file key, on the other hand, will be encrypted with under an access policy. This encrypted file key will be uploaded to server where it is stored securly. 
+
+\subsection{Decryption}
+On decryption the process first the encrypted file key will be downloaded from the server and if the Bob has a matching super set of attributes he can decipher it. He might also apply the two factory key from Alice to endup with the plain file key. 
+
+Next, he downloads the file chunks from the CSP, assembled them back together and decryphs them with the revocered file key.
+
+\subsection{Revoke attribute}
 
 
 \subsection{Adaptions and Improvements}
+
+\subsubsection{Removing the fix two-factor contrain}
 To make \ac{TF-DAC-MACS} more pratically applicable we removed the fixed two-factor contrain from the encyrption, decryption, and cipher update part. The two factor identifier $\alpha$ is used by the data owner to restirct the access to the content to certain users. 
 
 This leads to the fact that the underlying \ac{ABE} schemes looses some of it expressivness. The zero knowledge of the data owner on which invidual is able to decrypter the cipher text is broken with the two factor part. Here each user that wants to decryper the encrypted text need to make an \textit{authentication request} to the data owner to receive the corresponing decryption key. To restore the possiblity to let an unkown user group decrypter the cipher text, we removed the two factor part. To do so we adapted encryption, decryption and cipher text update. The authentication key update will be ignored since it makes no sense to apply it on a non exisiting authentication key. 
@@ -75,4 +116,15 @@ It can be shown that $C'_3$ computes to the message $m$ in the same way as shown
 Nothing need to change since cipher text do not contain authentication components. 
 \end{itemize}
 
+\subsubsection{Dynamic secret key generation}
 Another small tweak in the \ac{TF-DAC-MACS} scheme was that the attributes for each \ac{AA} do not have to be known on AA inizialisation. They can be creates as well on each users key gen. This reduces the universe of possible attribute values to thouse who are actually needed.
+
+\subsection{Extension to m-of-n treshold policy}
+Extending to m-of-n treshold policy is also quite straight forward if we are willing to make traide offs in performance. So the client could upload different versions of the plain text encrypted under different policies. A client only need to decipher one of thouse cipher texts to revocer the message.
+
+\subsection{Numerical boolean comparisons}
+As described in \cite{bethencourt2007ciphertext} we could display numeric values in binary. Each number $x$ is composed of $\lceil log_2(x) \rceil$ attributes. Each of this attributes relate to either a $1$ or $0$ in one position in the binary number respresentation of $x$. So for example the number $5$ in binary would be displayed as $0101$ and its attribute would be: $x:0***$, $x:*1**$, $x:**0*$ and $x:***1$. 
+
+If a user now wants to create a policy where he challanges a number $x$ to be greater or equal to $3$ he would create a policy: "$(x:1*** or (x:*1** or (x:**1* and x:***1))$". Analogous the policy for $x$ smaller than $4$: "$(x:0*** and (x:*0** or (x:*1** and x:**0* and x:***0))$".
+
+Disadventage of this representation is of cause that it is limited in space. To display a 32-bit number we must issue 64 attriubte values and maintain 64 attriubte value keys. 
