@@ -1,0 +1,4 @@
+dependencies {
+    compile 'net.java.dev.jna:jna:5.1.0'
+    compile 'it.unisa.dia.gas:jpbc-pbc:2.0.0'
+}
