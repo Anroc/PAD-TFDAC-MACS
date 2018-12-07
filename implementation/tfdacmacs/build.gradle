@@ -1,31 +1,10 @@
-buildscript {
-    ext {
-        springBootVersion = '2.1.1.RELEASE'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
 
     group = 'de.tuberlin.tfdacmacs'
     version = '0.0.1-SNAPSHOT'
     sourceCompatibility = 1.8
-
-    dependencyManagement {
-        imports {
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
-        }
-    }
-
 
     repositories {
         mavenCentral()
@@ -33,11 +12,10 @@ subprojects {
     }
 
     dependencies {
-        implementation('org.springframework.boot:spring-boot-starter')
-        compileOnly('org.projectlombok:lombok')
-
+        compileOnly("org.projectlombok:lombok:1.16.20")
         testImplementation "junit:junit:4.12"
-        testImplementation('org.springframework.boot:spring-boot-starter-test')
+//        testCompile 'org.assertj:assertj-core:3.11.1'
+//        testCompile 'org.mockito:mockito-all:1.10.19'
     }
 }
 

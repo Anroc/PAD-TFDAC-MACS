@@ -6,6 +6,7 @@ import it.unisa.dia.gas.jpbc.PairingParametersGenerator;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeACurveGenerator;
 import it.unisa.dia.gas.plaf.jpbc.pbc.curve.PBCTypeACurveGenerator;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class PairingGenerator {
         return setupPairing(generateNewTypeACurveParameter());
     }
 
-    public Pairing setupPairing(PairingParameters parameters) {
+    public Pairing setupPairing(@NonNull PairingParameters parameters) {
         return this.pairingFactory.initPairing(parameters);
     }
 

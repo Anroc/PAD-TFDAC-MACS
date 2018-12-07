@@ -1,4 +1,14 @@
+plugins { id "io.spring.dependency-management" version "1.0.5.RELEASE" }
+
+
+dependencyManagement {
+    imports { mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE") }
+}
+
 dependencies {
     compile 'net.java.dev.jna:jna:5.1.0'
     compile 'it.unisa.dia.gas:jpbc-pbc:2.0.0'
+    compile('org.springframework.boot:spring-boot-starter')
+
+    compile('org.springframework.boot:spring-boot-starter-web')
 }
