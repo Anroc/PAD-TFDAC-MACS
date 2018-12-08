@@ -24,3 +24,9 @@ project(':centralServer') {
         implementation project(':basics')
     }
 }
+
+project(':attributeAuthority') {
+    dependencies {
+        implementation project(':basics')
+    }
+}

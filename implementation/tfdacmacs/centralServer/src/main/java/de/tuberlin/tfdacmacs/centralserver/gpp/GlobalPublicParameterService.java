@@ -1,16 +1,18 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
 import de.tuberlin.tfdacmacs.basics.crypto.PairingGenerator;
-import de.tuberlin.tfdacmacs.centralserver.gpp.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.basics.gpp.data.GlobalPublicParameter;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Data
 @Service
+@Slf4j
 public class GlobalPublicParameterService {
 
     private GlobalPublicParameter globalPublicParameter;
@@ -20,10 +22,9 @@ public class GlobalPublicParameterService {
 
     public GlobalPublicParameter createOrGetGPP() {
         if (globalPublicParameter == null) {
-            return createGlobalPublicParameter();
-        } else {
-            return this.getGlobalPublicParameter();
+            this.globalPublicParameter = createGlobalPublicParameter();
         }
+        return this.getGlobalPublicParameter();
     }
 
     private GlobalPublicParameter createGlobalPublicParameter() {

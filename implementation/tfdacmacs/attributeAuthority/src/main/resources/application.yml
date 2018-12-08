@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: AttributeAuthority
+
+server:
+  port: 9002
+
+attributeAuthority:
+  id: "aa.tu-berlin.de"
+---
+spring:
+  profiles: test
