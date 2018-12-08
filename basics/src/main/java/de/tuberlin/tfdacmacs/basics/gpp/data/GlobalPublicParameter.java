@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.gpp.data;
+package de.tuberlin.tfdacmacs.basics.gpp.data;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
