@@ -30,7 +30,7 @@ public class GlobalPublicParameterService {
     private GlobalPublicParameter createGlobalPublicParameter() {
         PairingParameters pairingParameters = pairingGenerator.generateNewTypeACurveParameter();
         Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
-        Element g = pairing.getG1().newRandomElement();
+        Element g = pairing.getG1().newRandomElement().getImmutable();
         return new GlobalPublicParameter(pairing, pairingParameters, g);
     }
 }

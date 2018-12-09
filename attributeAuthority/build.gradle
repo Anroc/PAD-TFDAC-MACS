@@ -29,6 +29,5 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.cloud:spring-cloud-starter-eureka-server')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
