@@ -1,3 +1,4 @@
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
@@ -12,10 +13,10 @@ subprojects {
     }
 
     dependencies {
-        compileOnly("org.projectlombok:lombok:1.16.20")
+        compileOnly 'org.projectlombok:lombok:1.18.4'
+        annotationProcessor 'org.projectlombok:lombok:1.18.4'
         testImplementation "junit:junit:4.12"
-//        testCompile 'org.assertj:assertj-core:3.11.1'
-//        testCompile 'org.mockito:mockito-all:1.10.19'
+        testCompileOnly 'org.projectlombok:lombok:1.18.4'
     }
 }
 
@@ -28,5 +29,6 @@ project(':centralServer') {
 project(':attributeAuthority') {
     dependencies {
         implementation project(':basics')
+        testCompile project(':basics').sourceSets.test.output
     }
 }

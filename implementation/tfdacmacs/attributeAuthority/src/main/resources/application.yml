@@ -5,7 +5,7 @@ spring:
 server:
   port: 9002
 
-attributeAuthority:
+attribute-authority:
   id: "aa.tu-berlin.de"
 ---
 spring:

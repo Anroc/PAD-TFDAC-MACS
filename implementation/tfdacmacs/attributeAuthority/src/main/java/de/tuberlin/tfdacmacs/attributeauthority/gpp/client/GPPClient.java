@@ -19,7 +19,7 @@ public class GPPClient {
     public GlobalPublicParameter getGPP() {
         GlobalPublicParameterDTO gpp = gppFeignClient.getGPP();
         PairingParameters pairingParameters = gpp.getCurveParameter().toPairingParameter();
-        Pairing pairing = pairingGenerator.setupPairing();
+        Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
         Element g = gpp.getGenerator().toElement(pairing.getG1());
         return new GlobalPublicParameter(pairing, pairingParameters, g);
     }

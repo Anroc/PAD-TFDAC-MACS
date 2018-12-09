@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Configuration
-@ConfigurationProperties(prefix = "attributeAuthority")
+@ConfigurationProperties(prefix = "attribute-authority")
 public class AttributeAuthorityConfig {
 
     @NotBlank

@@ -1,7 +1,5 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attributes.data.dto;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,13 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.EXISTING_PROPERTY, property="type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value=BooleanAttribute.class, name="BOOLEAN"),
-        @JsonSubTypes.Type(value=StringAttribute.class, name="STRING"),
-        @JsonSubTypes.Type(value=NumberAttribute.class, name="NUMBER")
-})
-public abstract class AttributeCreationRequest<T> {
+public class AttributeCreationRequest {
 
     @NotBlank
     private String name;
@@ -28,5 +20,5 @@ public abstract class AttributeCreationRequest<T> {
     @NotNull
     private AttributeType type;
 
-    public abstract List<T> getValues();
+    private List<Object> values;
 }

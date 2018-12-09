@@ -13,7 +13,7 @@ public class AttributeKeyGenerator {
      * Generates new attribute private and public keys for the given attribute value.
      *
      * @param value the attribute value
-     * @param gpp the global public paramter
+     * @param gpp the global public parameter
      * @param <T> the type of the attribute
      * @return the computed {@link AttributeValue}
      */
@@ -22,6 +22,6 @@ public class AttributeKeyGenerator {
         Element privateKey = gpp.getPairing().getZr().newRandomElement();
         Element publicKey = g.powZn(privateKey);
 
-        return new AttributeValue<>(privateKey, publicKey, value);
+        return new AttributeValue(privateKey, publicKey, value);
     }
 }

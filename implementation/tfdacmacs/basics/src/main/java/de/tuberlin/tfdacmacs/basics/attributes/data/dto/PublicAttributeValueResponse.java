@@ -12,14 +12,14 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicAttributeValueResponse<T> {
+public class PublicAttributeValueResponse {
 
     @NotBlank
     private String publicKey;
     @NotNull
-    private T value;
+    private Object value;
 
-    public static <T> PublicAttributeValueResponse from(AttributeValue<T> attributeValue) {
+    public static PublicAttributeValueResponse from(AttributeValue attributeValue) {
         PublicAttributeValueResponse publicAttributeValueResponse = new PublicAttributeValueResponse();
         publicAttributeValueResponse.setValue(attributeValue.getValue());
         publicAttributeValueResponse.setPublicKey(ElementConverter.convert(attributeValue.getPublicKey()));

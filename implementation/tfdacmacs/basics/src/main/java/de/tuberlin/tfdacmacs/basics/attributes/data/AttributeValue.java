@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttributeValue<T> {
+
     @NotNull
     private Element privateKey;
     @NotNull
@@ -18,8 +19,4 @@ public class AttributeValue<T> {
 
     @NotNull
     private T value;
-
-    public static String generateId(String authorityDomain, String name, String value) {
-        return Attribute.generateId(authorityDomain, name) + ":" + value;
-    }
 }

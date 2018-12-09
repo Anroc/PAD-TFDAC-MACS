@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 
 @Data
 @NoArgsConstructor
@@ -38,7 +36,7 @@ public class CurveParameterDTO {
         propertiesParameters.put("exp1", String.valueOf(exp1));
         propertiesParameters.put("exp2", String.valueOf(exp2));
         propertiesParameters.put("sign0", String.valueOf(sign0));
-        propertiesParameters.put("sign0", String.valueOf(sign1));
+        propertiesParameters.put("sign1", String.valueOf(sign1));
         return propertiesParameters;
     }
 
@@ -50,7 +48,7 @@ public class CurveParameterDTO {
         curveParameterDTO.setExp1(pairingParameters.getInt("exp1"));
         curveParameterDTO.setExp2(pairingParameters.getInt("exp2"));
         curveParameterDTO.setSign0(pairingParameters.getInt("sign0"));
-        curveParameterDTO.setSign1(pairingParameters.getInt("sign0"));
+        curveParameterDTO.setSign1(pairingParameters.getInt("sign1"));
         return curveParameterDTO;
     }
 }

@@ -9,6 +9,6 @@ dependencies {
     compile 'net.java.dev.jna:jna:5.1.0'
     compile 'it.unisa.dia.gas:jpbc-pbc:2.0.0'
     compile('org.springframework.boot:spring-boot-starter')
-
     compile('org.springframework.boot:spring-boot-starter-web')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }

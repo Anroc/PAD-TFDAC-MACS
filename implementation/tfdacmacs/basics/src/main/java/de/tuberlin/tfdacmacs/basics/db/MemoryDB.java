@@ -17,8 +17,6 @@ public abstract class MemoryDB<T extends Entity> {
 
     @Autowired
     private SmartValidator validator;
-    @Autowired
-    private DirectFieldBindingResult directFieldBindingResult;
 
     private Map<String, T> memoryDB = new HashMap<>();
 
@@ -71,7 +69,7 @@ public abstract class MemoryDB<T extends Entity> {
      * @return the id of the entity for reference
      */
     public String upsert(@NonNull T entity) {
-        validator.validate(entity, directFieldBindingResult);
+        validator.validate(entity, new DirectFieldBindingResult(entity, entity.getClass().getName()));
         memoryDB.put(entity.getId(), entity);
         return entity.getId();
     }

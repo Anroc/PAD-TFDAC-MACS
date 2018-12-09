@@ -13,4 +13,8 @@ public class GlobalPublicParameter {
     private final Pairing pairing;
     private final PairingParameters pairingParameters;
     private final Element g;
+
+    public Element getG() {
+        return g.duplicate();
+    }
 }

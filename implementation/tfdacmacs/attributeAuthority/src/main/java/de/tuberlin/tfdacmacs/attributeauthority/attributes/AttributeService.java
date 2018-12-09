@@ -34,13 +34,15 @@ public class AttributeService {
         return attributeDB.findEntity(attributeId);
     }
 
-    public <T> Attribute createAttribute(@NonNull String name, @NonNull AttributeType type, List<T> values) {
+    public Attribute createAttribute(@NonNull String name, @NonNull AttributeType type, List<?> values) {
         GlobalPublicParameter gpp = globalPublicParameterService.createOrRetrieveGPP();
 
-        List<AttributeValue<T>> attrValues = values.stream().map(value ->
+        List<AttributeValue> attrValues = values.stream().map(value ->
                         attributeKeyGenerator.generateAttributeKeys(value, gpp))
                         .collect(Collectors.toList());
 
-        return new Attribute(config.getId(), name, attrValues, type);
+        Attribute attribute = new Attribute(config.getId(), name, attrValues, type);
+        attributeDB.insert(attribute);
+        return attribute;
     }
 }

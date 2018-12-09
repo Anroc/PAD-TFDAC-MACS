@@ -15,21 +15,20 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicAttributeResponse<T> {
+public class PublicAttributeResponse {
 
     @NotBlank
     private String authorityDomain;
     @NotBlank
     private String name;
     @NotBlank
-    private List<PublicAttributeValueResponse<T>> values;
+    private List<PublicAttributeValueResponse> values;
     @NotNull
     private AttributeType type;
-
     @NotBlank
-    private String publicKey;
+    private String id;
 
-    public static <T> PublicAttributeResponse from(@NonNull Attribute<T> attribute) {
+    public static PublicAttributeResponse from(@NonNull Attribute attribute) {
         PublicAttributeResponse publicAttributeResponse = new PublicAttributeResponse();
         publicAttributeResponse.setAuthorityDomain(attribute.getAuthorityDomain());
         publicAttributeResponse.setName(attribute.getName());
@@ -39,6 +38,7 @@ public class PublicAttributeResponse<T> {
                         .collect(Collectors.toList())
         );
         publicAttributeResponse.setType(attribute.getType());
+        publicAttributeResponse.setId(attribute.getId());
         return publicAttributeResponse;
     }
 }
