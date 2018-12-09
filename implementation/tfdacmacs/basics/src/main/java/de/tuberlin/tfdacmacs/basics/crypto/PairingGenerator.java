@@ -47,11 +47,12 @@ public class PairingGenerator {
         int rBits = 160;
         int qBits = 512;
 
+        log.info("Creating new GPP");
         PairingParametersGenerator ppg;
-
         if(nativeExtensionAvailable()) {
             ppg = new PBCTypeACurveGenerator(rBits, qBits);
         } else {
+
             ppg = new TypeACurveGenerator(rBits, qBits);
         }
 

@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.gpp.data;
+package de.tuberlin.tfdacmacs.basics.gpp.data;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -13,4 +13,8 @@ public class GlobalPublicParameter {
     private final Pairing pairing;
     private final PairingParameters pairingParameters;
     private final Element g;
+
+    public Element getG() {
+        return g.duplicate();
+    }
 }

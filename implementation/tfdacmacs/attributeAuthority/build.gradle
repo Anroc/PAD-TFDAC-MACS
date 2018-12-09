@@ -16,7 +16,7 @@ apply plugin: 'io.spring.dependency-management'
 dependencyManagement {
     imports {
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
-        mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     }
 }
 
@@ -24,7 +24,10 @@ dependencyManagement {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
