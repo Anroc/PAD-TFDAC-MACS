@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.attributes.db;
+package de.tuberlin.tfdacmacs.attributeauthority.attribute.db;
 
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.db.MemoryDB;
