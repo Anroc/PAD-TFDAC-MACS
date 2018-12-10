@@ -1,95 +1,108 @@
-\subsection{An introduction to the field of Attribute-Based Encryption}
-A key requirement in security of distributed systems is authenticity. It describes the principle of associating individuals with their digital representation. A so called \textit{public key infrastructure} (\ac{PKI}) uses certificates the validate the public key bound to an identity.
+\subsection{Basic Attribute-Based Encryption}
+In the following sections we will have a look at the different ABE schemes. We will extract the  characteristics of each subtopic of ABE, select a representative candidate and finally, a practical performance comparison to evaluate the scalability is done. 
 
-Identity-based encryption (\ac{IBE}) tries to circumvent this standard by binding identities to unique strings already associated with this identity, such as an email address. If we could encrypt directly with this identifier, we would not need a certificate check to validate the identity of the recipient. 
+A suitable candidate in the field of ABE is a scheme that satisfies the requirements stated in section \ref{sec:requirements}. The requirements are a super set of thous defined in \cite{lee2013survey}. For the basic \ac{ABE} schemes we will focus on the requirements \req{C1}, \req{C3}, \req{C5} - \req{C8} and optional requirements \req{O1} and \req{O2}.
+The general requirements \req{B1} and \req{B2} will be evaluated by the practical performance and scalability analysis.
 
-\subsubsection{Identity Based Encryption}
-The idea of using universal identifier instead of public keys to identify individuals goes back until 1984. Shamir proposed the first \textit{Identity-Based Encryption} (\ac{IBE}) \cite{shamir1984identity} to use a central authority to create for each newly registered user a unique universal identifier (e.g. the email address) that can be used for encryption as we use to do with a public key. However, the difference to \ac{RSA} is that, since the universal identity is the public key, the use of a \ac{PKI} becomes nugatory. The main point was constructed around the idea of sending an email to a yet unknown coworker. Since the sender has to know the email address of the recipient he can derivative public key component from it, encrypt the email with this key and can be sure that only the identity owning this email can decipher the content. 
+Some requirements are left out since not all requirements are directly applicable to all ABE schemes. We need to find the comparable subset of requirements on which bases we are able to compare the schemes. The more we dig deeper into the topic the more requirements can we include in our analysis. 
 
-A central authority was introduced since the users private key are derived from a random seed only known to this authority. If this seed was publicly known each user could simply compute the private key from any public identifier and so confidentiality would be broken. 
+\subsubsection{Collusion resistance (C2 requirement)}
+Lets construct a very basic attribute based encryption scheme to clarify the importance of collusion resistance. Assume a distributed crypto-system based on \ac{RSA}. We setup an \ac{AA} which binds attributes to \ac{RSA} public-private key pairs. The attribute "student" gets bound to $K_{PR(s)}$ for the private key and $K_{PU(s)}$ for the public key. Attribute "works at TU Berlin" gets bound to the Key $K_{PK_PR(tu)}$ and $K_{PU(tu)}$ respectively. Now, we setup our very own first ABE scheme. The AA can pin the public keys of each attributes to its public billboard so that every entity in the system can use the public attribute keys for encryption. Each user who is currently a student receives a copy of the private key $K_{PR(s)}$ and each user who is currently working at TU Berlin receives a copy of $K_{PR(tu)}$. 
 
-Since this scheme could neither be shown to be practical applicable, nor to proven secure, it was not until 2001 when Boneh and Franklin proposed in \cite{boneh2001identity} a new approach to identity-based encryption. The use of the \textit{Weil pairing} revolutionized the field of identity-based encryption.\footnote{Curious reader can readup on the weil pairing here \cite{Miller2004} \cite{galbraith2008pairings} or here \url{https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627}}
+A user, lets call her for historical reason Alice, wants to share content with all students that are also working at TU Berlin. With our basic scheme Alice is able to use \textit{layered encryption}\footnote{Layered encryption: encrypting a plain text with multiple keys, forcing the decryptor to own all relevant keys} to create an \textit{AND}-policy for her cipher text. She encrypts the plain text $p$ with both public attribute keys $c = K_{PU(s)}(K_{PU(tu)}(P))$ and publishes the ciphertext $c$ to a public CSP so that everyone can download it. Students that are working at TU Berlin owning both private keys can decipher the ciphertext by applying both private keys in reverse order $K_{PR(tu)(K_{PR{s}}(c)}$.
 
-\subsubsection{Bilinear Mappings}
-\label{sec:bilinearmappings}
-Bilinear mappings are a tool for \textit{cryptographic pairings} and define the relationship between two cyclic groups of the same order into a third one. A cyclic group $G$ is defined by an generator $g$ of that form that each $g^n \in G$ with $n \in \mathbb{Z}$ completely describes each element in the group $G$.
+The attentive reader will have notice a crucial security leak in this scheme. This \ac{ABE} scheme is not collusion resistant. In fact, collusion resistance is a core requirement of any ABE scheme. On paper it is defined as the impossibility of any two attribute holder to combine their attributes to archive a higher level of encryption. Lets assume that Bob is a student and Eve is working at \ac{TU} Berlin. Both users received their private key. Now they can simply exchange their attribute keys so that they are both able to decipher the ciphertext even if they separately do not own both attributes.  
 
-A bilinear map function $e$, also called \textit{pairing} is now defined as the mapping between two groups of the same order $G_1$ and $G_2$ into $G_t$:
+Usually collusion resistance is ensured by issuing each user a private key that is blinded by a random value. This random value will vanish on decryption. However, if two users collude they will mix their blinded values resulting a plain text that is still blinded by some unknown value. To ensure collusion resistance pairings are commonly used where a user specific id (\ac{UID}) is generated and bound to the exponent of the user's attribute private key. The decryption method will be designed in that way that the blinding of the attribute private key will vanish. 
 
-\begin{gather*}
- e : G_1 \times G_2 \rightarrow G_t \\
-\text{ such that for all } g_1 \in G_1, g_2 \in G_2, a, b \in \mathbb{Z} \\
-e(g_1^a, g_2^b) = e(g_1, g_2)^{ab} 
-\end{gather*}
+\subsubsection{\ac{KP-ABE}}
+In Key-Policy Attribute-Based Encryption (\ac{KP-ABE}) \cite{goyal2006attribute}, is a \ac{ABE} technique that associates ciphertexts with attributes that fulfill a policy embedded in the private key assigned to a user. 
 
-If $G_1$ and $G_2$ describe the same group the mapping is called symmetric. In fact the \textit{decisional bilinear Diffie-Hellman problem} becomes easily computable using bilinear mappings. \cite{bethencourt2015intro}
+To evaluate if a policy matches given attributes an \textit{Access Tree} or \textit{Linear Secrect Sharing Matrix} (\ac{LSSS}) is used. While both representations represent the same Boolean formula a \ac{LSSS} is often more efficient. For a better explanation the model of an access tree will be used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} threshold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshold gates meaning all children need to satisfy the condition. This approach is called a monotonic access structure and often referrers to \textit{Threshold Security} or \textit{Threshold Access Structure}. 
 
-This construct of pairings is used by many schemes to either distribute a secret or computing the secret without revealing it.
+The initial paper \cite{goyal2006attribute} did leak some basic requirements that was improved by other work. Such as a fix-length cipher text and attribute revocation. Further, the authors stated that users, once issued a policy, are able to delegate a subset of their access tree to other users. Users them self could act as a new attribute authority to issue other uses a subset of their decryption power. While this is a nice feature for some use cases, in a cloud system the provider would like to restrict this delegation or would like to be able to track traitors selling their private keys for black box decryption.
 
-\subsubsection{Attribute-Based encryption}
-Attribute-Based Encryption (\ac{ABE}) is ancestor of IBE. Instead assigning each user a unique identifier, the work of Sahai and Waters \cite{sahai2005fuzzy} describes the approach of assigning each user a descriptive set of attributes. A deeper dig into this topic revealed the well known setup from \ac{IBE}: a central \textit{attribute authority} (\ac{AA}) issues attributes on user registration, binds them to key pairs and serves as a central public-key directory. 
+KP-ABE is meant as a broadcasting encryption scheme used by radio providers so that they can address any user that bought a paid membership to distribute premium content. However, since the policy was bound to the users key it is not possible to address a ciphertext to a specific user group without knowing each users access policy. Only the central authority, which issued the users private keys in the first place, would know who could decipher the encrypted text. This in fact renders \ac{KP-ABE} impractical for the application in a cloud sharing scheme. User would simply don't know who are able to decrypt the cipher text. 
 
-The advantage is that the \ac{AA} doesn't have to be online all the time. Once the attributes are issued and distributed the data owner, without any further interactions with the \ac{AA}, can use those to share content to authorized members. Further, no server needed to check whether entities are authorized to access certain content. This follows due to the fact that if the entity was authorized to download the content, it will certainly also be able to decrypt it. 
+The certainly very specific use case of \ac{KP-ABE} probably led to the circumstances that not much paper using this technique exists. So few that it was hard to find any paper satisfying all requirements previously specified. The only paper that was found implemented direct revocation using negation of attributes \cite{lewko2010revocation}. This would in turn lead to the fact that users private key sizes would grow with each revoked attribute. 
 
-As we already know, content is encrypted under attributes, rather then users. This implies that the data owner encrypting the file does not really know or does not care which individual deciphers the ciphertext. Using Boolean formula and the given attribute universe, the data owner creates an access policy securing his ciphertext. Any entity owning a certain set of attributes is allowed to access the data. This feature comes in handy in specific domains such as the medical domain. Here any set of doctors satisfying certain attribute are able to read the medial record. The patient, as the data owner, does not care about the real identities of the doctors only if they satisfy a specific qualification goal. The same is applicable on file-sharing in the business domain. Here users often share content to roles or group of members and if an employee gets promoted he automatically gets access to the content addressed to his job level. 
+\subsubsection{\ac{CP-ABE}}
+In contrast to KP-ABE stands Cipher-text policy Attribute-Based Encryption (\ac{CP-ABE}) \cite{bethencourt2007ciphertext}. \ac{CP-ABE} assigns ciphertexts with a policy and user keys with attributes. This enables \ac{CP-ABE} to be much more flexible and verbose in comparison to \ac{KP-ABE}. The big advantage is (similar to \ac{KP-ABE}) that the need for a central authentication server is obsolete. Each ciphertext could simply be accessed by every user and only thous who have the right attribute set present are able to decipher the ciphertext. 
 
-Further, user management systems always also need a procedure to revoke users and their attributes. 
-In general two steps need to be made to revoke an attribute from an user. All users, except the revoked user, need to receive a new private key for this attribute and in addition, each ciphertext encrypted under this revoked attribute need to be updated to ensure forward secrecy. 
+The lack of revocation \req{C8} in \cite{bethencourt2007ciphertext} and the need for a large attribute and user universe was huge \req{C5}. Revocation means that a system manager could revoke attributes from users or even the user himself - in modern company settings an required feature to ensure forward secrecy. Large attribute universe, on the other hand, describes that the number of attributes that can be distributed by the \ac{AA} is so large that it is unlikely that a system will run out of attributes to issue. 
 
-In summary ABE provides us a big advance for the rekeying problem: Since new members joining a group just receive the respective attribute keys no group key needs to be distributed. Users are automatically member of a group if they satisfy the access policy. With \ac{ABE} we are able to go beyond the natural limitation of Secure Group Communication schemes which had a lower bound of one key per newly joined member.  
+The first proposal of a revocation scheme in \ac{CP-ABE} was in 2010 \cite{liang2010ciphertext}. This scheme used a similar approach like \ac{LKH} to make the revocation process efficient. In 2016 Lui \textit{et. al} \cite{liu2016practical} proposed a revocable \ac{ABE} scheme that supports traitor tracing and large attribute universe. To compare CP-ABE with the other schemes we implemented \cite{liu2016practical}. 
 
-\subsubsection{Comparing Secure Group Communication to Attribute-Based encryption}
-Comparing \ac{SGC} to \ac{ABE} is non trivial. This is due to a different encryption technique used by \ac{ABE}: paring. Pairing scales more or less with the overhead of \ac{RSA} rather then \ac{ECC} or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings}. But to archive the same bit security, computations in pairing need to happen in a much bigger bit-field and thous rendering \ac{ABE} less performant in comparison to \ac{RSA}. But in specific scenarios \ac{ABE} uses less keys to setup the group communication. In the following thous scenarios will be described and analyzed to find out where this schemes differ and what use-cases \ac{ABE} schemes address.
+\subsubsection{Non-monotonic access structure of \ac{ABE}}
+While monotonic access structures can describe \textit{AND} or \textit{OR} gates, non-monotonic access structure can also reference \textit{NOT} gates. This adds another layer of find-granularity into the system. In non-monotonic structures, first introduced by Ostrovsky \textit{et. al.} \cite{Ostrovsky:2007:AEN:1315245.1315270}, a user may be excluded from certain topics. 
 
-In a \ac{RSA} sharing scheme, each user has his own public key which needs to be transmitted to a third party to establish a secret connection. Creating a group under this scheme will implicitly force the data owner to retrieve all $n$ public keys of all $n$ group members. The central server needs to provide a \ac{PKI} together with the public keys of each registered user to proof their identity. Thus follows the constrain that the central server needs to be available all the time to provide public keys for new registered users. Each member in the group receives an encrypted copy of the group key. The number of keys in \ac{SGC} scales at least linearly with the number of members. 
+Take for example Alice who is an intern in the Top Secret company. In monotonic access structure she would receive both attribute private keys: "Intern" and "working in Top Secret Company". By nature of monotonic access structures, she would be able to decipher all content addressed to all employees at the Super Secret company. However, some content might be so confidential that interns shall not be able to access them. This exclusion would not be possible. With non-monotonic access structure an administrator may want to encrypt certain information with the policy "working in Top secret Company AND NOT intern".  
 
-\ac{ABE} breaks the constrain that the central server has to be available at all time. This is done by using attribute keys on encryption rather then the users public keys. This reduces the number of keys that need to be maintained to the size of the attribute set describing the group. If an new user is registered in the system no new keys need to be downloaded from the view of the data owner. The registered users retrieves his attribute set and eventually can decrypt the shared files if his attributes satisfy the access policy of the group. Further notable is that the number of keys that are maintained in the group remains constant in $a$. With $a$ donating the number attributes used to describe the group. 
+While being an imported field in the Boolean formula and fine-grand access control domain, non-monotonic access structures did not gain the same attention as \ac{CP-ABE} did. As an candidate which shall represent this \ac{ABE} topic we selected \cite{10.1007/978-3-642-54631-0_16}. With negation of attributes revocation becomes more or less trivial. Each attribute can be versioned and simply excluded on encryption. While this approach is not scalable over time it is simple enough to be implemented in some schemes.   
 
-Given this observation we can state that \ac{ABE} is adventitious in scenarios where users address an unknown group of individuals. This can be some departments (e.g. attribute: police department of New York), colloquiums (e.g. attribute: facility for Secure network communications), or general user groups (attribute issued to all employees working in the security research team).
+\subsubsection{Multi-Authority Attribute Based Encryption}
+On top of the previous mentioned schemes emerged a new sub topic of \ac{ABE}: \textit{Multi-Authority Attribute Based Encryption} (\ac{MA-ABE}). The main motivation was that a single \ac{AA} is not practically applicable. In the real world we face independent domains each maintaining their own non intersecting attributes. 
 
-To better clarify the scalability advantage of \ac{ABE} we compare GKMP with ABE in general\footnote{Specifically the ciphertext-policy ABE scheme of \cite{bethencourt2007ciphertext} is used in the comparison.} to evaluate the performance of both encryption schemes.
+\ac{MA-ABE}, while being a young field of \ac{ABE}, this technique enjoyed, because of the real world relation, a lot of attention in the research area. In addition to the normal requirements like collusion resistance and revocation mechanism, \ac{MA-ABE} also deals with the question on how to deescalate the global decryption power of the central authority (\ac{CA}). 
+
+A setup of a \ac{MA-ABE} system looks quite similar over the field of related work. On system initialization we setup the \ac{CA}. The purpose of the \ac{CA} is to bootstrap new Attribute Authorities (\ac{AA}) which then will administer their own domain. In this domain users and attributes of the \ac{AA} are located. The CA is only used to bootstrap new AAs and assign user their unique identifier. After this is done it could in theory go offline. 
+
+To ensure system wide collusion resistance each user usually gets a unique user identifier (\ac{UID}) assigned. This \ac{UID} is issued by the \ac{CA} which is the only entity having an overview about the whole system. 
+
+A suitable candidate to compare \ac{MA-ABE} to the previous introduced schemes is \textit{hierarchical attribute based encryption} (\ac{HABE}, section \ref{sec:HABE}). In short \ac{HABE} is structured around the idea of decryption power delegation. The structure can be imaged like the domain name system. At top level there is the root master administrating the whole system. He can delegate power to sub entities in form of attribute issuing and user registration. This sub entities can again forward a subset of their power to their children. For a complete explanation see \ref{sec:HABE}. We will use \cite{Wang:2010:HAE:1866307.1866414} as representative candidate for \ac{MA-ABE}. 
+
+\subsubsection{Comparison}
+To implement and compare the selected representatives of the different ABE sub topics the charm framework\footnote{\url{http://charm-crypto.io/}} was choosen. Here we can already find implementations for the \ac{KP-ABE} scheme \cite{lewko2010revocation} and for non-monotonic \ac{CP-ABE} \cite{10.1007/978-3-642-54631-0_16}. The other two schemes such as \ac{CP-ABE} \cite{liu2016practical} and HABE \cite{wang2011hierarchical} were implemented  by this work in addition to the charm framework\footnote{\url{https://github.com/Anroc/charm}}. 
 
 \begin{table*}[!ht]
 \centering
-\begin{tabular}{l 		| l 						| l 						| l }
- 						& \textbf{Bdrive}			& \textbf{\ac{GKMP}} 			& \textbf{\ac{ABE}} 		\\
-\hline
-\textbf{inizial share} 																				\\
-keys 					& $O(nf)$ 					& $O(1)$	 				& $O(1)$			\\
-messages (unicast)		& $O(nf)$  					& $O(n)$					& $O(n)$			\\
-messages (multicast) 	& $O(nf)$ 					& $O(n)$ 					& $O(1)$			\\
-encryptions				& $O(nf)$ 					& $O(f + n)$				& $O(a)$ 			\\
-\hline
-\textbf{member join} 																				\\
-keys 					& $O(f)$   					& $O(1)$					& $O(1)$			\\
-messages (unicast)		& $O(f)$  					& $O(1)$  					& $O(1)$ 			\\
-messages (multicast) 	& $O(f)$ 	 				& $O(1)$					& $O(1)$ 			\\
-encryptions				& $O(f)$  					& $O(1)$					& $O(1)$ 			\\
-\hline
-\textbf{member leave}																				\\
-keys 					& $O(0)$					& $O(1)$					& $O(1)$			\\
-messages (unicast)		& $O(0)$					& $O(n)$  					& $O(N(a^{-1}))$	\\
-messages (multicast)	& $O(0)$					& $O(n)$					& $O(1)$ 			\\ 
-encryptions 			& $O(0)$					& $O(f + n)$ 				& $O(F(a^{-1}))$	\\
-\hline	
-\textbf{addition of filekey}																		\\
-keys 					& $O(n)$	 				& $O(0)$					& $O(0)$			\\
-messages (unicast)		& $O(n)$	 				& $O(0)$					& $O(0)$			\\
-messages (multicast)	& $O(n)$ 					& $O(0)$ 					& $O(0)$			\\
-encryptions				& $O(n)$ 					& $O(1)$					& $O(1)$			\\
-\hline
+\begin{tabular}{l 					| l 				| l 						| l 				| l}
+									& \textbf{LSW 08} \cite{lewko2010revocation}	& \textbf{YAHK 14} \cite{10.1007/978-3-642-54631-0_16} & \textbf{LW 14} \cite{liu2016practical} & \textbf{WLWG 11} \cite{Wang:2010:HAE:1866307.1866414} 	\\
+\req{Scheme}						& \ac{KP-ABE}		& Non-Monotone \ac{CP-ABE} 	& \ac{CP-ABE} 		& Hirachical \ac{CP-ABE}		\\ 
+\req{Security scheme}				& Biliniear maps 	& Binilnear maps 			& Biliniear maps 	& Biliniear maps 				\\
+\req{Expression of access policy}	& \ac{LSSS}			& \ac{LSSS} matrix 			& \ac{LSSS} matrix 	& \ac{DNF} 						\\ 
 \end{tabular}
-\caption{Comparison of Bdrive, \ac{GKMP} and \ac{ABE} scheme. $n$ donating the number of members, $N$ the number of all users in the system, $f$ the number of file keys in the group, $F$ the number of all filekeys, $a$ the number of attributes used for this group, $A$ all attributes }
-\label{tab:comparisonsOWFTtoABE}
+\caption{Scheme description. }
+\label{tab:comparison_baic_abe_overview}
+\end{table*}
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 	| l					| l 				| l 				| l}
+					& \textbf{LSW 08} \cite{lewko2010revocation}	& \textbf{YAHK 14} \cite{10.1007/978-3-642-54631-0_16} & \textbf{LW 14} \cite{liu2016practical} & \textbf{WLWG 11} \cite{Wang:2010:HAE:1866307.1866414} 	\\
+\req{C1}			& Yes				& Yes 				& Yes 				& Yes 				\\
+\req{C2}			& No				& No 				& No 				& Yes 				\\ 
+\req{C3}			& No				& No 				& No 				& No 				\\ 
+\req{C4}			& No				& No 				& No 				& No 				\\ 
+\req{C5}			& Yes				& Yes 				& Yes 				& Yes 				\\ 
+\req{C6}			& - 				& - 				& -					& Yes				\\
+\req{C7}			& -					& - 				& - 				& No 				\\
+\req{C8}			& Yes				& Yes				& Yes				& Yes				\\
+\req{O1}			& No 				& No 				& Yes 				& No 				\\
+\req{O2}			& Yes+ 				& Yes+				& Yes				& Yes-				\\
+\end{tabular}
+\caption{}
+\label{tab:basic_abe_comparisons}
 \end{table*}
 
-Note that we assume the distribution of $a < n < f$ (number of attributes in the system is smaller than the number of devices which is smaller than the number of file keys) with growing number of users. While this assumption does not necessarily hold true, on average this constrain will be satisfied. Under this assumption we can extract from table \ref{tab:comparisonsOWFTtoABE}, that \ac{ABE} indeed scales better then \ac{OWFT} and Bdrive on initialization and member join. ABEs disadvantage is located in the member leave operations. Most likely the member leave would describe a degradation or revokation of an attribute. \ac{ABE} suffers from additional overhead due to updating the attribute key for each user owning this old attribute ($N(a^{-1}$) and additionally updating all cipher text that were encrypted with the attribute ($F(a^{-1}$).
+In table \ref{tab:comparison_baic_abe_overview} the main differences of this schemes are listed.  Table \ref{tab:basic_abe_comparisons} shows the requirements and whether they are satisfied by each of the schemes \ref{sec:requirements}. 
 
-On the meta level attribute-based encryption tackles the rekeying problem by focusing on attribute and groups rather then individuals. \ac{ABE} reduces the number of keys needed by reusing and combining existing keys. In contrast stands secure group communication schemes which need to create a new key per each group. Here \ac{ABE} exploits the fact that groups generally can be described by an unique attribute set. Implicitly it follows that if another group is described by the exact same set of attributes the same keys are used. So the total number of groups is limited to all possible combinations of attributes. 
+Please note that the scheme each address different use cases and were designed with different assumptions and techniques in mind. So the scalability comparison might not be as verbose as a comparison would be, if there was a scheme that exists in all four sub topics of ABE. In our case we selected the schemes that satisfied the most of the requirements for a cloud storage system. 
 
-%Lets define an scenario adventagous to \ac{ABE}. Alice wants to share a file with all management members of the coffee company. Since she does not know the members in person, nor their email addresses, she simply creates a share with the group "management of coffee company". Alice only needs to retrieve the key of the management from the central server of the coffee company. This proceedure took Alice, one encryption and two tranmissions: one to retrieve the key and one to upload the encrypted text. 
+However, from table \ref{tab:basic_abe_comparisons} it is clear that no scheme fully fulfill all requirements. They reveal a good indicator in which sub topic we should extend our research in. WLWG 11 clearly makes the race here satisfying 6 of 10 of the requirements. 
 
-%If we apply the same scenario to \ac{SGC} we face a problem. How to know which public keys belong to the executive officers? Alice need to check on the webside which people are in charge of the coffee company, to download thier public keys, encrypt the group key with their public keys, and upload the file and the \ac{GK} for each manager. This took alice one lookup of the role to key mappings, $n$ downloads of public keys, $n$ encryptions of the \ac{GK} for each member and one encryption of plain text, and two uploads of the cipher text and the group key.         
+\req{C6} and \req{C7} could not be satisfied by LSW08, YAHK14 or LW14 since they are not designed with multi-authority support in mind. 
+Lets have a look at \req{O2}. LSW08 and YAHK14 both supports fine grant access control by using a \ac{LSSS} access structure. Also both implement non-monotonic access structures which give them the extra plus. LW14, on the other hand, does not support negation of attributes but also uses a LSSS. WLWG11, however, does only support access structures in disjunctive normal form
+ (\ac{DNF}) which makes this scheme somehow restricted in expressiveness. 
 
-In conclusion is \ac{ABE} more suitable to make the rekeying process of Bdrive more scalable. We can clearly see that \ac{ABE} scales with the number of attributes which is assumed to be less than the number of clients. Further, \ac{ABE} does not only handle the encryption but also provides an authentication service. Users are bound to roles and attributes which are tightly interleaved with the encryption scheme. Bdrive target audience are business which by nature have some kind of attribute authority in the form of role management and authorization mechanism embedded. Here \ac{ABE} can enfold its true potential and outperform SGC schemes not only in efficiency but also in additional security features. 
+\begin{figure*}[!ht]
+\centering
+    \includegraphics[width=1\linewidth]{img/basic_abe_comparisons.png}
+    \caption{Performance and scalability comparison between the chosen schemes with increasing number of attributes. The policy for each new attribute $a_k$ with $a_k \in A$ was defined as $\bigwedge\limits_{a \in A}^a a$. Key generation relates to the creation of users key pairs given an access policy or attribute set.}
+    \label{fig:basic_abe_comparison}
+\end{figure*}
 
+The  benchmark show in figure \ref{fig:basic_abe_comparison} is executed with a constant size message $m \in G_T$ on a Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz with 16 GB RAM. For the setup was executed 30 times. Here we can see how long the time varies to find suitable curve parameter to initialize the pairing. The other runs are executed with increasing number of attributes. The policy that is used to create the ciphertexts and the user keys in the case of KP-ABE is defined as $\bigwedge\limits_{a \in A}^a a$ where $A$ defines the set of attributes. 
+
+Notable about the comparison in figure \ref{fig:basic_abe_comparison} is that while \ac{KP-ABE} (LSW08) was expected to have the biggest overhead in key generation compared to the \ac{CP-ABE} schemes. This turned out to be not true. It seems more like the time complexity and runtime of the different algorithms surly depends on the design of the scheme. Here we can say that each of the schemes have a linear overhead in runtime. While a constant runtime might is only achievable by the HABE scheme the other schemes show a linear time complexity. The HABE scheme in general shows the best overall performance. But it must also be noticed that we specifically excluded attribute authority key generation. 
+
+Due the great performance and the coverage of the most of the requirements of the hierarchical attribute based encryption technique, the field of multi-authority attribute based encryption will be evaluated in more depth. Regardless of the great scalability of the \ac{HABE} it comes with a non negotiable disadvantage. The root master and the top level domain master have both global decryption power. For each user regardless of the company affiliation the administrator of the system will always be able to decipher ciphertexts of each users. This would break end-to-end encryption. So clearly we would favor solutions that support different attribute authorities so that each company can administer their own domain separately from each other, but we want also that the root, while being able to bootstrap new attribute authorities, is not able to decipher any ciphertext. 
