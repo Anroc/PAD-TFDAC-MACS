@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.attributes.data.dto;
+package de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto;
 
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import lombok.AllArgsConstructor;

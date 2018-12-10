@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs;
 
-import de.tuberlin.tfdacmacs.attributeauthority.attributes.AttributeController;
-import de.tuberlin.tfdacmacs.attributeauthority.attributes.db.AttributeDB;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.gpp.client.GPPFeignClient;
 import de.tuberlin.tfdacmacs.basics.crypto.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;

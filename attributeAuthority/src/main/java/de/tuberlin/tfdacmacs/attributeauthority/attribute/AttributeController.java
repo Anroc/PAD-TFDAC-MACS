@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.attributeauthority.attributes;
+package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 
-import de.tuberlin.tfdacmacs.attributeauthority.attributes.data.dto.AttributeCreationRequest;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.basics.attributes.data.dto.PublicAttributeResponse;

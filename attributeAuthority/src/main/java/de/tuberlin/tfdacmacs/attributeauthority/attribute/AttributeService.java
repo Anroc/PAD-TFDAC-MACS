@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.attributeauthority.attributes;
+package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 
-import de.tuberlin.tfdacmacs.attributeauthority.attributes.db.AttributeDB;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.gpp.GlobalPublicParameterService;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
