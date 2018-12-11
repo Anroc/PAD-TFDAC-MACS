@@ -3,6 +3,8 @@ package de.tuberlin.tfdacmacs;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPFeignClient;
+import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;
 import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
@@ -39,10 +41,14 @@ public abstract class IntegrationTestSuite {
     // Utils and Services
     @Autowired
     protected PairingGenerator pairingGenerator;
+    @Autowired
+    protected AttributeKeyGenerator attributeKeyGenerator;
 
     // DBs
     @Autowired
     protected AttributeDB attributeDB;
+    @Autowired
+    protected UserDB userDB;
 
     // Factories
     @Autowired
@@ -59,5 +65,6 @@ public abstract class IntegrationTestSuite {
     @After
     public void cleanUp() {
         attributeDB.drop();
+        userDB.drop();
     }
 }

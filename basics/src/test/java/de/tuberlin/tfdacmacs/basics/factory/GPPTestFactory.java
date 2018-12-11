@@ -9,9 +9,11 @@ import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.RSAPublicKeyDTO;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@Data
 @Component
 @RequiredArgsConstructor
 public class GPPTestFactory {

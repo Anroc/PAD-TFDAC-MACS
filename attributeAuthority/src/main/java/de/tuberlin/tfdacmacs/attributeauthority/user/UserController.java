@@ -10,6 +10,7 @@ import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
 import de.tuberlin.tfdacmacs.basics.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.basics.exceptions.UnauthorizedException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +19,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    public UserService userService;
-    public AttributeService attributeService;
+    public final UserService userService;
+    public final AttributeService attributeService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
