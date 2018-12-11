@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.basics.gpp.data.dto;
 
-import de.tuberlin.tfdacmacs.basics.utils.ElementConverter;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.converter.ElementConverter;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.Data;

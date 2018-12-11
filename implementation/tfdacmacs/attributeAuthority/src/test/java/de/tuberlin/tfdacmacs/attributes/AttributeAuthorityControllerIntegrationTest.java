@@ -6,7 +6,6 @@ import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCrea
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.basics.attributes.data.dto.PublicAttributeResponse;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 
 public class AttributeAuthorityControllerIntegrationTest extends IntegrationTestSuite {
 
@@ -26,9 +24,6 @@ public class AttributeAuthorityControllerIntegrationTest extends IntegrationTest
 
     @Before
     public void setup() {
-        GlobalPublicParameterDTO globalPublicParameterDTO = gppTestFactory.createDTO();
-        doReturn(globalPublicParameterDTO).when(gppFeignClient).getGPP();
-
         attribute = attributeTestFactory.create();
         attributeDB.insert(attribute);
     }

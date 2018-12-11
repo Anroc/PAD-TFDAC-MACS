@@ -15,4 +15,6 @@ public class GlobalPublicParameterDTO {
     private CurveParameterDTO curveParameter;
     @NotNull
     private GeneratorDTO generator;
+    @NotNull
+    private RSAPublicKeyDTO rsaPublicKeyDTO;
 }

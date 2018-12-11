@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.basics.crypto;
+package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;

@@ -19,4 +19,9 @@ public class AttributeValue<T> {
 
     @NotNull
     private T value;
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
 }
