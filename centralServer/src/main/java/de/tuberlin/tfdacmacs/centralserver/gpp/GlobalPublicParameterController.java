@@ -1,9 +1,10 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import de.tuberlin.tfdacmacs.basics.gpp.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.CurveParameterDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GeneratorDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.basics.gpp.data.dto.RSAPublicKeyDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +23,9 @@ public class GlobalPublicParameterController {
 
         CurveParameterDTO curveParameterDTO = CurveParameterDTO.from(globalPublicParameter.getPairingParameters());
         GeneratorDTO generatorDTO = GeneratorDTO.from(globalPublicParameter.getG());
+        RSAPublicKeyDTO rsaPublicKeyDTO = RSAPublicKeyDTO.from(globalPublicParameter.getRsaPublicKey());
 
-        return new GlobalPublicParameterDTO(curveParameterDTO, generatorDTO);
+        return new GlobalPublicParameterDTO(curveParameterDTO, generatorDTO, rsaPublicKeyDTO);
     }
 
 }

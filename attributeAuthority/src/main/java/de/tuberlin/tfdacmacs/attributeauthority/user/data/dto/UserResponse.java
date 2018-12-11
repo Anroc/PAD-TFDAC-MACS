@@ -1,10 +1,15 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data.dto;
 
+import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -14,11 +19,13 @@ public class UserResponse {
     @NotBlank
     private String id;
 
-    @NotBlank
-    private String publicKey;
+    @NotEmpty
+    private Set<AttributeValueResponse> attributes;
 
-    @NotBlank
-    private String certificate;
-
-
+    public static UserResponse from(@NonNull User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getAttributes().stream().map(AttributeValueResponse::from).collect(Collectors.toSet())
+        );
+    }
 }

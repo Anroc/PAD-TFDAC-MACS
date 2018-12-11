@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.gpp.client;
+package de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client;
 
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
