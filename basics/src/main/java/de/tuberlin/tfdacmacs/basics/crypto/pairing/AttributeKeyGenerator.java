@@ -2,31 +2,17 @@ package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.Key;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.HashGenerator;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 @Component
+@RequiredArgsConstructor
 public class AttributeKeyGenerator {
 
-    private final MessageDigest messageDigest;
-
-    public AttributeKeyGenerator() {
-        try {
-            this.messageDigest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private byte[] sha256Hash(@NonNull String input) {
-        this.messageDigest.update(input.getBytes(StandardCharsets.UTF_8));
-        return this.messageDigest.digest();
-    }
+    private final HashGenerator hashGenerator;
 
     /**
      * Generates a new attribute private and public key.
@@ -57,8 +43,7 @@ public class AttributeKeyGenerator {
             @NonNull Element privateAuthorityKey,
             @NonNull Element privateAttributeValueKey) {
 
-        byte[] userIdBytes = sha256Hash(userId);
-        Element userIdHash = gpp.getPairing().getG1().newElementFromHash(userIdBytes, 0, userIdBytes.length);
+        Element userIdHash = hashGenerator.g1Hash(gpp, userId);
         // g ** x * H(uid)**y
         return gpp.getG().powZn(privateAuthorityKey).mul(userIdHash.powZn(privateAttributeValueKey));
     }

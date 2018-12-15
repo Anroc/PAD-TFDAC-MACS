@@ -15,7 +15,7 @@ public class AttributeKeyGeneratorTest extends UnitTestSuite {
 
     @Before
     public void setup() {
-        attributeKeyGenerator = new AttributeKeyGenerator();
+        attributeKeyGenerator = new AttributeKeyGenerator(hashGenerator);
         globalPublicParameter = gppTestFactory.create();
     }
 
