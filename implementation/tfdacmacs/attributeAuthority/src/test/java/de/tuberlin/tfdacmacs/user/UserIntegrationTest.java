@@ -12,16 +12,19 @@ import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.basics.attributes.data.dto.PublicAttributeResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class UserIntegrationTest extends IntegrationTestSuite {
 
     private String attributeId;
+    private String email;
 
     @Before
     public void setup() {
@@ -36,13 +39,14 @@ public class UserIntegrationTest extends IntegrationTestSuite {
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         this.attributeId = exchange.getBody().getId();
+        this.email = "test@tu-berlin.de";
     }
 
 
     @Test
     public void createUser_passes_onExistingAttributeValue() {
         CreateUserRequest createUserRequest = new CreateUserRequest(
-                "test@tu-berlin.de",
+                email,
                 Sets.newHashSet(
                         new AttributeValueRequest(
                                 attributeId,
@@ -54,7 +58,7 @@ public class UserIntegrationTest extends IntegrationTestSuite {
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         UserResponse body = exchange.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getId()).isEqualTo("test@tu-berlin.de");
+        assertThat(body.getId()).isEqualTo(email);
         assertThat(body.getAttributes()).hasSize(1);
         AttributeValueResponse attributeValueResponse = body.getAttributes().stream().findFirst().get();
         assertThat(attributeValueResponse).isNotNull();
@@ -66,7 +70,7 @@ public class UserIntegrationTest extends IntegrationTestSuite {
     @Test
     public void createUser_passes_nonNonExistingAttributeValue() {
         CreateUserRequest createUserRequest = new CreateUserRequest(
-                "test@tu-berlin.de",
+                email,
                 Sets.newHashSet(
                         new AttributeValueRequest(
                                 attributeId,
@@ -78,7 +82,30 @@ public class UserIntegrationTest extends IntegrationTestSuite {
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         UserResponse body = exchange.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getId()).isEqualTo("test@tu-berlin.de");
+        assertThat(body.getId()).isEqualTo(email);
+        assertThat(body.getAttributes()).hasSize(1);
+        AttributeValueResponse attributeValueResponse = body.getAttributes().stream().findFirst().get();
+        assertThat(attributeValueResponse).isNotNull();
+        assertThat(attributeValueResponse.getAttributeId()).isEqualTo(attributeId);
+        assertThat(attributeValueResponse.getValue()).isInstanceOf(String.class).isEqualTo("professor");
+        assertThat(attributeValueResponse.getKey()).isNotBlank();
+    }
+
+    @Test
+    public void getAttributeKeys() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        // setup
+        String sign = gppTestFactory.getCryptEngine().sign(email);
+        createUser_passes_nonNonExistingAttributeValue();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, sign);
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<UserResponse> exchange = restTemplate
+                .exchange("/users/" + email, HttpMethod.GET, httpEntity, UserResponse.class);
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        UserResponse body = exchange.getBody();
+        assertThat(body.getId()).isEqualTo(email);
         assertThat(body.getAttributes()).hasSize(1);
         AttributeValueResponse attributeValueResponse = body.getAttributes().stream().findFirst().get();
         assertThat(attributeValueResponse).isNotNull();
