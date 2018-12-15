@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import java.security.PublicKey;
 
 @Data
-@RequiredArgsConstructor
 public class GlobalPublicParameter {
 
     private final Pairing pairing;
@@ -17,6 +16,14 @@ public class GlobalPublicParameter {
     private final Element g;
 
     private final PublicKey rsaPublicKey;
+
+    public GlobalPublicParameter(Pairing pairing, PairingParameters pairingParameters, Element g,
+            PublicKey rsaPublicKey) {
+        this.pairing = pairing;
+        this.pairingParameters = pairingParameters;
+        this.g = g.getImmutable();
+        this.rsaPublicKey = rsaPublicKey;
+    }
 
     public Element getG() {
         return g.duplicate();
