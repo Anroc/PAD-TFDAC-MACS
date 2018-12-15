@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -56,7 +58,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     public UserResponse getAttributeKeys(@PathVariable("email") String email,
-            @RequestHeader("Authentication") String authenticationHeader) {
+            @RequestHeader(AUTHORIZATION) String authenticationHeader) {
 
         if( ! userService.isSignatureAuthentic(email, authenticationHeader)) {
             throw new UnauthorizedException("CA signature is invalid.");
