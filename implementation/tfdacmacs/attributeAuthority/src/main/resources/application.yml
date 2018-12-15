@@ -10,3 +10,6 @@ attribute-authority:
 ---
 spring:
   profiles: test
+
+attribute-authority:
+  requestGPPOnInit: false

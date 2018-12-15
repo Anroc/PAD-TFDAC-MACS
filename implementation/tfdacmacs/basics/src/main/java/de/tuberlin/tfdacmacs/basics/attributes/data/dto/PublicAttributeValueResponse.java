@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.attributes.data.dto;
 
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
-import de.tuberlin.tfdacmacs.basics.utils.ElementConverter;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.converter.ElementConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

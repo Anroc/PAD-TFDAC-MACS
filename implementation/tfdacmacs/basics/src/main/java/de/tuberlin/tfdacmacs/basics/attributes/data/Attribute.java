@@ -4,11 +4,13 @@ import de.tuberlin.tfdacmacs.basics.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -20,19 +22,38 @@ public class Attribute extends Entity {
     @NotBlank
     private String name;
     @NotEmpty
-    private List<AttributeValue> values;
+    private Set<AttributeValue> values;
     @NotNull
     private AttributeType type;
 
     public Attribute(String authorityDomain,
             String name,
-            List<AttributeValue> values,
+            Set<AttributeValue> values,
             AttributeType type) {
         super(generateId(authorityDomain, name));
         this.authorityDomain = authorityDomain;
         this.name = name;
-        this.values = values;
         this.type = type;
+        addValues(values);
+    }
+
+    public final Attribute addValues(@NonNull Set<AttributeValue> values) {
+        values.forEach(this::addValue);
+        return this;
+    }
+
+    public final Attribute addValue(@NonNull AttributeValue attributeValue) {
+        if (! type.matchesType(attributeValue.getValue())) {
+            throw new IllegalArgumentException(
+                    String.format("The value of %s did not match the type of this attribute: %s.",
+                            attributeValue, getType()));
+        }
+        if(values == null) {
+            this.values = new HashSet<>();
+        }
+
+        this.values.add(attributeValue);
+        return this;
     }
 
     public static String generateId(String authorityDomain, String name) {

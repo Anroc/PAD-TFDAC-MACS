@@ -17,4 +17,6 @@ public class AttributeAuthorityConfig {
 
     @NotBlank
     private String id;
+
+    private boolean requestGPPOnInit = true;
 }

@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.factory;
 
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
-import de.tuberlin.tfdacmacs.basics.crypto.PairingGenerator;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
 import it.unisa.dia.gas.jpbc.Pairing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
