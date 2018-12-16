@@ -38,6 +38,7 @@ public class HashGenerator {
 
     public Element g1Hash(@NonNull GlobalPublicParameter gpp, @NonNull String input) {
         byte[] bytes = this.sha256Hash(input);
+        // TODO: check this
         return gpp.getPairing().getG1().newElementFromHash(bytes, 0, bytes.length);
     }
 }

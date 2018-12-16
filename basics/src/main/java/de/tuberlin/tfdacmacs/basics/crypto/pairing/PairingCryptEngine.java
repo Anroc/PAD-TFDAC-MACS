@@ -46,13 +46,13 @@ public class PairingCryptEngine {
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull GlobalPublicParameter gpp,
             DataOwner dataOwner) {
-        Element key = gpp.getPairing().getG1().newRandomElement();
-        Element s = gpp.getPairing().getZr().newRandomElement();
+        Element key = gpp.getPairing().getG1().newRandomElement().getImmutable();
+        Element s = gpp.getPairing().getZr().newRandomElement().getImmutable();
 
         Map<Element, Set<Element>> policy = andAccessPolicy.groupByAttributeAuthority();
 
         Element c1 = null;
-        Element c2 = gpp.getG().powZn(s);
+        Element c2 = gpp.getG().powZn(s).getImmutable();
         Element c3 = null;
         for(Map.Entry<Element, Set<Element>> entry : policy.entrySet()) {
             Element authorityPublicKey = entry.getKey().duplicate();
@@ -65,13 +65,13 @@ public class PairingCryptEngine {
             }
         }
 
-        c1 = key.duplicate().mul(c1.powZn(s));
+        c1 = key.duplicate().mul(c1.powZn(s)).getImmutable();
 
         if(dataOwner == null) {
-            c3.powZn(s);
+            c3 = c3.powZn(s).getImmutable();
             return new CipherTextDescription(c1, c2, c3, andAccessPolicy, null, key);
         } else {
-            c3.powZn(s.duplicate().add(dataOwner.getTwoFactorPrivateKey()));
+            c3 = c3.powZn(s.duplicate().add(dataOwner.getTwoFactorPrivateKey())).getImmutable();
             return new CipherTextDescription(c1, c2, c3, andAccessPolicy, dataOwner.getId(), null, key);
         }
     }
@@ -113,7 +113,7 @@ public class PairingCryptEngine {
                 .reduce((a,b) -> a.duplicate().mul(b))
                 .orElseThrow(() -> new IllegalArgumentException("Given secrets where empty."));
 
-        Element pairing1 = gpp.getPairing().pairing(hashGenerator.g1Hash(gpp, userId), cipherText.getC2());
+        Element pairing1 = gpp.getPairing().pairing(hashGenerator.g1Hash(gpp, userId), cipherText.getC3());
         Element upper = cipherText.getC1().duplicate().mul(pairing1);
 
         Element pairing2 = gpp.getPairing().pairing(cipherText.getC2(), sk);
