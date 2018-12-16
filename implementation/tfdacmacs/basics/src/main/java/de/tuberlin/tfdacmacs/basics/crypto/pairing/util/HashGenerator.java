@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 @Component
 public class HashGenerator {
@@ -22,8 +23,17 @@ public class HashGenerator {
     }
 
     public byte[] sha256Hash(@NonNull String input) {
-        this.messageDigest.update(input.getBytes(StandardCharsets.UTF_8));
+        return sha256Hash(input.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public byte[] sha256Hash(byte[] input) {
+        this.messageDigest.update(input);
         return this.messageDigest.digest();
+    }
+
+    public byte[] sha256Hash(byte[] input, int outputLength) {
+        byte[] hash = sha256Hash(input);
+        return Arrays.copyOf(hash, outputLength);
     }
 
     public Element g1Hash(@NonNull GlobalPublicParameter gpp, @NonNull String input) {

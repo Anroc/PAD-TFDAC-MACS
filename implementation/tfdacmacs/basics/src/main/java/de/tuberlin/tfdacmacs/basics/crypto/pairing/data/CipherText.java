@@ -16,15 +16,18 @@ public class CipherText {
     private final Element c2;
     private final Element c3;
 
-    private final String accessPolicy;
+    private final AndAccessPolicy accessPolicy;
     private final String ownerId;
 
-    public CipherText(Element c1, Element c2, Element c3, String accessPolicy) {
+    private final String encryptedMessage;
+
+    public CipherText(Element c1, Element c2, Element c3, AndAccessPolicy accessPolicy, String encryptedMessage) {
         this.c1 = c1;
         this.c2 = c2;
         this.c3 = c3;
         this.accessPolicy = accessPolicy;
         this.ownerId = null;
+        this.encryptedMessage = encryptedMessage;
     }
 
     public boolean isTwoFactorSecured() {
