@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringSymmetricCryptEngine;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.BadPaddingException;
@@ -16,6 +17,7 @@ import java.security.Key;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PairingCryptEngine {
@@ -42,11 +44,11 @@ public class PairingCryptEngine {
         }
     }
 
-    private CipherTextDescription abeEncrypt(
+    protected CipherTextDescription abeEncrypt(
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull GlobalPublicParameter gpp,
             DataOwner dataOwner) {
-        Element key = gpp.getPairing().getG1().newRandomElement().getImmutable();
+        Element key = gpp.getPairing().getGT().newRandomElement().getImmutable();
         Element s = gpp.getPairing().getZr().newRandomElement().getImmutable();
 
         Map<Element, Set<Element>> policy = andAccessPolicy.groupByAttributeAuthority();
@@ -65,7 +67,7 @@ public class PairingCryptEngine {
             }
         }
 
-        c1 = key.duplicate().mul(c1.powZn(s)).getImmutable();
+        c1 = key.duplicate().mul(c1.duplicate().powZn(s)).getImmutable();
 
         if(dataOwner == null) {
             c3 = c3.powZn(s).getImmutable();
@@ -92,7 +94,8 @@ public class PairingCryptEngine {
         try {
             return symmetricCryptEngine.decryptRaw(encryptedMessage, symmetricKey);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
-            throw new RuntimeException(e);
+            log.error("Decryption failed. Maybe wrong key is used.", e);
+            return new byte[0];
         }
     }
 
@@ -101,7 +104,7 @@ public class PairingCryptEngine {
         return symmetricCryptEngine.createKeyFromBytes(randomBytes);
     }
 
-    private Element abeDecrypt(@NonNull CipherText cipherText, @NonNull GlobalPublicParameter gpp,
+    protected Element abeDecrypt(@NonNull CipherText cipherText, @NonNull GlobalPublicParameter gpp,
             @NonNull String userId, @NonNull Set<AttributeSecretComponents> secrets, Element twoFactorPrivateKey) {
         Element sk = secrets.stream()
                 .map(AttributeSecretComponents::getUserSecretAttributeKey)
