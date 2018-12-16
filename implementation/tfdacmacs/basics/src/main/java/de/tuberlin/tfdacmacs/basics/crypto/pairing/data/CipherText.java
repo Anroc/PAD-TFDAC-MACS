@@ -22,9 +22,9 @@ public class CipherText {
     private final String encryptedMessage;
 
     public CipherText(Element c1, Element c2, Element c3, AndAccessPolicy accessPolicy, String encryptedMessage) {
-        this.c1 = c1;
-        this.c2 = c2;
-        this.c3 = c3;
+        this.c1 = c1.getImmutable();
+        this.c2 = c2.getImmutable();
+        this.c3 = c3.getImmutable();
         this.accessPolicy = accessPolicy;
         this.ownerId = null;
         this.encryptedMessage = encryptedMessage;

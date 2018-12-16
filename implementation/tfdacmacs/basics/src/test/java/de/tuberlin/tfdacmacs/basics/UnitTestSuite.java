@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 public class UnitTestSuite {
 
@@ -26,5 +27,17 @@ public class UnitTestSuite {
         for(int i = 0; i<actual.length; i ++) {
             assertThat(actual[i]).isSameAs(expected[i]);
         }
+    }
+
+    public void assertNotSameElements(byte[] actual, byte[] expected) {
+        if(actual.length != expected.length) {
+            return;
+        }
+        for(int i = 0; i<actual.length; i ++) {
+            if(actual[i] != expected[i]) {
+                return;
+            }
+        }
+        fail("Arrays are identical.");
     }
 }
