@@ -1,24 +1,21 @@
 package de.tuberlin.tfdacmacs.basics.attributes.data;
 
-import it.unisa.dia.gas.jpbc.Element;
-import lombok.AllArgsConstructor;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AttributeValue<T> {
-
-    @NotNull
-    private Element privateKey;
-    @NotNull
-    private Element publicKey;
+public class AttributeValue<T> extends AttributeValueKey {
 
     @NotNull
     private T value;
+
+    public AttributeValue(@NonNull T value, @NonNull AttributeValueKey attributeValueKey) {
+        super(attributeValueKey.getPrivateKey().getKey(), attributeValueKey.getPublicKey().getKey(), attributeValueKey.getAttributeValueId());
+        this.value = value;
+    }
 
     @Override
     public int hashCode() {

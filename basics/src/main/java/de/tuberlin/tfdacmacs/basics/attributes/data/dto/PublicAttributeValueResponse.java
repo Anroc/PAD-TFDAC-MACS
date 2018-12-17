@@ -22,7 +22,7 @@ public class PublicAttributeValueResponse {
     public static PublicAttributeValueResponse from(AttributeValue attributeValue) {
         PublicAttributeValueResponse publicAttributeValueResponse = new PublicAttributeValueResponse();
         publicAttributeValueResponse.setValue(attributeValue.getValue());
-        publicAttributeValueResponse.setPublicKey(ElementConverter.convert(attributeValue.getPublicKey()));
+        publicAttributeValueResponse.setPublicKey(ElementConverter.convert(attributeValue.getPublicKey().getKey()));
         return publicAttributeValueResponse;
     }
 }

@@ -1,6 +1,8 @@
 package de.tuberlin.tfdacmacs.basics;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.*;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.aes.AESDecryptor;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.aes.AESEncryptor;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.HashGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringSymmetricCryptEngine;
@@ -17,10 +19,17 @@ public class UnitTestSuite {
     protected HashGenerator hashGenerator = new HashGenerator();
     protected GPPTestFactory gppTestFactory = new GPPTestFactory(pairingGenerator, rsaCryptEngine);
     protected AuthorityKeyGenerator authorityKeyGenerator = new AuthorityKeyGenerator();
-    protected AttributeKeyGenerator attributeKeyGenerator = new AttributeKeyGenerator(hashGenerator);
+    protected AttributeKeyManager attributeKeyManager = new AttributeKeyManager(hashGenerator);
     protected TwoFactorKeyGenerator twoFactorKeyGenerator = new TwoFactorKeyGenerator(hashGenerator);
 
-    protected PairingCryptEngine pairingCryptEngine = new PairingCryptEngine(aesCryptEngine, hashGenerator);
+    protected AESEncryptor aesEncryptor = new AESEncryptor(hashGenerator, aesCryptEngine);
+    protected AESDecryptor aesDecryptor = new AESDecryptor(hashGenerator, aesCryptEngine);
+
+    protected ABEEncryptor abeEncryptor = new ABEEncryptor();
+    protected ABEDecryptor abeDecryptor = new ABEDecryptor(hashGenerator);
+
+    protected PairingCryptEngine pairingCryptEngine =
+            new PairingCryptEngine(aesEncryptor, aesDecryptor, abeEncryptor, abeDecryptor);
 
     public void assertSameElements(byte[] actual, byte[] expected) {
         assertThat(actual.length).isEqualTo(expected.length);

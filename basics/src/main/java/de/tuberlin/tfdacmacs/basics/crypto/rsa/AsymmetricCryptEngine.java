@@ -41,7 +41,7 @@ public abstract class AsymmetricCryptEngine<T> extends CypherProcessor {
     /**
      * Generates a new RSA key pair.
      *
-     * @return a new Key Pair
+     * @return a new AuthorityKey Pair
      */
     public KeyPair generateKeyPair() {
         KeyPairGenerator keyGen;

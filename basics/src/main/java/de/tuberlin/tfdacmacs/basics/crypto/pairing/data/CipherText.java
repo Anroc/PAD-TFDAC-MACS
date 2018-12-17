@@ -4,6 +4,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -16,12 +17,12 @@ public class CipherText {
     private final Element c2;
     private final Element c3;
 
-    private final AndAccessPolicy accessPolicy;
+    private final Set<String> accessPolicy;
     private final String ownerId;
 
     private final String encryptedMessage;
 
-    public CipherText(Element c1, Element c2, Element c3, AndAccessPolicy accessPolicy, String encryptedMessage) {
+    public CipherText(Element c1, Element c2, Element c3, Set<String> accessPolicy, String encryptedMessage) {
         this.c1 = c1.getImmutable();
         this.c2 = c2.getImmutable();
         this.c3 = c3.getImmutable();
@@ -31,7 +32,7 @@ public class CipherText {
     }
 
     public boolean isTwoFactorSecured() {
-        return this.ownerId == null;
+        return this.ownerId != null;
     }
 
 }

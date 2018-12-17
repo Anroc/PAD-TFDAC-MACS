@@ -1,17 +1,13 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing.data;
 
-import it.unisa.dia.gas.jpbc.Element;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.TwoFactorKey;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class DataOwner {
 
     private final String id;
-    private final Element twoFactorPrivateKey;
-
-    public DataOwner(String id, Element twoFactorPrivateKey) {
-        this.id = id;
-        this.twoFactorPrivateKey = twoFactorPrivateKey.getImmutable();
-    }
+    private final TwoFactorKey.Private twoFactorPrivateKey;
 }

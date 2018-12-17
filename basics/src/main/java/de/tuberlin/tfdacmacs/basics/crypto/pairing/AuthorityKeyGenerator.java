@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.Key;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
@@ -16,13 +16,13 @@ public class AuthorityKeyGenerator {
      * @param gpp the global public parameter
      * @return the private and public key pair
      */
-    public Key generateAuthorityKey(@NonNull GlobalPublicParameter gpp) {
+    public AuthorityKey generateAuthorityKey(@NonNull GlobalPublicParameter gpp) {
         Field Zr = gpp.getPairing().getZr();
         Element g = gpp.getG();
 
         Element x = Zr.newRandomElement();
         Element egg_x = gpp.getPairing().pairing(g, g).powZn(x);
 
-        return new Key(x, egg_x);
+        return new AuthorityKey(x, egg_x);
     }
 }
