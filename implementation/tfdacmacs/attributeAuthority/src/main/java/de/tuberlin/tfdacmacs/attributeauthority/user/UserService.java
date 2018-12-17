@@ -8,7 +8,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyGenerator;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyManager;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
 import it.unisa.dia.gas.jpbc.Element;
@@ -33,7 +33,7 @@ public class UserService {
     private final UserDB userDB;
     private final StringAsymmetricCryptEngine cryptEngine;
 
-    private final AttributeKeyGenerator attributeKeyGenerator;
+    private final AttributeKeyManager attributeKeyManager;
 
     public Optional<User> findUser(@NonNull String userId) {
         return userDB.findEntity(userId);
@@ -72,7 +72,7 @@ public class UserService {
             Element authorityPrivateKey, UserAttributeKey userAttributeKey) {
         AttributeValue attributeValue = getAttributeValue(gpp, userAttributeKey);
 
-        return attributeKeyGenerator.generateSecretUserKey(gpp, userId,
+        return attributeKeyManager.generateSecretUserKey(gpp, userId,
                 authorityPrivateKey, attributeValue.getPrivateKey());
     }
 

@@ -4,7 +4,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPFeignClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyGenerator;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyManager;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;
 import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
@@ -42,7 +42,7 @@ public abstract class IntegrationTestSuite {
     @Autowired
     protected PairingGenerator pairingGenerator;
     @Autowired
-    protected AttributeKeyGenerator attributeKeyGenerator;
+    protected AttributeKeyManager attributeKeyManager;
 
     // DBs
     @Autowired

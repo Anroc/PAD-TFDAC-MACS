@@ -2,7 +2,10 @@ package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.basics.UnitTestSuite;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.*;
-import it.unisa.dia.gas.jpbc.Element;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
 import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,35 +15,37 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class PairingCryptEngineTest extends UnitTestSuite {
 
     private final byte[] message = "Hello World!".getBytes();
     private final String userId = UUID.randomUUID().toString();
     private GlobalPublicParameter gpp;
-    private Key authorityKeys;
-    private Key attributeKeys;
-    private Element userSecretAttributeValueKey;
+    private AuthorityKey authorityKeys;
+    private AttributeValueKey attributeKeys;
+    private String attributeValueIdentifier = "aa.tu-berlin.de.role:professor";
+    private UserAttributeValueKey userSecretAttributeValueKey;
     private AndAccessPolicy andAccessPolicy;
 
-    private String dataOwerId = UUID.randomUUID().toString();
-    private Key twoFactoryKey;
+    private String dataOwnerId = UUID.randomUUID().toString();
+    private AuthorityKey twoFactoryKey;
     private DataOwner dataOwner;
 
     @Before
     public void setup() {
         gpp = gppTestFactory.create();
         authorityKeys = authorityKeyGenerator.generateAuthorityKey(gpp);
-        attributeKeys = attributeKeyGenerator.generateAttributeValueKey(gpp);
-        userSecretAttributeValueKey = attributeKeyGenerator
+        attributeKeys = attributeKeyManager.generateAttributeValueKey(gpp, attributeValueIdentifier);
+        userSecretAttributeValueKey = attributeKeyManager
                 .generateSecretUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys.getPrivateKey());
 
         HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey()));
+        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
         andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
 
         twoFactoryKey = twoFactorKeyGenerator.generateTwoFactoryKey(gpp, userId);
-        dataOwner = new DataOwner(dataOwerId, twoFactoryKey.getPrivateKey());
+        dataOwner = new DataOwner(dataOwnerId, twoFactoryKey.getPrivateKey());
     }
 
     @Test
@@ -48,10 +53,11 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
         assertSameElements(output, message);
@@ -70,23 +76,24 @@ public class PairingCryptEngineTest extends UnitTestSuite {
 
     @Test
     public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_sameAuthority() {
-        Key attributeKeys2 = attributeKeyGenerator.generateAttributeValueKey(gpp);
-        Element userAttributeSecretValueKey2 = attributeKeyGenerator
+        String attrValueId = "aa.tu-berlin.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        UserAttributeValueKey userAttributeSecretValueKey2 = attributeKeyManager
                 .generateSecretUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys2.getPrivateKey());
 
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey()));
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey()));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
 
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()),
-                new AttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
         assertSameElements(output, message);
@@ -94,45 +101,96 @@ public class PairingCryptEngineTest extends UnitTestSuite {
 
     @Test
     public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_sameAuthority_butPolicyNotSatisfied() {
-        Key attributeKeys2 = attributeKeyGenerator.generateAttributeValueKey(gpp);
+        String attrValueId = "aa.tu-berlin.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
 
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey()));
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey()));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
 
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
+                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null)
+        );
+    }
+
+    @Test
+    public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_otherAuthorities() {
+        String attrValueId = "aa.hpi.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
+
+        UserAttributeValueKey userAttributeSecretValueKey2 = attributeKeyManager
+                .generateSecretUserKey(gpp, userId, authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
+
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
+
+        // encrypt
+        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
+
+        // decrypt
+        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
-        assertNotSameElements(output, message);
+        assertSameElements(output, message);
     }
 
     @Test
     public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_otherAuthorities_butPolicyNotSatisfied() {
-        Key attributeKeys2 = attributeKeyGenerator.generateAttributeValueKey(gpp);
-        Key authorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
+        String attrValueId = "aa.hpi.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
 
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey()));
-        accessPolicyElements.add(new AccessPolicyElement(authorityKey2.getPublicKey(), attributeKeys2.getPublicKey()));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
 
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
+                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null)
+        );
+    }
+
+    @Test
+    public void encrypt_decrypt_passes_without_2FA_withUseProvidingMoreAttributeKeysThenNessecary() {
+        String attrValueId = "aa.hpi.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
+        UserAttributeValueKey userSecretAttributeValueKey2 = attributeKeyManager
+                .generateSecretUserKey(gpp, userId, authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
+
+        // encrypt
+        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
+
+        // decrypt
+        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
-        assertNotSameElements(output, message);
+        assertSameElements(output, message);
     }
 
     @Test
@@ -140,10 +198,11 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
         assertThat(cipherText).hasNoNullFieldsOrProperties();
+        assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, twoFactoryKey.getPublicKey());
 
         assertSameElements(output, message);
@@ -154,48 +213,39 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         // encrypt
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
         assertThat(cipherText).hasNoNullFieldsOrProperties();
+        assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
         assertNotSameElements(output, message);
     }
 
     @Test
-    public void abe_encrypt_decrypt() {
+    public void collusionResistance() {
+        String attrValueId = "aa.hpi.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
+        UserAttributeValueKey userSecretAttributeValueKey2 = attributeKeyManager
+                .generateSecretUserKey(gpp, "OtherId", authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
+
         // encrypt
-        CipherTextDescription cipherText = pairingCryptEngine.abeEncrypt(andAccessPolicy, gpp, null);
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
+
+        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
         LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
-        Element key = pairingCryptEngine.abeDecrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
 
-        assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
-        assertThat(key).isEqualTo(cipherText.getKey());
-    }
-
-    @Test
-    public void abe_encrypt_decrypt_failsOnUnsatisfyingPolicy() {
-        Key attributeKeys2 = attributeKeyGenerator.generateAttributeValueKey(gpp);
-        Key authorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
-
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey()));
-        accessPolicyElements.add(new AccessPolicyElement(authorityKey2.getPublicKey(), attributeKeys2.getPublicKey()));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
-
-        // encrypt
-        CipherTextDescription cipherText = pairingCryptEngine.abeEncrypt(andAccessPolicy, gpp, null);
-
-        // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey()));
-        Element key = pairingCryptEngine.abeDecrypt(cipherText, gpp, userId, attributeSecretComponents, null);
-
-        assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
-        assertThat(key).isNotEqualTo(cipherText.getKey());
+        assertNotSameElements(output, message);
     }
 }

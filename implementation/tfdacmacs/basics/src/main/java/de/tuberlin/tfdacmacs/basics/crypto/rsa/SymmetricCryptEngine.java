@@ -45,7 +45,7 @@ public abstract class SymmetricCryptEngine<T> extends CypherProcessor {
     /**
      * Generates a new RSA key pair.
      *
-     * @return a new Key Pair
+     * @return a new AuthorityKey Pair
      */
     protected Key generateKey() {
         KeyGenerator keyGen;

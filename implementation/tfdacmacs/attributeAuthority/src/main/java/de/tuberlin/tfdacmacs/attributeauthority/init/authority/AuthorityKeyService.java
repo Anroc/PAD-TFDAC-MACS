@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.init.authority;
 import de.tuberlin.tfdacmacs.attributeauthority.init.authority.events.AuthorityKeyCreatedEvent;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AuthorityKeyGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.Key;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ public class AuthorityKeyService {
 
     private final AuthorityKeyGenerator authorityKeyGenerator;
 
-    private Key authorityKey;
+    private AuthorityKey authorityKey;
 
     @EventListener(GPPReceivedEvent.class)
     public AuthorityKeyCreatedEvent setup(GPPReceivedEvent gppReceivedEvent) {
@@ -24,11 +24,11 @@ public class AuthorityKeyService {
     }
 
     public Element getPrivateKey() {
-        return authorityKey.getPrivateKey();
+        return authorityKey.getPrivateKey().getKey();
     }
 
     public Element getPublicKey() {
-        return authorityKey.getPublicKey();
+        return authorityKey.getPublicKey().getKey();
     }
 
 

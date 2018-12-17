@@ -1,16 +1,16 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing.data;
 
-import it.unisa.dia.gas.jpbc.Element;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class AttributeSecretComponents {
 
-    private final Element userSecretAttributeKey;
-    private final Element attributePublicKey;
+    private final UserAttributeValueKey userSecretAttributeKey;
+    private final AttributeValueKey.Public attributePublicKey;
 
-    public AttributeSecretComponents(Element userSecretAttributeKey, Element attributePublicKey) {
-        this.userSecretAttributeKey = userSecretAttributeKey.getImmutable();
-        this.attributePublicKey = attributePublicKey.getImmutable();
-    }
+    private final String attributeValueId;
 }

@@ -6,9 +6,9 @@ import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyGenerator;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyManager;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.Key;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class AttributeService {
 
     private final AttributeDB attributeDB;
-    private final AttributeKeyGenerator attributeKeyGenerator;
+    private final AttributeKeyManager attributeKeyManager;
     private final GPPService gppService;
     private final AttributeAuthorityConfig config;
 
@@ -42,7 +42,7 @@ public class AttributeService {
         GlobalPublicParameter gpp = gppService.getGpp();
 
         Set<AttributeValue> attrValues = values.stream()
-                .map(value -> generateAttributeKeys(value, gpp))
+                .map(value -> generateAttributeKeys(value, AttributeValue.generateId(config.getId(), name, value), gpp))
                 .collect(Collectors.toSet());
 
         Attribute attribute = new Attribute(config.getId(), name, attrValues, type);
@@ -59,7 +59,7 @@ public class AttributeService {
         }
 
         log.info("Generating new attribute key for value {} of attribute {}.", value, attribute.getId());
-        AttributeValue<T> newAttributeValue = generateAttributeKeys(value, gpp);
+        AttributeValue<T> newAttributeValue = generateAttributeKeys(value, AttributeValue.generateId(attribute, value), gpp);
         attribute.addValue(newAttributeValue);
         attributeDB.update(attribute);
         return newAttributeValue;
@@ -73,8 +73,12 @@ public class AttributeService {
      * @param <T> the type of the attribute
      * @return the computed {@link AttributeValue}
      */
-    private <T> AttributeValue<T> generateAttributeKeys(@NonNull T value, @NonNull GlobalPublicParameter gpp) {
-        Key key = attributeKeyGenerator.generateAttributeValueKey(gpp);
-        return new AttributeValue(key.getPrivateKey(), key.getPublicKey(), value);
+    private <T> AttributeValue<T> generateAttributeKeys(
+            @NonNull T value,
+            @NonNull String attributeValueId,
+            @NonNull GlobalPublicParameter gpp) {
+
+        AttributeValueKey key = attributeKeyManager.generateAttributeValueKey(gpp, attributeValueId);
+        return new AttributeValue(value, key);
     }
 }

@@ -187,4 +187,12 @@ To develop the first prototype of the system defined previously we will use the 
 \end{itemize}
 \todo{write me}
 
+\subsection{Problems}
+
+\subsubsection{En- and decrypting arbitrary data}
+TF-DAC-MACS takes as an input for encryption a message $M \in GT$. Since there is not easy way to reconstruct a message from an element in $GT$, we have to combine some encryption teachniques to encrypt arbitrary data. 
+
+The alogirhtm first chooses a random $M \in GT$ and outputs $M$ together with the constructed cipher text. $M$ is then hashed into a byte buffer using \ac{SHA}-256. In the next step we will encrypt our arbitrary data using \ac{AES} and as a key the hash previous computed. 
+
+On decryption we frist reconstruct $M$ using the ABE decryption technique and then hashing $M$ again to reconstruct our AES secret key. This will help us to decipher the data that was encrypted. 
 
