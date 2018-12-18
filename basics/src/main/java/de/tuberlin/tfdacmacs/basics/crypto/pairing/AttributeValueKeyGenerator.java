@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AttributeKeyManager {
+public class AttributeValueKeyGenerator {
 
     private final HashGenerator hashGenerator;
 
@@ -21,7 +21,7 @@ public class AttributeKeyManager {
      * @param gpp the global public paramter
      * @return the attribute key
      */
-    public AttributeValueKey generateAttributeValueKey(@NonNull GlobalPublicParameter gpp, @NonNull String attributeValueId) {
+    public AttributeValueKey generate(@NonNull GlobalPublicParameter gpp, @NonNull String attributeValueId) {
         Element g = gpp.getG();
         Element privateKey = gpp.getPairing().getZr().newRandomElement(); // y
         Element publicKey = g.powZn(privateKey); // g ** y
@@ -38,7 +38,7 @@ public class AttributeKeyManager {
      * @param privateAttributeValueKey the private attribute value key
      * @return users secret key
      */
-    public UserAttributeValueKey generateSecretUserKey(
+    public UserAttributeValueKey generateUserKey(
             @NonNull GlobalPublicParameter gpp,
             @NonNull String userId,
             @NonNull AuthorityKey.Private privateAuthorityKey,
@@ -62,7 +62,7 @@ public class AttributeKeyManager {
      * @param newAttributePrivateKey the new attribute value key
      * @return a update key that needs to be distributed to the user
      */
-    public UserAttributeValueUpdateKey generateSecetUserUpdateKey(
+    public UserAttributeValueUpdateKey generateUserUpdateKey(
             @NonNull GlobalPublicParameter gpp,
             @NonNull String userId,
             @NonNull AttributeValueKey.Private revokedAttributePrivateKey,
@@ -85,7 +85,7 @@ public class AttributeKeyManager {
      * @param twoFactorPublicKey the two factory public key, may be null if not present
      * @return the cipher text update key
      */
-    public CipherTextUpdateKey generateCipherTextUpdateKey(
+    public CipherTextAttributeUpdateKey generateCipherTextUpdateKey(
             @NonNull CipherText cipherText,
             @NonNull AttributeValueKey revokedAttributeValueKey,
             @NonNull AttributeValueKey newAttributeValueKey,
@@ -99,7 +99,7 @@ public class AttributeKeyManager {
         cuk.powZn(newAttributeValueKey.getPrivateKey().getKey().duplicate()
                 .sub(revokedAttributeValueKey.getPrivateKey().getKey()));
 
-        return  new CipherTextUpdateKey(
+        return  new CipherTextAttributeUpdateKey(
                 cuk,
                 newAttributeValueKey.getAttributeValueId(),
                 newAttributeValueKey.getPublicKey()

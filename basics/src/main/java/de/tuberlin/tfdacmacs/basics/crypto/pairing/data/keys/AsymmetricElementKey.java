@@ -20,21 +20,21 @@ public abstract class AsymmetricElementKey<T> {
     }
 
     @SuppressWarnings("unused")
-    public class Private<T> extends Key {
+    public static class Private<T> extends Key {
         public Private(@NonNull Element key) {
             super(key);
         }
     }
 
     @SuppressWarnings("unused")
-    public class Public<T> extends Key {
+    public static class Public<T> extends Key {
         public Public(@NonNull Element key) {
             super(key);
         }
     }
 
     @RequiredArgsConstructor
-    private class Key {
+    private static class Key {
         private final @NonNull Element key;
 
         public Element getKey() {

@@ -7,12 +7,12 @@ import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CipherTextUpdateKey extends UpdateKey {
+public class CipherTextAttributeUpdateKey extends UpdateKey {
 
     private final String attributeValueId;
     private final AttributeValueKey.Public newAttributeValuePublicKey;
 
-    public CipherTextUpdateKey(
+    public CipherTextAttributeUpdateKey(
             @NonNull Element updateKey,
             @NonNull String attributeValueId,
             @NonNull AttributeValueKey.Public newAttributeValuePublicKey) {

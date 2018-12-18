@@ -19,7 +19,7 @@ public class UnitTestSuite {
     protected HashGenerator hashGenerator = new HashGenerator();
     protected GPPTestFactory gppTestFactory = new GPPTestFactory(pairingGenerator, rsaCryptEngine);
     protected AuthorityKeyGenerator authorityKeyGenerator = new AuthorityKeyGenerator();
-    protected AttributeKeyManager attributeKeyManager = new AttributeKeyManager(hashGenerator);
+    protected AttributeValueKeyGenerator attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
     protected TwoFactorKeyGenerator twoFactorKeyGenerator = new TwoFactorKeyGenerator(hashGenerator);
 
     protected AESEncryptor aesEncryptor = new AESEncryptor(hashGenerator, aesCryptEngine);
