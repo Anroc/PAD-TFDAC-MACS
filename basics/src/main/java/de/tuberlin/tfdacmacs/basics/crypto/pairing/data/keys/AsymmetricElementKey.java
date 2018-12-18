@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public abstract class AsymmetricElementKey {
+public abstract class AsymmetricElementKey<T> {
 
-    private final @NonNull Private privateKey;
-    private final @NonNull Public publicKey;
+    private final @NonNull Private<T> privateKey;
+    private final @NonNull Public<T> publicKey;
 
     public AsymmetricElementKey(
             @NonNull Element privateKey,
@@ -19,17 +19,22 @@ public abstract class AsymmetricElementKey {
         this.publicKey = new Public(publicKey);
     }
 
-    @RequiredArgsConstructor
-    public class Private {
-        private final @NonNull Element key;
+    @SuppressWarnings("unused")
+    public class Private<T> extends Key {
+        public Private(@NonNull Element key) {
+            super(key);
+        }
+    }
 
-        public Element getKey() {
-            return this.key.getImmutable();
+    @SuppressWarnings("unused")
+    public class Public<T> extends Key {
+        public Public(@NonNull Element key) {
+            super(key);
         }
     }
 
     @RequiredArgsConstructor
-    public class Public {
+    private class Key {
         private final @NonNull Element key;
 
         public Element getKey() {

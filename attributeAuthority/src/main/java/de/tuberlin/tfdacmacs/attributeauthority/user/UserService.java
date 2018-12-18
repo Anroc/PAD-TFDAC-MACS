@@ -10,8 +10,9 @@ import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyManager;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
-import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class UserService {
     private Set<UserAttributeKey> enrichWithUserAttributeSecretKeys(String userId, Set<UserAttributeKey> attributes) {
         log.info("Generating secret keys for user {}", userId);
         GlobalPublicParameter gpp = gppService.getGpp();
-        Element authorityPrivateKey = authorityKeyService.getPrivateKey();
+        AuthorityKey.Private authorityPrivateKey = authorityKeyService.getPrivateKey();
 
         return attributes.stream().map(
                 userAttributeKey -> {
@@ -68,8 +69,8 @@ public class UserService {
         ).collect(Collectors.toSet());
     }
 
-    private Element generateSecretUserAttributeValueKey(String userId, GlobalPublicParameter gpp,
-            Element authorityPrivateKey, UserAttributeKey userAttributeKey) {
+    private UserAttributeValueKey generateSecretUserAttributeValueKey(String userId, GlobalPublicParameter gpp,
+            AuthorityKey.Private authorityPrivateKey, UserAttributeKey userAttributeKey) {
         AttributeValue attributeValue = getAttributeValue(gpp, userAttributeKey);
 
         return attributeKeyManager.generateSecretUserKey(gpp, userId,

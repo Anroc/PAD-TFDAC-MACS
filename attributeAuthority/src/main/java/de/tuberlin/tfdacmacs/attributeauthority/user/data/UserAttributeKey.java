@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
-import it.unisa.dia.gas.jpbc.Element;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,5 +16,5 @@ public class UserAttributeKey<T> {
     @NotNull
     private T value;
     @NotNull
-    private Element key;
+    private UserAttributeValueKey key;
 }
