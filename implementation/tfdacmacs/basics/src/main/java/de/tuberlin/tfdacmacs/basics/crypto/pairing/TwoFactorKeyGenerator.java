@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.HashGenerator;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -15,11 +15,11 @@ public class TwoFactorKeyGenerator {
 
     private final HashGenerator hashGenerator;
 
-    public AuthorityKey generateTwoFactoryKey(@NonNull GlobalPublicParameter globalPublicParameter, @NonNull String uid) {
+    public TwoFactorKey generateTwoFactoryKey(@NonNull GlobalPublicParameter globalPublicParameter, @NonNull String uid) {
         Pairing pairing = globalPublicParameter.getPairing();
 
         Element alpha = pairing.getZr().newRandomElement();
         Element twoFAKey = hashGenerator.g1Hash(globalPublicParameter, uid).powZn(alpha);
-        return new AuthorityKey(alpha, twoFAKey);
+        return new TwoFactorKey(alpha, twoFAKey);
     }
 }

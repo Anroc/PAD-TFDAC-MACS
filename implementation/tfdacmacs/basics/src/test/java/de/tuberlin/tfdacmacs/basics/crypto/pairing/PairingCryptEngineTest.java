@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.basics.UnitTestSuite;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
 import org.assertj.core.util.Sets;
@@ -29,7 +30,7 @@ public class PairingCryptEngineTest extends UnitTestSuite {
     private AndAccessPolicy andAccessPolicy;
 
     private String dataOwnerId = UUID.randomUUID().toString();
-    private AuthorityKey twoFactoryKey;
+    private TwoFactorKey twoFactoryKey;
     private DataOwner dataOwner;
 
     @Before
