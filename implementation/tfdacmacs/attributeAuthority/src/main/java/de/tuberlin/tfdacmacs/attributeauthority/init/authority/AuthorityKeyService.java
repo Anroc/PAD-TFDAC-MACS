@@ -18,7 +18,7 @@ public class AuthorityKeyService {
 
     @EventListener(GPPReceivedEvent.class)
     public AuthorityKeyCreatedEvent setup(GPPReceivedEvent gppReceivedEvent) {
-        this.authorityKey = authorityKeyGenerator.generateAuthorityKey(gppReceivedEvent.getSource());
+        this.authorityKey = authorityKeyGenerator.generate(gppReceivedEvent.getSource());
         return new AuthorityKeyCreatedEvent(this.authorityKey);
     }
 

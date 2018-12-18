@@ -6,7 +6,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeKeyManager;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import lombok.NonNull;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class AttributeService {
 
     private final AttributeDB attributeDB;
-    private final AttributeKeyManager attributeKeyManager;
+    private final AttributeValueKeyGenerator attributeValueKeyGenerator;
     private final GPPService gppService;
     private final AttributeAuthorityConfig config;
 
@@ -78,7 +78,7 @@ public class AttributeService {
             @NonNull String attributeValueId,
             @NonNull GlobalPublicParameter gpp) {
 
-        AttributeValueKey key = attributeKeyManager.generateAttributeValueKey(gpp, attributeValueId);
+        AttributeValueKey key = attributeValueKeyGenerator.generate(gpp, attributeValueId);
         return new AttributeValue(value, key);
     }
 }

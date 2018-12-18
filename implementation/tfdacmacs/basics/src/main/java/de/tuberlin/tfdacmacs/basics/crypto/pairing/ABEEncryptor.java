@@ -1,10 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.*;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AsymmetricElementKey;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.CipherTextUpdateKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.*;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -56,26 +53,73 @@ public class ABEEncryptor extends ABECrypto {
             @NonNull GlobalPublicParameter gpp,
             @NonNull CipherText cipherText,
             @NonNull AndAccessPolicy andAccessPolicy,
-            @NonNull CipherTextUpdateKey cipherTextUpdateKey) {
-        if(! cipherText.getAccessPolicy().contains(cipherTextUpdateKey.getAttributeValueId())
-            || ! andAccessPolicy.contains(cipherTextUpdateKey.getAttributeValueId())) {
+            @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey) {
+        if(! cipherText.getAccessPolicy().contains(cipherTextAttributeUpdateKey.getAttributeValueId())
+            || ! andAccessPolicy.contains(cipherTextAttributeUpdateKey.getAttributeValueId())) {
 
             log.info("Nothing to do on cipher text. Policy does not contain the attribute value to update.");
             return cipherText;
         }
 
         Element r = gpp.getPairing().getZr().newRandomElement();
-        Element updatedC1 = cipherText.getC1().duplicate().mul(
-                mulAuthorityPublicKeys(andAccessPolicy.groupByAttributeAuthority()).powZn(r));
-        Element updatedC2 = cipherText.getC2().duplicate().mul(gpp.getG().powZn(r));
-        Element updatedC3 = cipherText.getC3().duplicate().mul(cipherTextUpdateKey.getUpdateKey())
+        Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
+        Element updatedC2 = updateC2(gpp, cipherText, r);
+        Element updatedC3 = cipherText.getC3().duplicate().mul(cipherTextAttributeUpdateKey.getUpdateKey())
                 .mul(mulAttributePublicValueKeys(
-                        andAccessPolicy.getAccessPolicyElements(), cipherTextUpdateKey.getAttributeValueId())
+                        andAccessPolicy.getAccessPolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId())
                         .orElse(gpp.getPairing().getG1().newOneElement())
                         .powZn(r))
-                .mul(cipherTextUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
+                .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
 
         return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getEncryptedMessage());
+    }
+
+    public CipherText update(
+            @NonNull GlobalPublicParameter gpp,
+            @NonNull CipherText cipherText,
+            @NonNull AndAccessPolicy andAccessPolicy,
+            @NonNull Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
+        if(! cipherText.isTwoFactorSecured()) {
+            return cipherText;
+        }
+        if (cipherText2FAUpdateKeys.isEmpty()) {
+            throw new IllegalArgumentException("Given update key set is empty.");
+        }
+        boolean allMatch = cipherText2FAUpdateKeys.stream()
+                .map(CipherText2FAUpdateKey::getOid)
+                .allMatch(oid -> cipherText.getOwnerId().equals(oid));
+        if(! allMatch) {
+            throw new IllegalArgumentException("Given ciphertext owner id does not match issued update key.");
+        }
+
+        Set<Element> subSet2FaUpdateKeys = cipherText2FAUpdateKeys.stream()
+                .filter(cipherText2FAUpdateKey -> cipherText.getAccessPolicy()
+                        .contains(cipherText2FAUpdateKey.getAttributeValueId()))
+                .map(UpdateKey::getUpdateKey)
+                .collect(Collectors.toSet());
+
+        if(subSet2FaUpdateKeys.size() != cipherText.getAccessPolicy().size()) {
+            throw new IllegalArgumentException(
+                    String.format("Could not match all attribute keys to an update key. Missing %d update keys.",
+                            cipherText.getAccessPolicy().size() - subSet2FaUpdateKeys.size()));
+        }
+
+        Element r = gpp.getPairing().getZr().newRandomElement();
+        Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
+        Element updatedC2 = updateC2(gpp, cipherText, r);
+        Element updatedC3 = cipherText.getC3().duplicate()
+                .mul(subSet2FaUpdateKeys.stream().reduce((a,b) -> a.duplicate().mul(b)).get())
+                .mul(mulAttributePublicValueKeys(andAccessPolicy.getAccessPolicyElements()).powZn(r));
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getEncryptedMessage());
+    }
+
+    private Element updateC1(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy, Element r) {
+        return cipherText.getC1().duplicate().mul(
+                mulAuthorityPublicKeys(andAccessPolicy.groupByAttributeAuthority()).powZn(r));
+    }
+
+    private Element updateC2(@NonNull GlobalPublicParameter gpp, @NonNull CipherText cipherText, Element r) {
+        return cipherText.getC2().duplicate().mul(gpp.getG().powZn(r));
     }
 
     private Element mulAuthorityPublicKeys(Map<AsymmetricElementKey.Public, Set<AccessPolicyElement>> policy) {
@@ -99,6 +143,7 @@ public class ABEEncryptor extends ABECrypto {
                 .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().equals(excludedAttributeValueId))
                 .map(AccessPolicyElement::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
-                .reduce((a, b) -> a.duplicate().mul(b));
+                .reduce((a, b) -> a.duplicate().mul(b))
+                .map(Element::duplicate);
     }
 }

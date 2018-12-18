@@ -16,7 +16,7 @@ public class AuthorityKeyGenerator {
      * @param gpp the global public parameter
      * @return the private and public key pair
      */
-    public AuthorityKey generateAuthorityKey(@NonNull GlobalPublicParameter gpp) {
+    public AuthorityKey generate(@NonNull GlobalPublicParameter gpp) {
         Field Zr = gpp.getPairing().getZr();
         Element g = gpp.getG();
 

@@ -8,21 +8,21 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AttributeKeyManagerTest extends UnitTestSuite {
+public class AttributeValueKeyGeneratorTest extends UnitTestSuite {
 
     private GlobalPublicParameter globalPublicParameter;
-    private AttributeKeyManager attributeKeyManager;
+    private AttributeValueKeyGenerator attributeValueKeyGenerator;
 
     @Before
     public void setup() {
-        attributeKeyManager = new AttributeKeyManager(hashGenerator);
+        attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
         globalPublicParameter = gppTestFactory.create();
     }
 
     @Test
     public void generateAttributeKeys_passes_forTwoValuesGeneration() {
-        AttributeValueKey key1 = attributeKeyManager.generateAttributeValueKey(globalPublicParameter, "asd");
-        AttributeValueKey key2 = attributeKeyManager.generateAttributeValueKey(globalPublicParameter, "dsa");
+        AttributeValueKey key1 = attributeValueKeyGenerator.generate(globalPublicParameter, "asd");
+        AttributeValueKey key2 = attributeValueKeyGenerator.generate(globalPublicParameter, "dsa");
 
         assertThat(key1.getPublicKey().getKey().toBytes()).isNotEqualTo(key2.getPrivateKey().getKey().toBytes());
         assertThat(key1.getPublicKey().getKey().toBytes()).isNotEqualTo(key2.getPublicKey().getKey().toBytes());
