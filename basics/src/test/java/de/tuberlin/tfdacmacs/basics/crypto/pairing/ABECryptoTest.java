@@ -107,8 +107,54 @@ public class ABECryptoTest extends UnitTestSuite {
                 new AttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier));
         key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedAttributeSecretComponents, null);
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
+    }
 
+    @Test
+    public void ciphertext_update_passes_withMultipleAttributePublicy() {
+        // encrypt
+        String attrValueId = "aa.hpi.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeKeyManager.generateAttributeValueKey(gpp, attrValueId);
+        AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generateAuthorityKey(gpp);
 
+        andAccessPolicy.getAccessPolicyElements().add(
+                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        );
+        CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, null);
+        assertThat(cipherText.isTwoFactorSecured()).isFalse();
+
+        UserAttributeValueKey userSecretAttributeValueKey2 = attributeKeyManager
+                .generateSecretUserKey(gpp, userId, authorityAuthorityKey2.getPrivateKey(),
+                        attributeKeys2.getPrivateKey());
+
+        // generate update components
+        AttributeValueKey newAttributeValueKey = attributeKeyManager
+                .generateAttributeValueKey(gpp, attributeValueIdentifier);
+        UserAttributeValueUpdateKey newUserAttributeValueUpdateKey = attributeKeyManager
+                .generateSecetUserUpdateKey(gpp, userId, attributeKeys.getPrivateKey(),
+                        newAttributeValueKey.getPrivateKey());
+        CipherTextUpdateKey cipherTextUpdateKey = attributeKeyManager.generateCipherTextUpdateKey(cipherText, attributeKeys, newAttributeValueKey, null);
+
+        // 1. update user key
+        UserAttributeValueKey updateUserSecretKey = userSecretAttributeValueKey.update(newUserAttributeValueUpdateKey);
+
+        // 2. update cipher text
+        CipherText updatedCipherText = abeEncryptor.update(gpp, cipherText, andAccessPolicy, cipherTextUpdateKey);
+
+        // oldUserSecret component is not able to decrypt new ciphertext
+        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
+        );
+        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, attributeSecretComponents, null);
+        assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
+
+        // updated components are able to decrypt
+        LinkedHashSet<AttributeSecretComponents> updatedAttributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier),
+                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
+        );
+        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedAttributeSecretComponents, null);
+        assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
 }
