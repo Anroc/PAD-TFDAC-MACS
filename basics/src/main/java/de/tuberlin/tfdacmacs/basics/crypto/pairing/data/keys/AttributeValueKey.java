@@ -25,6 +25,7 @@ public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
     }
 
     @Data
+    @EqualsAndHashCode(callSuper = true)
     @SuppressWarnings("unused")
     public static class Private<T> extends AsymmetricElementKey.Private<AttributeValueKey> {
         private final String attributeValueId;
@@ -36,6 +37,7 @@ public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
     }
 
     @Data
+    @EqualsAndHashCode(callSuper = true)
     @SuppressWarnings("unused")
     public static class Public<T> extends AsymmetricElementKey.Public<AttributeValueKey> {
         private final String attributeValueId;

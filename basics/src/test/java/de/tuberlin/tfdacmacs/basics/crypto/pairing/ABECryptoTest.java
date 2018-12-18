@@ -161,4 +161,41 @@ public class ABECryptoTest extends UnitTestSuite {
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
+    @Test
+    public void ciphertext_2fa_update_passes() {
+        String ownerId = UUID.randomUUID().toString();
+        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gpp, userId);
+        TwoFactorKey.Public user2FAKey = twoFactorKey.getPublicKey();
+
+        // encrypt
+        CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, new DataOwner(ownerId, twoFactorKey.getPrivateKey()));
+        assertThat(cipherText.isTwoFactorSecured()).isTrue();
+
+        // generate Update components
+        TwoFactorKey newTwoFactorKey = twoFactorKeyGenerator.generate(gpp, userId);
+        TwoFactorUpdateKey twoFactorUpdateKey = twoFactorKeyGenerator.generateUpdateKey(gpp, twoFactorKey.getPrivateKey(), newTwoFactorKey.getPrivateKey(), userId);
+        CipherText2FAUpdateKey cipherText2FAUpdateKey = twoFactorKeyGenerator.generateCipherTextUpdateKey(twoFactorKey.getPrivateKey(), newTwoFactorKey.getPrivateKey(), attributeKeys.getPublicKey(), ownerId);
+
+        // update components
+        TwoFactorKey.Public newUser2FAKey = user2FAKey.update(twoFactorUpdateKey);
+        CipherText updatedCipherText = abeEncryptor
+                .update(gpp, cipherText, andAccessPolicy, Sets.newLinkedHashSet(cipherText2FAUpdateKey));
+
+        // assert old keys are not legitimit anymore
+        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
+        );
+        Element message = abeDecryptor
+                .decrypt(updatedCipherText, gpp, userId, attributeSecretComponents, twoFactorKey.getPublicKey());
+        assertNotSameElements(message.toBytes(), cipherText.getKey().toBytes());
+
+        // assert update succeedes
+        LinkedHashSet<AttributeSecretComponents> updateAttributeSecretComponents = Sets.newLinkedHashSet(
+                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
+        );
+        Element message2 = abeDecryptor
+                .decrypt(updatedCipherText, gpp, userId, updateAttributeSecretComponents, newUser2FAKey);
+        assertSameElements(message2.toBytes(), cipherText.getKey().toBytes());
+    }
+
 }
