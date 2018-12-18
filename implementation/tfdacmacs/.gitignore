@@ -27,3 +27,4 @@ out/
 
 *.class
 *.so
+.attach_*
