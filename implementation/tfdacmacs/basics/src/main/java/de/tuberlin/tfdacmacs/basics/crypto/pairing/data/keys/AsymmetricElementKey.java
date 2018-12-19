@@ -21,7 +21,6 @@ public abstract class AsymmetricElementKey<T> {
     }
 
     @SuppressWarnings("unused")
-    @EqualsAndHashCode(callSuper = true)
     public static class Private<T> extends Key {
         public Private(@NonNull Element key) {
             super(key);
@@ -29,14 +28,12 @@ public abstract class AsymmetricElementKey<T> {
     }
 
     @SuppressWarnings("unused")
-    @EqualsAndHashCode(callSuper = true)
     public static class Public<T> extends Key {
         public Public(@NonNull Element key) {
             super(key);
         }
     }
 
-    @EqualsAndHashCode
     @RequiredArgsConstructor
     private static class Key {
         private final @NonNull Element key;
