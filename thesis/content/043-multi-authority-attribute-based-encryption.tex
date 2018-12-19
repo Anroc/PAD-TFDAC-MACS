@@ -1,38 +1,30 @@
 \subsection{Multi-authority attribute based encryption}
-In this section the field of Multi-authority attribute-based encryption (\ac{MA-ABE}) will be evaluated more deeply with respect to all requirements of section \ref{sec:requierements}. 
-
-Another notable technique recently used by \cite{yang2013dac}, \cite{wu2017security}, \cite{li2017two} and \cite{wang2011hierarchical} is \textit{proxy de-/reencryption}. It is motivated by the fact that mobile devices often don't have much computing resources so that the server may help the clients for decryption. The main idea is that the server does the preprocessing of the encrypted text given paramteres by the user. In the end the preprocessed encrypted content will be easily computable by the edge device. The cural fact is that the server will have no knowledge about the plaintext but rather helps the user on decryption or reencryption. 
-
-In the following the different sub topics of \ac{MA-ABE} will be described, analyzed given the requirement set and finally evaluated based on their perforamnce and scalability. 
+In the following the different sub topics of Multi-Authority Attribute-Based Encryption (\ac{MA-ABE}) will be described, analyzed given all the requirements and finally evaluated based on their performance and scalability. 
 
 \subsubsection{Introduction into Multi-Authority Attribute-based Encryption}
-Chase 2007 \cite{chase2007multi} was the frist known to introduce the first \ac{MA-ABE} schemes. In her paper she describes the process on how to derrive a multi-authority attribute-based encryption scheme vom the single authrotity schemes. 
+Chase 2007 \cite{chase2007multi} was the first known to introduce the first \ac{MA-ABE} schemes. In her paper she describes the process on how to derive a multi-authority attribute-based encryption scheme from the single authority schemes. While chase's scheme also used bilinear maps its main security is based on interpolation and the fact that no under defined linear equation system could definitely be solved\footnote{\ac{LSSS} matrix are based on the same assumption.}.  
 
-The collussion resistance criteria in \ac{ABE} implies that any data owner needs to encrypt under attributes in such kind that the ciphertext is independent of any users specific identifiers. Any user could in theory decrypter the ciphertext if he holds the fullfilling attribute set. While chase's scheme also used bilinear maps it main security was based on interpolation and the fact that no underdefined linaer equation system could definitly be solved\footnote{For \ac{LSSS} matrix are based on the same assumption.}.  
+To ensure collusion resistance each user is given blinded attribute private keys so that when used on decryption the plain text is still blinded with the user specific identifier. Using pairings this identifier can be substituted and the plaintext gets revealed. 
 
-Colluding users can not decrypter any cipher text and the plain text is encrypted using a blinded master secret. The blinding factor is then implemented in the policy so that any user satisfying this policy can restore the blinding factor and so revocer the plaintext. 
+Chases scheme had two major disadvantages, which were not addressed in the initial scheme. First the \ac{CA} had global decryption power. That was due to the fact that it needed to issue each \ac{AA} a specific seed so that on using this seed in a pseudo random generator the \ac{CA} knew what random value would be calculated. This information is used to precompute the users secret key so that when later combined with the secret attribute keys, it resolves in the correct plain text. This was important since the CA was defined as the trusted authority, the AA was not. So the cipher text need this extra security layer.  
 
-In the next step each user is given blinded attribute private keys so that when used on decryption the plaintext is still blinded with the user specific identifier. Using pairings this identifier can be substituted and the plaintext gets revealed. 
+Chase improved her scheme 2009 in \cite{chase2009improving}. Now all \ac{AA}s will do a n-party key exchange to distribute the secret seeds with each other. This results in the fact that each no AA know the whole master secret, but only its required secret seed. Agreeing on a well known value the \ac{CA} was no longer required and as long $N-2$ \ac{AA}s are not colluding with each other the secret remained secure. 
 
-Two cural disadventages where not respected by chase in her initial scheme. First the \ac{CA} had global decryption power. It needed to issue each \ac{AA} a specific seed so that on using this seed in a pheudo random generator the \ac{CA} knew what random value would be calculated. This was importent since the \ac{CA} need to isse the user his private key which combined with the private attribute keys from the \ac{AA} would reveal on decryption the unblinded plaintext. 
+The other disadvantage, that was still present in the updated scheme, was that no new \ac{AA} could be added after system initialization since it would trigger a new system bootstrap and distribution of the master secret. 
 
-Chase improved her scheme 2009 in \cite{chase2009improving}. Now all \ac{AA}s will do a n-party key exchange to distribute the secret seeds with each other. Agreeing on a well known value the \ac{CA} was no longer needed and as long $N-2$ \ac{AA}s are not colluding with each other the secret remained secure. 
+The lack of adding new attributes and the missing revocation scheme made chases scheme impractical for further evaluations but gives a good introduction the challenges of the \ac{MA-ABE} schemes.
 
-The other disadventage, that was will present in the updated scheme, was that no new \ac{AA} could be added after system inizialisation since it would trigger a new system inizialisation and distribution of the master secret. 
-
-The lack of addition new attribute authorities and the missing revocation scheme made chases scheme impractical for further evaluations but give a good introduction the fitfalls of \ac{MA-ABE} schemes.
-
-\subsubsection{Hirachical \ac{ABE}}
+\subsubsection{Hierarchical \ac{ABE}}
 \label{sec:HABE}
 
 \begin{figure*}[!ht]
 \centering
     \includegraphics[width=0.5\linewidth]{img/HABE.png}
-    \caption{Structe of hirachical attribute-based encryption systems}
+    \caption{Structure of hierarchical attribute-based encryption systems}
     \label{fig:habe}
 \end{figure*}
 
-Hirachical Attribute-Based encryption (\ac{HABE}) takes the key delegation one step further. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of his access power to a new instance. By nature follows a hirachical structure where each user could administrate an own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing.
+Hierarchical Attribute-Based encryption (\ac{HABE}) takes the key delegation one step further. It is sourly designed arround the idea that if a private key exist that have a certain access power, it is possible for the key holder to deletate a subset of his access power to a new instance. By nature follows a hirachical structure where each user could administrate an own subdomain. Here many use cases for cloud computing as well as cloud storage system emerged. \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a cural requirement is still missing.
 
 As displayed in figure \ref{fig:habe}, which is based on the approach in \cite{wang2011hierarchical}, the root master summarized the global decryption power of the system and can set up new domain masters (attribute authorities). They on the other hand can delegate a subset of decryption power to a sub domain master. Each domain master can administer users and attributes.
 
@@ -61,6 +53,8 @@ The most explored field in \ac{MA-ABE} is the Efficient Data Access Control for 
 \ac{DAC-MACS} elliminates the need for the global decryption power of the \ac{CA} by issuing $k$ ciphertexts: One per \ac{AA}. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new \ac{AA}s at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
 
 \ac{DAC-MACS} is not collusion resistance on attribute revocation under the active attack model. The scheme \ac{NEDAC-MACS} (New Extended \ac{DAC-MACS}) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as \ac{MAACS} \cite{li2016secure} and \ac{TF-DAC-MACS} (Two-Factor \ac{DAC-MACS})\cite{li2017two}. 
+
+Another notable technique recently used by \cite{yang2013dac}, \cite{wu2017security}, \cite{li2017two} and \cite{wang2011hierarchical} is \textit{proxy de-/reencryption}. It is motivated by the fact that mobile devices often don't have much computing resources so that the server may help the clients for decryption. The main idea is that the server does the preprocessing of the encrypted text given paramteres by the user. In the end the preprocessed encrypted content will be easily computable by the edge device. The cural fact is that the server will have no knowledge about the plaintext but rather helps the user on decryption or reencryption. 
 
 All the \ac{DAC-MACS} schemes are structed in roughly the same way. They usally describe six different entities:
 

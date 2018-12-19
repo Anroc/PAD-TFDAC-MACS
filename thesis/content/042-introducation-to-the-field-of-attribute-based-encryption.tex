@@ -33,7 +33,7 @@ The lack of revocation \req{C8} in \cite{bethencourt2007ciphertext} and the need
 
 The first proposal of a revocation scheme in \ac{CP-ABE} was in 2010 \cite{liang2010ciphertext}. This scheme used a similar approach like \ac{LKH} to make the revocation process efficient. In 2016 Lui \textit{et. al} \cite{liu2016practical} proposed a revocable \ac{ABE} scheme that supports traitor tracing and large attribute universe. To compare CP-ABE with the other schemes we implemented \cite{liu2016practical}. 
 
-\subsubsection{Non-monotonic access structure of \ac{ABE}}
+\subsubsection{Non-monotonic access structure for \ac{ABE}}
 While monotonic access structures can describe \textit{AND} or \textit{OR} gates, non-monotonic access structure can also reference \textit{NOT} gates. This adds another layer of find-granularity into the system. In non-monotonic structures, first introduced by Ostrovsky \textit{et. al.} \cite{Ostrovsky:2007:AEN:1315245.1315270}, a user may be excluded from certain topics. 
 
 Take for example Alice who is an intern in the Top Secret company. In monotonic access structure she would receive both attribute private keys: "Intern" and "working in Top Secret Company". By nature of monotonic access structures, she would be able to decipher all content addressed to all employees at the Super Secret company. However, some content might be so confidential that interns shall not be able to access them. This exclusion would not be possible. With non-monotonic access structure an administrator may want to encrypt certain information with the policy "working in Top secret Company AND NOT intern".  
