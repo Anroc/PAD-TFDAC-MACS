@@ -50,6 +50,7 @@ node {
             if("${env.BRANCH_NAME}" == "automatic-deply") {
                 copyArtifacts(
                     projectName: "${env.JOB_NAME}", 
+                    selector: "${built.number}",
                     target: '/var/lib/jenkins/deploy/',
                     flatten: true, 
                     filter: '**/*.jar');
