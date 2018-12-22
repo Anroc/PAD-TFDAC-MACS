@@ -32,12 +32,24 @@ node {
                     }
                 }
             }
+            stage('gralde bootjar') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                echo pwd()
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew bootjar')
+                    } finally {
+                        archiveArtifacts artifacts: "**/*.jar", fingerprint: true
+                    }
+                }
+            }
             
         }
 
         stage('deploy') {
             if("${env.BRANCH_NAME}" == "master") {
-                echo "TODO: Restart/start server"
+                echo "Deploy artifacts."
+                sh('/home/jenkins/deploy/deploy.sh')
             }
         }
         currentBuild.result = 'SUCCESS'
