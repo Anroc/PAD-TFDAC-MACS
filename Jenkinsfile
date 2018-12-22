@@ -56,7 +56,7 @@ node {
 
 
                 echo "Deploy artifacts."
-                sh('/var/lib/deploy/deploy.sh')
+                sh('/var/lib/jenkins/deploy/deploy.sh')
             }
         }
         currentBuild.result = 'SUCCESS'
