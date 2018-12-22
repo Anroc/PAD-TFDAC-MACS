@@ -26,7 +26,7 @@ node {
                 sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew clean test')
+                        // sh('./gradlew clean test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
                     }
@@ -50,7 +50,7 @@ node {
             if("${env.BRANCH_NAME}" == "automatic-deply") {
                 copyArtifacts(
                     projectName: "${env.JOB_NAME}", 
-                    target: '/home/jenkins/deploy/',
+                    target: '/var/lib/jenkins/deploy/',
                     flatten: true, 
                     filter: '*.jar');
 
