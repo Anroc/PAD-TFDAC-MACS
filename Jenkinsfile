@@ -51,8 +51,7 @@ node {
                 copyArtifacts(
                     projectName: "${env.JOB_NAME}", 
                     target: '/var/lib/jenkins/deploy/',
-                    flatten: true, 
-                    filter: '*.jar');
+                    flatten: true);
 
 
                 echo "Deploy artifacts."
