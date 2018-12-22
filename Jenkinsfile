@@ -28,7 +28,7 @@ node {
                     try {
                         // sh('./gradlew clean test')
                     } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        //step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
                     }
                 }
             }
