@@ -49,7 +49,7 @@ node {
         stage('deploy') {
             if("${env.BRANCH_NAME}" == "automatic-deply") {
                 copyArtifacts(
-                    projectName: 'Pratical MA-ABE for Secure Cloud Storage Systems', 
+                    projectName: "${env.JOB_NAME}", 
                     target: '/home/jenkins/deploy/',
                     flatten: true, 
                     filter: '*.jar');
