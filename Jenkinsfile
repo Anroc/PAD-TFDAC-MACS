@@ -39,7 +39,7 @@ node {
                     try {
                         sh('./gradlew bootjar')
                     } finally {
-                        archiveArtifacts artifacts: "**/*.jar", fingerprint: true
+                        archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
                     }
                 }
             }
@@ -47,7 +47,14 @@ node {
         }
 
         stage('deploy') {
-            if("${env.BRANCH_NAME}" == "master") {
+            if("${env.BRANCH_NAME}" == "automatic-deply") {
+                copyArtifacts(
+                    projectName: 'Pratical MA-ABE for Secure Cloud Storage Systems', 
+                    target: '/home/jenkins/deploy/',
+                    flatten: true, 
+                    filter: '*.jar');
+
+
                 echo "Deploy artifacts."
                 sh('/home/jenkins/deploy/deploy.sh')
             }
