@@ -23,18 +23,20 @@ node {
         java: {
             stage('gradle test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                sh('printenv')
+                // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
+                        // TODO:include me
                         // sh('./gradlew clean test')
                     } finally {
+                        // TODO:include me
                         //step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
                     }
                 }
             }
             stage('gralde bootjar') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                echo pwd()
+                // echo pwd()
                 dir (SOURCE_DIR) {
                     try {
                         sh('./gradlew bootjar')
