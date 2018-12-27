@@ -12,18 +12,30 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 @RequiredArgsConstructor
 public class TwoFactorKeyGenerator {
 
     private final HashGenerator hashGenerator;
 
-    public TwoFactorKey generate(@NonNull GlobalPublicParameter globalPublicParameter, @NonNull String uid) {
+    public TwoFactorKey generate(@NonNull GlobalPublicParameter globalPublicParameter, @NonNull String... uids) {
         Pairing pairing = globalPublicParameter.getPairing();
 
         Element alpha = pairing.getZr().newRandomElement();
-        Element twoFAKey = hashGenerator.g1Hash(globalPublicParameter, uid).powZn(alpha);
-        return new TwoFactorKey(alpha, twoFAKey);
+        TwoFactorKey twoFactorKey = new TwoFactorKey(alpha);
+
+        Arrays.stream(uids).forEach(uid -> generatePublicKeyForUser(globalPublicParameter, twoFactorKey, uid));
+
+        return twoFactorKey;
+    }
+
+    public TwoFactorKey generatePublicKeyForUser(@NonNull GlobalPublicParameter globalPublicParameter,
+            @NonNull TwoFactorKey twoFactorKey, @NonNull String uid) {
+        Element twoFAKey = hashGenerator.g1Hash(globalPublicParameter, uid).powZn(twoFactorKey.getPrivateKey().getKey());
+        twoFactorKey.putPublicKey(uid, twoFAKey);
+        return twoFactorKey;
     }
 
     public TwoFactorUpdateKey generateUpdateKey(@NonNull GlobalPublicParameter gpp,

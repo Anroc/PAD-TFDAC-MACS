@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.basics.crypto.pairing.aes.AESEncryptor;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.HashGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringSymmetricCryptEngine;
@@ -34,6 +35,7 @@ public class TFDACMACSDemo {
 
     private final AuthorityKeyGenerator authorityKeyGenerator = new AuthorityKeyGenerator();
     private final AttributeValueKeyGenerator attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
+    private final TwoFactorKeyGenerator twoFactorKeyGenerator = new TwoFactorKeyGenerator(hashGenerator);
 
     /**
      * Setup the pairing and calculate a new pairing type A curve.
@@ -61,6 +63,10 @@ public class TFDACMACSDemo {
         return attributeValueKeyGenerator.generateUserKey(gpp, userId, authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey());
     }
 
+    private TwoFactorKey generate2FA(GlobalPublicParameter gpp, TwoFactorKeyGenerator twoFactorKeyGenerator) {
+        return twoFactorKeyGenerator.generate(gpp);
+    }
+
     private void addPolicyElement(AuthorityKey authorityKey, String aid, AttributeValueKey attributeValueKey,
             Set<AccessPolicyElement> policy) {
         policy.add(new AccessPolicyElement(authorityKey.getPublicKey(), attributeValueKey.getPublicKey(), aid));
@@ -68,6 +74,10 @@ public class TFDACMACSDemo {
 
     private CipherText encrypt(GlobalPublicParameter gpp, AndAccessPolicy andAccessPolicy, byte[] message) {
         return pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+    }
+
+    private CipherText encrypt(GlobalPublicParameter gpp, AndAccessPolicy andAccessPolicy, byte[] message, DataOwner dataOwner) {
+        return pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
     }
 
     private boolean addUserAttributeSecretComponent(String aid, AttributeValueKey attributeValueKey,
@@ -78,6 +88,11 @@ public class TFDACMACSDemo {
     private byte[] decrypt(GlobalPublicParameter gpp, String uid, CipherText cipherText,
             Set<UserAttributeSecretComponents> userAttributeKeys) {
         return pairingCryptEngine.decrypt(cipherText, gpp, uid, userAttributeKeys, null);
+    }
+
+    private byte[] decrypt(GlobalPublicParameter gpp, String uid, CipherText cipherText,
+            Set<UserAttributeSecretComponents> userAttributeKeys, TwoFactorKey.Public twoFactorPublicKey) {
+        return pairingCryptEngine.decrypt(cipherText, gpp, uid, userAttributeKeys, twoFactorPublicKey);
     }
 
     @Test
@@ -98,6 +113,7 @@ public class TFDACMACSDemo {
         AndAccessPolicy andAccessPolicy = new AndAccessPolicy(policy);
 
         CipherText cipherText = encrypt(gpp, andAccessPolicy, message);
+        System.out.println(String.format("Encrypted Message: \t%s", cipherText.getEncryptedMessage()));
 
         Set<UserAttributeSecretComponents> userAttributeKeys = new HashSet<>();
         addUserAttributeSecretComponent(aid, attributeValueKey, userAttributeValueKey, userAttributeKeys);
@@ -109,5 +125,39 @@ public class TFDACMACSDemo {
         System.out.println(String.format("Recovered Message: \t%s", recoveredStrMessage));
     }
 
+    @Test
+    public void demo2FA() {
+        GlobalPublicParameter gpp = setup();
+        AuthorityKey authorityKey = setupAuthority(gpp);
+        final String aid = "aa.tu-berlin.de.role:Student";
+        final String uid = "genesisUser@tu-berlin.de";
+        final String oid = "dataowner@tu-berlin.de";
+        final String strMessage = "No, Eve please :(";
+        final byte[] message = strMessage.getBytes();
 
+        AttributeValueKey attributeValueKey = createAttribute(gpp, aid);
+
+        UserAttributeValueKey userAttributeValueKey = createUserAttributeKey(gpp, uid, authorityKey, attributeValueKey);
+
+        Set<AccessPolicyElement> policy = new HashSet<>();
+        addPolicyElement(authorityKey, aid, attributeValueKey, policy);
+        AndAccessPolicy andAccessPolicy = new AndAccessPolicy(policy);
+
+        TwoFactorKey twoFactorKey = generate2FA(gpp, twoFactorKeyGenerator);
+        DataOwner dataOwner = new DataOwner(oid, twoFactorKey.getPrivateKey());
+
+        CipherText cipherText = encrypt(gpp, andAccessPolicy, message, dataOwner);
+        System.out.println(String.format("Encrypted Message: \t%s", cipherText.getEncryptedMessage()));
+
+        Set<UserAttributeSecretComponents> userAttributeKeys = new HashSet<>();
+        addUserAttributeSecretComponent(aid, attributeValueKey, userAttributeValueKey, userAttributeKeys);
+
+        twoFactorKey = twoFactorKeyGenerator.generatePublicKeyForUser(gpp, twoFactorKey, uid);
+
+        byte[] recoveredMessage = decrypt(gpp, uid, cipherText, userAttributeKeys, twoFactorKey.getPublicKeyOfUser(uid));
+        String recoveredStrMessage = new String(recoveredMessage);
+
+        System.out.println(String.format("Original Message: \t%s", strMessage));
+        System.out.println(String.format("Recovered Message: \t%s", recoveredStrMessage));
+    }
 }

@@ -165,7 +165,7 @@ public class ABECryptoTest extends UnitTestSuite {
     public void ciphertext_2fa_update_passes() {
         String ownerId = UUID.randomUUID().toString();
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gpp, userId);
-        TwoFactorKey.Public user2FAKey = twoFactorKey.getPublicKey();
+        TwoFactorKey.Public user2FAKey = twoFactorKey.getPublicKeyOfUser(userId);
 
         // encrypt
         CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, new DataOwner(ownerId, twoFactorKey.getPrivateKey()));
@@ -186,7 +186,7 @@ public class ABECryptoTest extends UnitTestSuite {
                 new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
         );
         Element message = abeDecryptor
-                .decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKey());
+                .decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKeyOfUser(userId));
         assertNotSameElements(message.toBytes(), cipherText.getKey().toBytes());
 
         // assert update succeedes

@@ -204,7 +204,7 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         // decrypt
         LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, twoFactoryKey.getPublicKey());
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, twoFactoryKey.getPublicKeyOfUser(userId));
 
         assertSameElements(output, message);
     }
