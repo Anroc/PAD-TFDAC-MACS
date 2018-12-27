@@ -31,7 +31,7 @@ public class StringSymmetricCryptEngine extends SymmetricCryptEngine<String> {
      * @throws IllegalBlockSizeException on wrong alignment
      */
     @Override
-    public String encryptRaw(String data, Key key)
+    public String encrypt(String data, Key key)
             throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException {
         try {

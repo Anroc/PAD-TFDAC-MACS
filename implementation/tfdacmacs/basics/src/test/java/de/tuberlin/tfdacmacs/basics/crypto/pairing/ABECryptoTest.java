@@ -46,9 +46,9 @@ public class ABECryptoTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        Element key = abeDecryptor.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        Element key = abeDecryptor.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
         assertThat(key).isEqualTo(cipherText.getKey());
@@ -69,10 +69,10 @@ public class ABECryptoTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
-                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null)
+                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null)
         );
     }
 
@@ -99,15 +99,15 @@ public class ABECryptoTest extends UnitTestSuite {
                 cipherTextAttributeUpdateKey);
 
         // oldUserSecret component is not able to decrypt new ciphertext
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null);
         assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
 
         // updated components are able to decrypt
-        LinkedHashSet<AttributeSecretComponents> updatedAttributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier));
-        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedAttributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> updatedUserAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier));
+        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
@@ -145,19 +145,19 @@ public class ABECryptoTest extends UnitTestSuite {
                 cipherTextAttributeUpdateKey);
 
         // oldUserSecret component is not able to decrypt new ciphertext
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
         );
-        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, attributeSecretComponents, null);
+        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null);
         assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
 
         // updated components are able to decrypt
-        LinkedHashSet<AttributeSecretComponents> updatedAttributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
+        LinkedHashSet<UserAttributeSecretComponents> updatedUserAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
         );
-        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedAttributeSecretComponents, null);
+        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
@@ -182,19 +182,19 @@ public class ABECryptoTest extends UnitTestSuite {
                 .update(gpp, cipherText, andAccessPolicy, Sets.newLinkedHashSet(cipherText2FAUpdateKey));
 
         // assert old keys are not legitimit anymore
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
         );
         Element message = abeDecryptor
-                .decrypt(updatedCipherText, gpp, userId, attributeSecretComponents, twoFactorKey.getPublicKey());
+                .decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKey());
         assertNotSameElements(message.toBytes(), cipherText.getKey().toBytes());
 
         // assert update succeedes
-        LinkedHashSet<AttributeSecretComponents> updateAttributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
+        LinkedHashSet<UserAttributeSecretComponents> updateUserAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
         );
         Element message2 = abeDecryptor
-                .decrypt(updatedCipherText, gpp, userId, updateAttributeSecretComponents, newUser2FAKey);
+                .decrypt(updatedCipherText, gpp, userId, updateUserAttributeSecretComponents, newUser2FAKey);
         assertSameElements(message2.toBytes(), cipherText.getKey().toBytes());
     }
 

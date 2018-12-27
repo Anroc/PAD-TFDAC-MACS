@@ -72,7 +72,7 @@ public abstract class SymmetricCryptEngine<T> extends CypherProcessor {
      * @throws InvalidKeyException       on wrong cipher instance
      * @throws IllegalBlockSizeException on wrong alignment
      */
-    abstract public String encryptRaw(T data, Key key)
+    abstract public String encrypt(T data, Key key)
             throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException;
 

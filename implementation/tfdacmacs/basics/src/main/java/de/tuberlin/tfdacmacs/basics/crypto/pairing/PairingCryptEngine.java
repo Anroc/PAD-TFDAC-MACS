@@ -38,7 +38,7 @@ public class PairingCryptEngine {
             @NonNull CipherText cipherText,
             @NonNull GlobalPublicParameter gpp,
             @NonNull String userId,
-            @NonNull Set<AttributeSecretComponents> secrets,
+            @NonNull Set<UserAttributeSecretComponents> secrets,
             TwoFactorKey.Public twoFactorPublicKey) {
 
         Element key = abeDecryptor.decrypt(cipherText, gpp, userId, secrets, twoFactorPublicKey);
