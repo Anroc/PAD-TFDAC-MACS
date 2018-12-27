@@ -57,9 +57,9 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertSameElements(output, message);
     }
@@ -92,10 +92,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertSameElements(output, message);
     }
@@ -115,10 +115,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
-                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null)
+                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null)
         );
     }
 
@@ -141,10 +141,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertSameElements(output, message);
     }
@@ -165,10 +165,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
-                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null)
+                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null)
         );
     }
 
@@ -186,10 +186,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertSameElements(output, message);
     }
@@ -202,9 +202,9 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, twoFactoryKey.getPublicKey());
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, twoFactoryKey.getPublicKey());
 
         assertSameElements(output, message);
     }
@@ -217,9 +217,9 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertNotSameElements(output, message);
     }
@@ -242,10 +242,10 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<AttributeSecretComponents> attributeSecretComponents = Sets.newLinkedHashSet(
-                new AttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new AttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, attributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertNotSameElements(output, message);
     }

@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.AttributeSecretComponents;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.UserAttributeSecretComponents;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
@@ -23,19 +23,19 @@ public class ABEDecryptor extends ABECrypto {
     private final HashGenerator hashGenerator;
 
     public Element decrypt(@NonNull CipherText cipherText, @NonNull GlobalPublicParameter gpp,
-            @NonNull String userId, @NonNull Set<AttributeSecretComponents> secrets,
+            @NonNull String userId, @NonNull Set<UserAttributeSecretComponents> secrets,
             TwoFactorKey.Public twoFactorPublicKey) {
         secrets = findSatisfingSubSet(cipherText, secrets);
 
 
         Element sk = secrets.stream()
-                .map(AttributeSecretComponents::getUserSecretAttributeKey)
+                .map(UserAttributeSecretComponents::getUserSecretAttributeKey)
                 .map(UserAttributeValueKey::getSecretKey)
                 .reduce((a,b) -> a.duplicate().mul(b))
                 .orElseThrow(() -> new IllegalArgumentException("Given secrets where empty."));
 
         Element upk = secrets.stream()
-                .map(AttributeSecretComponents::getAttributePublicKey)
+                .map(UserAttributeSecretComponents::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
                 .reduce((a,b) -> a.duplicate().mul(b))
                 .orElseThrow(() -> new IllegalArgumentException("Given secrets where empty."));
@@ -54,8 +54,8 @@ public class ABEDecryptor extends ABECrypto {
         }
     }
 
-    private Set<AttributeSecretComponents> findSatisfingSubSet(CipherText cipherText, Set<AttributeSecretComponents> secrets) {
-        Set<AttributeSecretComponents> satisfyingSubSet = getSatisfyingSubSet(cipherText.getAccessPolicy(), secrets);
+    private Set<UserAttributeSecretComponents> findSatisfingSubSet(CipherText cipherText, Set<UserAttributeSecretComponents> secrets) {
+        Set<UserAttributeSecretComponents> satisfyingSubSet = getSatisfyingSubSet(cipherText.getAccessPolicy(), secrets);
         if(satisfyingSubSet.size() != cipherText.getAccessPolicy().size()) {
             throw new AccessPolicyNotSatisfiedException(
                     String.format("Policy %s could not be fulfilled. Missing %d attribute keys.",
@@ -68,7 +68,7 @@ public class ABEDecryptor extends ABECrypto {
         return satisfyingSubSet;
     }
 
-    private Set<AttributeSecretComponents> getSatisfyingSubSet(Set<String> accessPolicy, Set<AttributeSecretComponents> secrets) {
+    private Set<UserAttributeSecretComponents> getSatisfyingSubSet(Set<String> accessPolicy, Set<UserAttributeSecretComponents> secrets) {
         return secrets.stream()
                 .filter(secret -> accessPolicy.contains(secret.getAttributeValueId()))
                 .collect(Collectors.toSet());
