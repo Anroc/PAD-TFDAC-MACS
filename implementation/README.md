@@ -10,7 +10,7 @@ decryption. To encrypt an arbitrary string message using ABE we first habe to ge
 The classes `StringSymmetricCryptEngine` and `HashGenerator` are just interface classes to bouncy castels AES encryption and SHA-256 hashes. Further, the `HashGenerator` provides a method to hash an element into the field *G1*. 
 
 ```java
-	// basic dependencies
+    // basic dependencies
     private final StringSymmetricCryptEngine symmetricCryptEngine = new StringSymmetricCryptEngine();
     private final HashGenerator hashGenerator = new HashGenerator();
 
@@ -41,8 +41,8 @@ We frist need to initialize the pairing and calcuate the public paramter.
 ```java
     PairingGenerator pairingGenerator = new PairingGenerator();
     PairingParameters pairingParameters = pairingGenerator.generateNewTypeACurveParameter();
-	Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
-	// this object saves the pairing field, curve paramter and the generator object g
+    Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
+    // this object saves the pairing field, curve paramter and the generator object g
     GlobalPublicParameter gpp = new GlobalPublicParameter(
             pairing, pairingParameters, pairing.getG1().newRandomElement().getImmutable(), null);
 ```
@@ -69,7 +69,7 @@ In the next setup we register a new user. This user will be registered in the TU
 created attribute assigned. 
 
 ```java
-	UserAttributeValueKey userAttributeValueKey = attributeValueKeyGenerator.generateUserKey(gpp, "genesisUser@tu-berlin.de", authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey());
+    UserAttributeValueKey userAttributeValueKey = attributeValueKeyGenerator.generateUserKey(gpp, "genesisUser@tu-berlin.de", authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey());
 ```
 
 ## Encrypt
@@ -85,7 +85,7 @@ To encrypt for a user we first ned to create a policy for this cipher text.
 Lets choose a plain text that we want to encrypt: "No, Eve please :(". 
 
 ```java
-	byte[] message = "No, Eve please :(".getBytes();
+    byte[] message = "No, Eve please :(".getBytes();
     CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
 ```
 
@@ -99,12 +99,40 @@ To decrypt the encrypted message we now use the `userAttributeValueSecretKey`.
 
 ```java
     Set<UserAttributeSecretComponents> userAttributeKeys = new HashSet<>();
-	userAttributeKeys.add(new UserAttributeSecretComponents(userAttributeValueKey, attributeValueKey.getPublicKey(), aid));
+    userAttributeKeys.add(new UserAttributeSecretComponents(userAttributeValueKey, attributeValueKey.getPublicKey(), aid));
 
-	byte[] recoveredMessage = pairingCryptEngine.decrypt(cipherText, gpp, uid, userAttributeKeys, null);
+    byte[] recoveredMessage = pairingCryptEngine.decrypt(cipherText, gpp, uid, userAttributeKeys, null);
 ```
 
 Finally we can convert the `byte[]` back to a `String` with `new String(recoveredMessage)`. 
+
+
+## Encrypt using two factor authentication
+
+We need to add another dependency to enable two-factor authentication (2FA) and create a new identifier for the data owner. 
+
+```java
+    String oid = "dataowner@tu-berlin.de";
+    TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gpp);
+    DataOwner dataOwner = new DataOwner(oid, twoFactorKey.getPrivateKey());
+```
+
+We then can encrypt the plain text additionally with the data owner object. 
+
+```java
+   CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
+```
+
+
+## Decrypt using two factor authentication
+
+Let's generate the user 2FA key for this cipher text and decipher this message using this key. 
+
+```java
+   twoFactorKey = twoFactorKeyGenerator.generatePublicKeyForUser(gpp, twoFactorKey, uid);
+   byte[] recoveredMessage = decrypt(gpp, uid, cipherText, userAttributeKeys, twoFactorKey.getPublicKeyOfUser(uid));
+```
+
 
 
 
