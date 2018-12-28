@@ -1,8 +1,7 @@
 package de.tuberlin.tfdacmacs.basics.db.config;
 
-import com.couchbase.client.deps.com.fasterxml.jackson.databind.util.StdConverter;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.converter.ElementConverter;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.GlobalPublicParameterProvider;
+import de.tuberlin.tfdacmacs.basics.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.plaf.jpbc.pbc.PBCField;
@@ -12,6 +11,7 @@ import it.unisa.dia.gas.plaf.jpbc.pbc.field.PBCGTField;
 import it.unisa.dia.gas.plaf.jpbc.pbc.field.PBCZrField;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class CouchbaseElementConverters {
 
     @WritingConverter
     @Component
-    public static class Write extends StdConverter<Element, String> {
+    public static class Write implements Converter<Element, String> {
 
         @Override
         public String convert(Element value) {
@@ -48,11 +48,11 @@ public class CouchbaseElementConverters {
         }
     }
 
-    @RequiredArgsConstructor
     @ReadingConverter
     @Component
+    @RequiredArgsConstructor
     @Slf4j
-    public static class Read extends StdConverter<String, Element> {
+    public static class Read implements Converter<String, Element> {
 
         private final GlobalPublicParameterProvider gppProvider;
 

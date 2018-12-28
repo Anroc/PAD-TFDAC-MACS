@@ -5,7 +5,9 @@ import de.tuberlin.tfdacmacs.basics.db.CouchbaseDB;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GlobalPublicParameterDTODB extends CouchbaseDB<GlobalPublicParameterDTO> {
 
     @Autowired

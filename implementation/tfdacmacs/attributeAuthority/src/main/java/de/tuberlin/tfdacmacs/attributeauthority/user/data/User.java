@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 import de.tuberlin.tfdacmacs.basics.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class User extends Entity {
 

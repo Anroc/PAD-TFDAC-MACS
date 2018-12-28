@@ -1,7 +1,17 @@
 spring:
   application:
     name: AttributeAuthority
-
+  couchbase:
+    env:
+      timeouts:
+        connect: 10000
+        query: 75000
+        view: 75000
+        socket-connect: 10000
+    bootstrap-hosts: localhost
+    bucket:
+      name: aa.tu-berlin.de
+      password: foobar
 server:
   port: 9002
 
@@ -10,6 +20,11 @@ attribute-authority:
 ---
 spring:
   profiles: test
+  couchbase:
+    bootstrap-hosts: localhost
+    bucket:
+      name: aa-test
+      password: password
 
 attribute-authority:
   requestGPPOnInit: false

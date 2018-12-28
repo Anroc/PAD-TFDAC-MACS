@@ -41,5 +41,7 @@ public class GlobalPublicParameterIntegrationTest extends IntegrationTestSuite {
         PublicKey publicKey = KeyConverter.from(publicKeyResponse.getPublicKey()).toPublicKey();
         assertThat(publicKey).isInstanceOf(RSAPublicKey.class);
         assertThat(keyDB.findEntity(RsaKeyPair.ID).get().getPublicKey()).isEqualTo(publicKey);
+        assertThat(globalPublicParameterDB.gppExist()).isTrue();
+        assertThat(globalPublicParameterDTODB.findEntity(GlobalPublicParameterDTO.ID).get()).isEqualTo(gpp);
     }
 }

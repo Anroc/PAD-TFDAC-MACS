@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 
-import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.CouchbaseDB;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AttributeService {
 
-    private final CouchbaseDB attributeDB;
+    private final AttributeDB attributeDB;
     private final AttributeValueKeyGenerator attributeValueKeyGenerator;
     private final GPPService gppService;
     private final AttributeAuthorityConfig config;
@@ -39,7 +39,7 @@ public class AttributeService {
     }
 
     public Attribute createAttribute(@NonNull String name, @NonNull AttributeType type, List<?> values) {
-        GlobalPublicParameter gpp = gppService.getGpp();
+        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
 
         Set<AttributeValue> attrValues = values.stream()
                 .map(value -> generateAttributeKeys(value, AttributeValue.generateId(config.getId(), name, value), gpp))

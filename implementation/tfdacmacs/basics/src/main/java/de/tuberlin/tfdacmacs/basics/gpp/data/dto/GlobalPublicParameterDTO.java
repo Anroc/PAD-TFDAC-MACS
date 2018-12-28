@@ -7,21 +7,31 @@ import de.tuberlin.tfdacmacs.basics.db.Entity;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
 import java.security.PublicKey;
 
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class GlobalPublicParameterDTO extends Entity {
 
     public static final String ID = "GLOBAL_PUBLIC_PARAMETER";
 
     public GlobalPublicParameterDTO() {
         super(ID);
+    }
+
+    public GlobalPublicParameterDTO(
+            @NotNull CurveParameterDTO curveParameter,
+            @NotNull GeneratorDTO generator,
+            @NotNull RSAPublicKeyDTO rsaPublicKeyDTO) {
+        super(ID);
+        this.curveParameter = curveParameter;
+        this.generator = generator;
+        this.rsaPublicKeyDTO = rsaPublicKeyDTO;
     }
 
     @NotNull

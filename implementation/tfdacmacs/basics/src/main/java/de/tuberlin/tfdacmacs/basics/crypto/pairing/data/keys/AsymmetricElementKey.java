@@ -1,17 +1,17 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys;
 
 import it.unisa.dia.gas.jpbc.Element;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 @RequiredArgsConstructor
 public abstract class AsymmetricElementKey<T> {
 
-    private final @NonNull Private<T> privateKey;
-    private final @NonNull Public<T> publicKey;
+    private @NotNull @NonNull Private<T> privateKey;
+    private @NotNull @NonNull Public<T> publicKey;
 
     public AsymmetricElementKey(
             @NonNull Element privateKey,
@@ -34,9 +34,10 @@ public abstract class AsymmetricElementKey<T> {
         }
     }
 
-    @RequiredArgsConstructor
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class Key {
-        private final @NonNull Element key;
+        private @NotNull @NonNull Element key;
 
         public Element getKey() {
             return this.key.getImmutable();

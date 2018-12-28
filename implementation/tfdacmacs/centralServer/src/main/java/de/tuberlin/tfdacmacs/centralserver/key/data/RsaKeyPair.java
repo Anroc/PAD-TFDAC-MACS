@@ -6,13 +6,16 @@ import de.tuberlin.tfdacmacs.basics.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.basics.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RsaKeyPair extends Entity {
 
@@ -20,11 +23,10 @@ public class RsaKeyPair extends Entity {
 
     @Field
     @NotBlank
-    private final String serializedPublicKey;
+    private String serializedPublicKey;
     @Field
     @NotBlank
-    private final String serializedPrivateKey;
-
+    private String serializedPrivateKey;
 
     public RsaKeyPair(@NotNull PublicKey publicKey, @NotNull PrivateKey privateKey) {
         super(ID);
@@ -43,4 +45,8 @@ public class RsaKeyPair extends Entity {
         return KeyConverter.from(serializedPrivateKey).toPrivateKey();
     }
 
+    @JsonIgnore
+    public KeyPair getKeyPair() {
+        return new KeyPair(getPublicKey(), getPrivateKey());
+    }
 }

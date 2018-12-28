@@ -22,6 +22,7 @@ public abstract class CouchbaseDB<T extends Entity> {
     private final CouchbaseRepository<T, String> repository;
     private final CouchbaseTemplate template;
     private final Class<T> clazz;
+    private final Set<String> ids = new HashSet<>();
 
     /**
      * Finds a entity identified by the given id.
@@ -48,6 +49,7 @@ public abstract class CouchbaseDB<T extends Entity> {
     public String insert(@NonNull T entity) throws EntityDoesExistException {
         try {
             template.insert(entity);
+            ids.add(entity.getId());
             return entity.getId();
         } catch (DocumentAlreadyExistsException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()), e);
@@ -118,6 +120,7 @@ public abstract class CouchbaseDB<T extends Entity> {
         Optional<T> entity = findEntity(id);
         if(entity.isPresent()) {
             repository.delete(entity.get());
+            ids.remove(id);
             return entity;
         } else {
             return Optional.empty();
@@ -128,7 +131,8 @@ public abstract class CouchbaseDB<T extends Entity> {
      * Drop the whole database.
      */
     public void drop() {
-        repository.deleteAll();
+        ids.forEach(bucket::remove);
+        ids.clear();
     }
 }
 
