@@ -2,6 +2,8 @@ package de.tuberlin.tfdacmacs.centralserver.gpp;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.GlobalPublicParameterProvider;
+import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.key.KeyService;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -15,18 +17,21 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GlobalPublicParameterService {
-
-    private GlobalPublicParameter globalPublicParameter;
+public class GlobalPublicParameterService implements GlobalPublicParameterProvider {
 
     private final PairingGenerator pairingGenerator;
     private final KeyService keyService;
+    private final GlobalPublicParameterDB globalPublicParameterDB;
 
-    public GlobalPublicParameter createOrGetGPP() {
-        if (globalPublicParameter == null) {
-            this.globalPublicParameter = createGlobalPublicParameter();
+    @Override
+    public GlobalPublicParameter getGlobalPublicParameter() {
+        if(globalPublicParameterDB.gppExist()) {
+            return globalPublicParameterDB.findEntity().get();
+        } else {
+            GlobalPublicParameter globalPublicParameter = createGlobalPublicParameter();
+            globalPublicParameterDB.insert(globalPublicParameter);
+            return globalPublicParameter;
         }
-        return this.getGlobalPublicParameter();
     }
 
     private GlobalPublicParameter createGlobalPublicParameter() {

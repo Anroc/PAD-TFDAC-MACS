@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.basics.gpp.data.dto;
 
+import com.couchbase.client.java.repository.annotation.Field;
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.converter.KeyConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.security.PublicKey;
 public class RSAPublicKeyDTO {
 
     @NotBlank
+    @Field
     public String publicKey;
 
     public static RSAPublicKeyDTO from(PublicKey publicKey) {

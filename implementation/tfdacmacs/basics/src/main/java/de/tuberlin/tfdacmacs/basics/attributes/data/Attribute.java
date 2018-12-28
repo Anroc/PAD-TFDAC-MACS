@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.basics.attributes.data;
 
+import com.couchbase.client.java.repository.annotation.Field;
 import de.tuberlin.tfdacmacs.basics.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,12 +18,16 @@ import java.util.Set;
 @NoArgsConstructor
 public class Attribute extends Entity {
 
+    @Field
     @NotBlank
     private String authorityDomain;
+    @Field
     @NotBlank
     private String name;
+    @Field
     @NotEmpty
     private Set<AttributeValue> values;
+    @Field
     @NotNull
     private AttributeType type;
 

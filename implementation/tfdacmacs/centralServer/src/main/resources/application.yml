@@ -1,6 +1,17 @@
 spring:
   application:
     name: CentralServer
+  couchbase:
+    env:
+      timeouts:
+        connect: 10000
+        query: 75000
+        view: 75000
+        socket-connect: 10000
+    bootstrap-hosts: localhost
+    bucket:
+      name: ca
+      password: foobar
 
 server:
   port: 9001
