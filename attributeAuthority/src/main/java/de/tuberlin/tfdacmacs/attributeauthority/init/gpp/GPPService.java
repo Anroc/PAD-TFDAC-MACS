@@ -2,8 +2,8 @@ package de.tuberlin.tfdacmacs.attributeauthority.init.gpp;
 
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPClient;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,7 +18,7 @@ public class GPPService {
     private final AttributeAuthorityConfig config;
     private final ApplicationEventPublisher eventPublisher;
 
-    private GlobalPublicParameter gpp;
+    private GlobalPublicParameter globalPublicParameter;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initGPP() {
@@ -28,15 +28,15 @@ public class GPPService {
     }
 
     private GlobalPublicParameter retrieveGPP() {
-        this.gpp = gppClient.getGPP();
-        eventPublisher.publishEvent(new GPPReceivedEvent(this.gpp));
-        return gpp;
+        this.globalPublicParameter = gppClient.getGPP();
+        eventPublisher.publishEvent(new GlobalPublicParameterChangedEvent(this.globalPublicParameter));
+        return globalPublicParameter;
     }
 
-    public GlobalPublicParameter getGpp() {
-        if (gpp == null) {
-           this.gpp = retrieveGPP();
+    public GlobalPublicParameter getGlobalPublicParameter() {
+        if (globalPublicParameter == null) {
+           this.globalPublicParameter = retrieveGPP();
         }
-        return gpp;
+        return globalPublicParameter;
     }
 }

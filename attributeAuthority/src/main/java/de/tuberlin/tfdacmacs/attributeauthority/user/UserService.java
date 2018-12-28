@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public boolean isSignatureAuthentic(@NonNull String id, @NonNull String signatureId) {
-        GlobalPublicParameter gpp = gppService.getGpp();
+        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
         return cryptEngine.isSignatureAuthentic(signatureId, id, gpp.getRsaPublicKey());
     }
 
@@ -56,7 +56,7 @@ public class UserService {
 
     private Set<UserAttributeKey> enrichWithUserAttributeSecretKeys(String userId, Set<UserAttributeKey> attributes) {
         log.info("Generating secret keys for user {}", userId);
-        GlobalPublicParameter gpp = gppService.getGpp();
+        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
         AuthorityKey.Private authorityPrivateKey = authorityKeyService.getPrivateKey();
 
         return attributes.stream().map(

@@ -3,11 +3,13 @@ package de.tuberlin.tfdacmacs.centralserver.user.data;
 import de.tuberlin.tfdacmacs.basics.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class User extends Entity {
 

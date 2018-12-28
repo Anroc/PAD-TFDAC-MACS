@@ -3,11 +3,15 @@ package de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
+
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
 
-    private final String attributeValueId;
+    @NotNull
+    private String attributeValueId;
 
     public AttributeValueKey(@NonNull Element privateKey, @NonNull Element publicKey, @NonNull String attributeValueId) {
         super(new AttributeValueKey.Private(privateKey, attributeValueId), new AttributeValueKey.Public(publicKey, attributeValueId));

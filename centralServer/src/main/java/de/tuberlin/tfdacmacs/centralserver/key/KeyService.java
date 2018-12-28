@@ -25,12 +25,17 @@ public class KeyService {
 
     @PostConstruct
     public void saveKeys() {
-        KeyPair keyPair = cryptEngine.getAsymmetricCipherKeyPair();
-        keyDB.insert(new RsaKeyPair(keyPair.getPublic(), keyPair.getPrivate()));
+        if(! keyDB.existRsaKeyPair()) {
+            KeyPair keyPair = cryptEngine.getAsymmetricCipherKeyPair();
+            keyDB.insert(new RsaKeyPair(keyPair.getPublic(), keyPair.getPrivate()));
+        } else {
+            RsaKeyPair rsaKeyPair = keyDB.findEntity().get();
+            cryptEngine.setAsymmetricCipherKeyPair(rsaKeyPair.getKeyPair());
+        }
     }
 
     public PublicKey getPublicKey() {
-        return cryptEngine.getAsymmetricCipherKeyPair().getPublic();
+        return keyDB.findEntity().map(RsaKeyPair::getPublicKey).get();
     }
 
     public String sign(@NonNull String content) {

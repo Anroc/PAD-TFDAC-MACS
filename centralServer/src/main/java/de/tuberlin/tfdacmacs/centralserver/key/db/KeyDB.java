@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class KeyDB extends CouchbaseDB<RsaKeyPair> {
 
@@ -15,5 +17,13 @@ public class KeyDB extends CouchbaseDB<RsaKeyPair> {
             KeyRepository repository,
             CouchbaseTemplate template) {
         super(bucket, repository, template, RsaKeyPair.class);
+    }
+
+    public Optional<RsaKeyPair> findEntity() {
+        return super.findEntity(RsaKeyPair.ID);
+    }
+
+    public boolean existRsaKeyPair() {
+        return super.exist(RsaKeyPair.ID);
     }
 }

@@ -1,9 +1,9 @@
 package de.tuberlin.tfdacmacs.attributeauthority.init.authority;
 
 import de.tuberlin.tfdacmacs.attributeauthority.init.authority.events.AuthorityKeyCreatedEvent;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AuthorityKeyGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ public class AuthorityKeyService {
 
     private AuthorityKey authorityKey;
 
-    @EventListener(GPPReceivedEvent.class)
-    public AuthorityKeyCreatedEvent setup(GPPReceivedEvent gppReceivedEvent) {
-        this.authorityKey = authorityKeyGenerator.generate(gppReceivedEvent.getSource());
+    @EventListener(GlobalPublicParameterChangedEvent.class)
+    public AuthorityKeyCreatedEvent setup(GlobalPublicParameterChangedEvent event) {
+        this.authorityKey = authorityKeyGenerator.generate(event.getSource());
         return new AuthorityKeyCreatedEvent(this.authorityKey);
     }
 

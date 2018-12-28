@@ -18,3 +18,8 @@ server:
 ---
 spring:
   profiles: test
+  couchbase:
+    bootstrap-hosts: localhost
+    bucket:
+      name: ca-test
+      password: password

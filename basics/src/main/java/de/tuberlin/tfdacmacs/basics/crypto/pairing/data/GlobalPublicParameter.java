@@ -1,6 +1,5 @@
 package de.tuberlin.tfdacmacs.basics.crypto.pairing.data;
 
-import de.tuberlin.tfdacmacs.basics.db.Entity;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;

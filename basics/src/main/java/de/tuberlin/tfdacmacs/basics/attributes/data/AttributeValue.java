@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.basics.attributes.data;
 
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.AttributeValueKey;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @ToString
+@NoArgsConstructor
 public class AttributeValue<T> extends AttributeValueKey {
 
     @NotNull

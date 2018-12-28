@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
-import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.CouchbaseDB;
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPFeignClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeValueKeyGenerator;
@@ -46,7 +46,7 @@ public abstract class IntegrationTestSuite {
 
     // DBs
     @Autowired
-    protected CouchbaseDB attributeDB;
+    protected AttributeDB attributeDB;
     @Autowired
     protected UserDB userDB;
 
