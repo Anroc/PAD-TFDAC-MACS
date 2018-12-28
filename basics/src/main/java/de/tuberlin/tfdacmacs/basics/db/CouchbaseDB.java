@@ -1,24 +1,27 @@
 package de.tuberlin.tfdacmacs.basics.db;
 
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.error.DocumentAlreadyExistsException;
+import com.couchbase.client.java.error.DocumentDoesNotExistException;
 import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesExistException;
 import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesNotExistException;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.DirectFieldBindingResult;
-import org.springframework.validation.SmartValidator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.couchbase.core.CouchbaseTemplate;
+import org.springframework.data.couchbase.repository.CouchbaseRepository;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings("unused")
-public abstract class MemoryDB<T extends Entity> {
+@Slf4j
+@RequiredArgsConstructor
+public abstract class CouchbaseDB<T extends Entity> {
 
-    @Autowired
-    private SmartValidator validator;
-
-    private Map<String, T> memoryDB = new HashMap<>();
+    private final Bucket bucket;
+    private final CouchbaseRepository<T, String> repository;
+    private final CouchbaseTemplate template;
+    private final Class<T> clazz;
 
     /**
      * Finds a entity identified by the given id.
@@ -27,7 +30,12 @@ public abstract class MemoryDB<T extends Entity> {
      * @return optional of the found value or {@link Optional#empty()} if the value was not present
      */
     public Optional<T> findEntity(@NonNull String id) {
-        return Optional.ofNullable(memoryDB.get(id));
+        try {
+            return Optional.of(template.findById(id, clazz));
+        } catch (DocumentDoesNotExistException e) {
+            log.debug("Document with id {} does not exist.", id, e);
+            return Optional.empty();
+        }
     }
 
     /**
@@ -38,10 +46,11 @@ public abstract class MemoryDB<T extends Entity> {
      * @throws EntityDoesExistException if an entity with the id does exist
      */
     public String insert(@NonNull T entity) throws EntityDoesExistException {
-        if(exist(entity.getId())) {
-            throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()));
-        } else {
-            return upsert(entity);
+        try {
+            template.insert(entity);
+            return entity.getId();
+        } catch (DocumentAlreadyExistsException e) {
+            throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()), e);
         }
     }
 
@@ -54,10 +63,11 @@ public abstract class MemoryDB<T extends Entity> {
      * @throws EntityDoesNotExistException if no entity with the given id was found
      */
     public String update(@NonNull T entity) throws EntityDoesNotExistException {
-        if(! exist(entity.getId())) {
-            throw  new EntityDoesNotExistException(String.format("Entity with id [%s] does not exist!", entity.getId()));
-        } else {
-            return upsert(entity);
+        try {
+            template.update(entity);
+            return entity.getId();
+        } catch (DocumentDoesNotExistException e) {
+            throw new EntityDoesExistException(String.format("Entity with id [%s] does not exist!", entity.getId()), e);
         }
     }
 
@@ -69,9 +79,11 @@ public abstract class MemoryDB<T extends Entity> {
      * @return the id of the entity for reference
      */
     public String upsert(@NonNull T entity) {
-        validator.validate(entity, new DirectFieldBindingResult(entity, entity.getClass().getName()));
-        memoryDB.put(entity.getId(), entity);
-        return entity.getId();
+        if(exist(entity.getId())) {
+            return update(entity);
+        } else {
+            return insert(entity);
+        }
     }
 
     /**
@@ -80,7 +92,9 @@ public abstract class MemoryDB<T extends Entity> {
      * @return a collection of all found entities.
      */
     public Collection<T> findAll() {
-        return memoryDB.values();
+        Collection<T> collection = new ArrayList();
+        repository.findAll().forEach(collection::add);
+        return collection;
     }
 
     /**
@@ -90,7 +104,7 @@ public abstract class MemoryDB<T extends Entity> {
      * @return true if an entity with the id exist, else false.
      */
     public boolean exist(@NonNull String id) {
-        return memoryDB.containsKey(id);
+        return bucket.exists(id);
     }
 
     /**
@@ -101,14 +115,20 @@ public abstract class MemoryDB<T extends Entity> {
      * @return the removed entity or {@link Optional#empty()} if no entity with the id was found
      */
     public Optional<T> remove(@NonNull String id) {
-        return Optional.ofNullable(memoryDB.remove(id));
+        Optional<T> entity = findEntity(id);
+        if(entity.isPresent()) {
+            repository.delete(entity.get());
+            return entity;
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
      * Drop the whole database.
      */
     public void drop() {
-        this.memoryDB = new HashMap<>();
+        repository.deleteAll();
     }
 }
 

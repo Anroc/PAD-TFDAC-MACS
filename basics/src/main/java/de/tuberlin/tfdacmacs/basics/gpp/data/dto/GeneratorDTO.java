@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 public class GeneratorDTO {
 
     @NotBlank
+    @com.couchbase.client.java.repository.annotation.Field
     private String g;
 
     public static GeneratorDTO from(@NonNull Element g) {

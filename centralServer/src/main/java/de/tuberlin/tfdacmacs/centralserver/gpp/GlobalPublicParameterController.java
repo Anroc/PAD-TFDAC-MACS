@@ -19,7 +19,7 @@ public class GlobalPublicParameterController {
 
     @GetMapping
     public GlobalPublicParameterDTO getGlobalPublicParameter() {
-        GlobalPublicParameter globalPublicParameter = gppService.createOrGetGPP();
+        GlobalPublicParameter globalPublicParameter = gppService.getGlobalPublicParameter();
 
         CurveParameterDTO curveParameterDTO = CurveParameterDTO.from(globalPublicParameter.getPairingParameters());
         GeneratorDTO generatorDTO = GeneratorDTO.from(globalPublicParameter.getG());

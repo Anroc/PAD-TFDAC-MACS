@@ -19,11 +19,6 @@ public class GPPClient {
     private final PairingGenerator pairingGenerator;
 
     public GlobalPublicParameter getGPP() {
-        GlobalPublicParameterDTO gpp = gppFeignClient.getGPP();
-        PairingParameters pairingParameters = gpp.getCurveParameter().toPairingParameter();
-        Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
-        Element g = gpp.getGenerator().toElement(pairing.getG1());
-        PublicKey rsaPublicKey = gpp.getRsaPublicKeyDTO().toPublicKey();
-        return new GlobalPublicParameter(pairing, pairingParameters, g, rsaPublicKey);
+        return gppFeignClient.getGPP().toGlobalPublicParameter();
     }
 }
