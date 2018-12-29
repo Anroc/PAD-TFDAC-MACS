@@ -1,7 +1,5 @@
 # Pratical Attribute-Based Encryption for Secure Cloud Storage Systems
 
-<a href='https://jenkins.undo.life/job/Pratical%20MA-ABE%20for%20Secure%20Cloud%20Storage%20Systems/job/master/'><img src='https://jenkins.undo.life/buildStatus/icon?job=Pratical MA-ABE for Secure Cloud Storage Systems/master'></a>
-
 Repository of the master theis on the topic of Multi-Authority Attribute based encryption for secure cloud storage systems.
 
 
