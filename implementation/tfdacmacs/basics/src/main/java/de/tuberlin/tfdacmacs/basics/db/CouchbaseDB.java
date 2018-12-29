@@ -89,17 +89,6 @@ public abstract class CouchbaseDB<T extends Entity> {
     }
 
     /**
-     * Finds all presented value in the memory.
-     *
-     * @return a collection of all found entities.
-     */
-    public Collection<T> findAll() {
-        Collection<T> collection = new ArrayList();
-        repository.findAll().forEach(collection::add);
-        return collection;
-    }
-
-    /**
      * Checks whether the given id exist.
      *
      * @param id NotNull: the id

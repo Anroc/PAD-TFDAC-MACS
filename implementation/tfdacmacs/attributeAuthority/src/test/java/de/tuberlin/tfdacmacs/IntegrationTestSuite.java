@@ -9,6 +9,7 @@ import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;
 import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -56,10 +58,17 @@ public abstract class IntegrationTestSuite {
     @Autowired
     protected AttributeTestFactory attributeTestFactory;
 
+    // Test usages
+    @Autowired
+    protected ApplicationEventPublisher publisher;
+
     @Before
     public void mockGPPRequest() {
         GlobalPublicParameterDTO globalPublicParameterDTO = gppTestFactory.createDTO();
         doReturn(globalPublicParameterDTO).when(gppFeignClient).getGPP();
+        publisher.publishEvent(
+                new GlobalPublicParameterChangedEvent(globalPublicParameterDTO.toGlobalPublicParameter(pairingGenerator))
+        );
     }
 
     @After
