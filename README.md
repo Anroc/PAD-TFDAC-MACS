@@ -1,5 +1,7 @@
 # Pratical Attribute-Based Encryption for Secure Cloud Storage Systems
 
+<a href='https://jenkins.undo.life/job/Pratical%20MA-ABE%20for%20Secure%20Cloud%20Storage%20Systems/job/master/'><img src='https://jenkins.undo.life/buildStatus/icon?job=Pratical MA-ABE for Secure Cloud Storage Systems/master'></a>
+
 Repository of the master theis on the topic of Multi-Authority Attribute based encryption for secure cloud storage systems.
 
 
@@ -13,4 +15,4 @@ Comparisons and evaluations:
 
 ## Jenkins CLI
 
-You can find the CLI pipline [here](https://jenkins.undo.life/job/pratical%20attribute-based%20encryption%20for%20secure%20cloud%20storage%20systems/).
+You can find the CLI pipline [here](https://jenkins.undo.life/job/Pratical%20MA-ABE%20for%20Secure%20Cloud%20Storage%20Systems/).
