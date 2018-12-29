@@ -1,10 +1,8 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute.db;
 
-import com.couchbase.client.java.Bucket;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.db.CouchbaseDB;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -16,10 +14,9 @@ public class AttributeDB extends CouchbaseDB<Attribute> {
     private final AttributeRepository repository;
 
     @Autowired
-    public AttributeDB(Bucket bucket,
-            AttributeRepository repository,
-            CouchbaseTemplate template) {
-        super(bucket, repository, template, Attribute.class);
+    public AttributeDB(
+            AttributeRepository repository) {
+        super(repository, Attribute.class);
         this.repository = repository;
     }
 

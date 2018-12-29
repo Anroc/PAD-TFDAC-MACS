@@ -6,7 +6,6 @@ import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -17,7 +16,6 @@ public class GlobalPublicParameterDB {
 
     private final GlobalPublicParameterDTODB globalPublicParameterDTODB;
     private final PairingGenerator pairingGenerator;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Cacheable("gpp")
     public Optional<GlobalPublicParameter> findEntity() {
@@ -30,8 +28,9 @@ public class GlobalPublicParameterDB {
     }
 
     public String insert(GlobalPublicParameter globalPublicParameter) {
-        String result = globalPublicParameterDTODB.insert(GlobalPublicParameterDTO.from(globalPublicParameter));
-        applicationEventPublisher.publishEvent(new GlobalPublicParameterChangedEvent(globalPublicParameter));
+        GlobalPublicParameterDTO gpp = GlobalPublicParameterDTO.from(globalPublicParameter);
+        gpp.registerDomainEvent(new GlobalPublicParameterChangedEvent(globalPublicParameter));
+        String result = globalPublicParameterDTODB.insert(gpp);
         return result;
     }
 }

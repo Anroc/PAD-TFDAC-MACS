@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.basics.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.key.db.KeyDB;
@@ -31,6 +32,8 @@ public abstract class IntegrationTestSuite {
     protected GlobalPublicParameterDTODB globalPublicParameterDTODB;
     @Autowired
     protected GlobalPublicParameterDB globalPublicParameterDB;
+    @Autowired
+    protected GlobalPublicParameterProvider gppProvider;
 
     @Autowired
     protected StringAsymmetricCryptEngine cryptEngine;
