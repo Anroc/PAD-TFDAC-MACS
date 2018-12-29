@@ -3,8 +3,7 @@ package de.tuberlin.tfdacmacs.basics.db;
 import com.couchbase.client.deps.com.fasterxml.jackson.annotation.JsonIgnore;
 import com.couchbase.client.java.repository.annotation.Field;
 import de.tuberlin.tfdacmacs.basics.events.DomainEvent;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
 
@@ -20,8 +19,8 @@ public abstract class Entity {
     @Field
     private String id;
 
-    @JsonIgnore
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @Getter(onMethod = @__({@JsonIgnore, @com.fasterxml.jackson.annotation.JsonIgnore}))
     private transient List<DomainEvent> events = new ArrayList<>();
 
     public Entity() {

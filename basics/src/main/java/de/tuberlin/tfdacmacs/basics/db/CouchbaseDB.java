@@ -56,9 +56,9 @@ public abstract class CouchbaseDB<T extends Entity> {
      */
     public String insert(@NonNull T entity) throws EntityDoesExistException {
         try {
+            publishAll(entity);
             template.insert(entity);
             ids.add(entity.getId());
-            publishAll(entity);
             return entity.getId();
         } catch (DocumentAlreadyExistsException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()), e);
@@ -67,6 +67,7 @@ public abstract class CouchbaseDB<T extends Entity> {
 
     private void publishAll(T entity) {
         entity.getEvents().forEach(publisher::publishEvent);
+        entity.getEvents().clear();
     }
 
     /**
@@ -79,8 +80,8 @@ public abstract class CouchbaseDB<T extends Entity> {
      */
     public String update(@NonNull T entity) throws EntityDoesNotExistException {
         try {
-            template.update(entity);
             publishAll(entity);
+            template.update(entity);
             return entity.getId();
         } catch (DocumentDoesNotExistException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does not exist!", entity.getId()), e);
