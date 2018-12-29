@@ -8,6 +8,8 @@ import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesNotExistException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.data.couchbase.repository.CouchbaseRepository;
 
@@ -18,10 +20,16 @@ import java.util.*;
 @RequiredArgsConstructor
 public abstract class CouchbaseDB<T extends Entity> {
 
-    private final Bucket bucket;
+    @Autowired
+    private Bucket bucket;
+    @Autowired
+    private CouchbaseTemplate template;
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     private final CouchbaseRepository<T, String> repository;
-    private final CouchbaseTemplate template;
     private final Class<T> clazz;
+
     private final Set<String> ids = new HashSet<>();
 
     /**
@@ -50,10 +58,15 @@ public abstract class CouchbaseDB<T extends Entity> {
         try {
             template.insert(entity);
             ids.add(entity.getId());
+            publishAll(entity);
             return entity.getId();
         } catch (DocumentAlreadyExistsException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()), e);
         }
+    }
+
+    private void publishAll(T entity) {
+        entity.getEvents().forEach(publisher::publishEvent);
     }
 
     /**
@@ -67,6 +80,7 @@ public abstract class CouchbaseDB<T extends Entity> {
     public String update(@NonNull T entity) throws EntityDoesNotExistException {
         try {
             template.update(entity);
+            publishAll(entity);
             return entity.getId();
         } catch (DocumentDoesNotExistException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does not exist!", entity.getId()), e);
