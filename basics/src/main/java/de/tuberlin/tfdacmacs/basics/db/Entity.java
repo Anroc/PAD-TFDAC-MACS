@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.basics.db;
 
+import com.couchbase.client.deps.com.fasterxml.jackson.annotation.JsonIgnore;
 import com.couchbase.client.java.repository.annotation.Field;
 import de.tuberlin.tfdacmacs.basics.events.DomainEvent;
 import lombok.Data;
@@ -19,7 +20,9 @@ public abstract class Entity {
     @Field
     private String id;
 
-    private transient final List<DomainEvent> events = new ArrayList<>();
+    @JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private transient List<DomainEvent> events = new ArrayList<>();
 
     public Entity() {
         this.id = UUID.randomUUID().toString();
