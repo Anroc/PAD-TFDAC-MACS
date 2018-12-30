@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.certificates;
+package de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate;
 
 import lombok.RequiredArgsConstructor;
 

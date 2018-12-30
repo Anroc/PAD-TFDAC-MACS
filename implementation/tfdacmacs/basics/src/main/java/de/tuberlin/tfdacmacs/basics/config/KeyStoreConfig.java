@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.centralserver.config;
+package de.tuberlin.tfdacmacs.basics.config;
 
-import de.tuberlin.tfdacmacs.centralserver.certificates.JavaKeyStore;
+import de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate.JavaKeyStore;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;

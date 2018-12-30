@@ -5,7 +5,7 @@ import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
 import de.tuberlin.tfdacmacs.basics.exceptions.ServiceException;
 import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
 import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationResponse;
-import de.tuberlin.tfdacmacs.centralserver.certificates.CertificateService;
+import de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate.CertificateService;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import de.tuberlin.tfdacmacs.centralserver.user.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.centralserver.user.dto.CertificateResponse;
