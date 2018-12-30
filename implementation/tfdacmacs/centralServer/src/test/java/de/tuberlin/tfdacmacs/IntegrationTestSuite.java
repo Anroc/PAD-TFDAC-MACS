@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.key.db.KeyDB;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
+import de.tuberlin.tfdacmacs.centralserver.user.factory.CertificateRequestTestFactory;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CentralServerApplication.class,
@@ -37,6 +37,9 @@ public abstract class IntegrationTestSuite {
 
     @Autowired
     protected StringAsymmetricCryptEngine cryptEngine;
+
+    @Autowired
+    protected CertificateRequestTestFactory certificateRequestTestFactory;
 
     @After
     public void cleanUp() {

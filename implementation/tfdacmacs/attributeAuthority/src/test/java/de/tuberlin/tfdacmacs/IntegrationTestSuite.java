@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPFeignClient;
+import de.tuberlin.tfdacmacs.attributeauthority.feign.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
@@ -34,7 +34,7 @@ public abstract class IntegrationTestSuite {
 
     // Mock beans
     @MockBean
-    protected GPPFeignClient gppFeignClient;
+    protected CAClient gppFeignClient;
 
     // Controller
     @Autowired
