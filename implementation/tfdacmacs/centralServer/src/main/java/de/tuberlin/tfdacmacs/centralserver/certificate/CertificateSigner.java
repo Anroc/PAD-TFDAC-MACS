@@ -1,5 +1,8 @@
-package de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate;
+package de.tuberlin.tfdacmacs.centralserver.certificate;
 
+import de.tuberlin.tfdacmacs.centralserver.config.CertificateConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -29,14 +32,20 @@ import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Random;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CertificateSigner {
 
-    public X509Certificate sign(CertificationRequest inputCSR, PrivateKey caPrivate, X509Certificate caCertificate, String id, PublicKey clientKey)
+    private final CertificateConfig certificateConfig;
+
+    public X509Certificate sign(@NonNull CertificationRequest inputCSR, @NonNull PrivateKey caPrivate,
+            @NonNull X509Certificate caCertificate, @NonNull String id, @NonNull PublicKey clientKey)
             throws NoSuchProviderException, IOException, OperatorCreationException, CertificateException,
             NoSuchAlgorithmException {
         log.info("Creating certificate for user {}", id);
@@ -50,8 +59,8 @@ public class CertificateSigner {
 
         GeneralNames subjectAltName = new GeneralNames(
                 new GeneralName[]{
-                        new GeneralName(GeneralName.dNSName, "localhost"),
-                        new GeneralName(GeneralName.iPAddress, "127.0.0.1")
+                        new GeneralName(GeneralName.dNSName, certificateConfig.getDomain()),
+                        new GeneralName(GeneralName.iPAddress, certificateConfig.getIp())
                 });
 
         JcaX509ExtensionUtils jcaX509ExtensionUtils = new JcaX509ExtensionUtils();
@@ -62,8 +71,8 @@ public class CertificateSigner {
         X509v3CertificateBuilder myCertificateGenerator = new X509v3CertificateBuilder(
                 X500Name.getInstance(caCertificate.getSubjectX500Principal().getEncoded()),
                 new BigInteger(32, new Random()),
-                new Date(1546124400000L),
-                new Date(1577660400000L),
+                new Date(),
+                new Date(Instant.now().plus(certificateConfig.getValidForDays(), ChronoUnit.DAYS).toEpochMilli()),
                 pk10Holder.getSubject(),
                 keyInfo);
         myCertificateGenerator.addExtension(new Extension(

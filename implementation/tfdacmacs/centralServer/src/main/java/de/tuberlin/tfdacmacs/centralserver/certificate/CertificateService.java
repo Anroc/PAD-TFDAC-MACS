@@ -1,6 +1,7 @@
-package de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate;
+package de.tuberlin.tfdacmacs.centralserver.certificate;
 
 import de.tuberlin.tfdacmacs.basics.config.KeyStoreConfig;
+import de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate.JavaKeyStore;
 import de.tuberlin.tfdacmacs.basics.exceptions.ServiceException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

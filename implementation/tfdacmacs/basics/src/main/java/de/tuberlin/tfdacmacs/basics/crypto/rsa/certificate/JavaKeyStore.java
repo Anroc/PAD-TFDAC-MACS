@@ -49,7 +49,7 @@ public class JavaKeyStore {
         return keyStore.getEntry(alias, protParam);
     }
 
-    void setKeyEntry(String alias, PrivateKey privateKey, String keyPassword, Certificate[] certificateChain) throws KeyStoreException {
+    public void setKeyEntry(String alias, PrivateKey privateKey, String keyPassword, Certificate[] certificateChain) throws KeyStoreException {
         keyStore.setKeyEntry(alias, privateKey, keyPassword.toCharArray(), certificateChain);
     }
 
@@ -58,11 +58,11 @@ public class JavaKeyStore {
         return getKeyStore().getKey(alias, keyPassword.toCharArray());
     }
 
-    void setCertificateEntry(String alias, Certificate certificate) throws KeyStoreException {
+    public void setCertificateEntry(String alias, Certificate certificate) throws KeyStoreException {
         keyStore.setCertificateEntry(alias, certificate);
     }
 
-    Certificate getCertificate(String alias) throws KeyStoreException {
+    public Certificate getCertificate(String alias) throws KeyStoreException {
         return keyStore.getCertificate(alias);
     }
 
