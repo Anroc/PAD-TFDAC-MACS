@@ -6,18 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class User extends Entity {
 
-    public User(@NonNull String id, @NotBlank String idSignature) {
+    public User(@NonNull String id) {
         super(id);
-        this.idSignature = idSignature;
     }
-
-    @NotBlank
-    private String idSignature;
 }

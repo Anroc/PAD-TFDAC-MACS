@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
+import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserCreatedEvent;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeValueKeyGenerator;
@@ -49,6 +50,7 @@ public class UserService {
         User user = new User(id);
         enrichWithUserAttributeSecretKeys(id, attributes);
         user.setAttributes(attributes);
+        user.registerDomainEvent(new UserCreatedEvent(user));
         userDB.insert(user);
 
         return user;
