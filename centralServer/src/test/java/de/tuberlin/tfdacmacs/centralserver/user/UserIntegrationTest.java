@@ -32,7 +32,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class UserIntegrationTest extends IntegrationTestSuite {
 
-    private String email = "test1";
+    private String email = "test@tu-berlin.de";
     private KeyPair clientKeys = new StringAsymmetricCryptEngine(4096).generateKeyPair();
 
     @Test

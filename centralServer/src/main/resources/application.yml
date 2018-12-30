@@ -34,6 +34,9 @@ central-server:
   credentials:
     username: admin
     password: password
+  certificate:
+    domain: localhost
+    ip: 127.0.0.1
 ---
 spring:
   profiles: test
