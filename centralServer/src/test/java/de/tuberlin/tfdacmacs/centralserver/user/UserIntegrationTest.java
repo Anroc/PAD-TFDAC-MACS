@@ -32,8 +32,8 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class UserIntegrationTest extends IntegrationTestSuite {
 
-    private String email = "test@tu-berlin.de";
-    private KeyPair clientKeys = new StringAsymmetricCryptEngine().generateKeyPair();
+    private String email = "test1";
+    private KeyPair clientKeys = new StringAsymmetricCryptEngine(4096).generateKeyPair();
 
     @Test
     public void createUser() {
@@ -69,6 +69,13 @@ public class UserIntegrationTest extends IntegrationTestSuite {
                                 KeyConverter.from(body.getCertificate()).toByes()));
         assertThat(x509Certificate.getType()).isEqualTo("X.509");
         assertThat(((X509Principal) x509Certificate.getIssuerDN()).getValues()).contains(
+                "Central Server",
+                "undo.life",
+                "tu-berlin",
+                "Berlin",
+                "DE"
+        );
+        assertThat(((X509Principal) x509Certificate.getSubjectDN()).getValues()).contains(
                 email,
                 "undo.life",
                 "tu-berlin",
@@ -76,9 +83,14 @@ public class UserIntegrationTest extends IntegrationTestSuite {
                 "DE"
         );
 
+        printPEMFormat(x509Certificate);
+        printPEMFormat(clientKeys.getPrivate());
+    }
+
+    private void printPEMFormat(Object o) throws IOException {
         StringWriter sw = new StringWriter();
         try (PemWriter pw = new PemWriter(sw)) {
-            PemObjectGenerator gen = new JcaMiscPEMGenerator(x509Certificate);
+            PemObjectGenerator gen = new JcaMiscPEMGenerator(o);
             pw.writeObject(gen);
         }
         System.out.println(sw.toString());
