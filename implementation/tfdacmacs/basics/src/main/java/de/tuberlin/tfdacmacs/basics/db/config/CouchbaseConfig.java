@@ -34,9 +34,16 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     private final CouchbaseElementConverters.Write elementWriter;
     private final CouchbaseElementConverters.Read elementReader;
 
+    private final CouchbaseX509CertificateConverter.Write x509CertificateWriter;
+    private final CouchbaseX509CertificateConverter.Read x509CertificateReader;
+
 
     @Override
     public CustomConversions customConversions() {
-        return new CouchbaseCustomConversions(Arrays.asList(elementReader, elementWriter));
+        return new CouchbaseCustomConversions(
+                Arrays.asList(
+                        elementReader, elementWriter,
+                        x509CertificateReader, x509CertificateWriter
+                ));
     }
 }

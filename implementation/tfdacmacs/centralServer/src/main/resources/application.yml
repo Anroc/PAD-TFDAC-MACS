@@ -16,14 +16,14 @@ spring:
 server:
   port: 9001
   ssl:
-    key-store: /home/anrock/Documents/Sem12_Inf/masterarbeit/tutorials/spring-security-x509/keystore/keystore.jks
+    key-store: classpath:ca-keystore.jks
     key-store-password: foobar
     key-alias: localhost
     ca-alias: ca
     key-password: foobar
     enabled: false # TODO: enable, but restTempalte and eurka feign client will fail
-    # client-auth: need
-    trust-store: /home/anrock/Documents/Sem12_Inf/masterarbeit/tutorials/spring-security-x509/keystore/truststore.jks
+    client-auth: want
+    trust-store: classpath:ca-truststore.jks
     trust-store-password: foobar
   security: # TODO: remove
     user:

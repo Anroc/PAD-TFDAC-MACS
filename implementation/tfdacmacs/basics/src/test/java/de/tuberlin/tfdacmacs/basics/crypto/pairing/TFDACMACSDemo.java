@@ -47,7 +47,7 @@ public class TFDACMACSDemo {
         PairingParameters pairingParameters = pairingGenerator.generateNewTypeACurveParameter();
         Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
         GlobalPublicParameter globalPublicParameter = new GlobalPublicParameter(
-                pairing, pairingParameters, pairing.getG1().newRandomElement().getImmutable(), null);
+                pairing, pairingParameters, pairing.getG1().newRandomElement().getImmutable());
         return globalPublicParameter;
     }
 

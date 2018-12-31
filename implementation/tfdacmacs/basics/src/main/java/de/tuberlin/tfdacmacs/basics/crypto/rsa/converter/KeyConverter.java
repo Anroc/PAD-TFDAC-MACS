@@ -4,7 +4,12 @@ import de.tuberlin.tfdacmacs.basics.crypto.rsa.AsymmetricCryptEngine;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.io.ByteArrayInputStream;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -21,6 +26,14 @@ public class KeyConverter {
 
     public static KeyProducer from(byte[] key) {
         return new KeyProducer(key);
+    }
+
+    public static KeyProducer from(X509Certificate certificate) {
+        try {
+            return new KeyProducer(certificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @RequiredArgsConstructor
@@ -53,6 +66,15 @@ public class KeyConverter {
 
         public byte[] toByes() {
             return key;
+        }
+
+        public X509Certificate toX509Certificate() {
+            try {
+                return (X509Certificate) CertificateFactory.getInstance("X.509", "BC")
+                        .generateCertificate(new ByteArrayInputStream(key));
+            } catch (CertificateException | NoSuchProviderException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

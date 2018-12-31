@@ -4,9 +4,8 @@ import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.basics.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
-import de.tuberlin.tfdacmacs.centralserver.key.db.KeyDB;
-import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
-import de.tuberlin.tfdacmacs.centralserver.user.factory.CertificateRequestTestFactory;
+import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
+import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +22,8 @@ public abstract class IntegrationTestSuite {
 
     @Autowired
     protected TestRestTemplate restTemplate;
-
     @Autowired
-    protected KeyDB keyDB;
-    @Autowired
-    protected UserDB userDB;
+    protected CertificateDB certificateDB;
     @Autowired
     protected GlobalPublicParameterDTODB globalPublicParameterDTODB;
     @Autowired
@@ -43,7 +39,7 @@ public abstract class IntegrationTestSuite {
 
     @After
     public void cleanUp() {
-        userDB.drop();
+        certificateDB.drop();
         globalPublicParameterDTODB.drop();
     }
 }
