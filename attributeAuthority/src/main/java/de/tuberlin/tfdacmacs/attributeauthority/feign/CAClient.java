@@ -1,8 +1,9 @@
 package de.tuberlin.tfdacmacs.attributeauthority.feign;
 
+import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationResponse;
+import de.tuberlin.tfdacmacs.basics.certificate.data.dto.InitCertificateRequest;
+import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificatePreparedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,9 @@ public interface CAClient {
     GlobalPublicParameterDTO getGPP();
 
     @PostMapping("/users")
-    UserCreationResponse createUser(UserCreationRequest userCreationRequest);
+    CertificatePreparedResponse createUser(InitCertificateRequest initCertificateRequest);
+
+    @GetMapping("/certificates/root")
+    CertificateResponse getCentralAuthorityCertificate();
 
 }

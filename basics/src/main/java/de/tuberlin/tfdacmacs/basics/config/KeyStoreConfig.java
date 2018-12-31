@@ -32,7 +32,11 @@ public class KeyStoreConfig {
     public JavaKeyStore javaKeyStore()
             throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException {
         JavaKeyStore javaKeyStore = new JavaKeyStore(keyStore, keyStorePassword);
-        javaKeyStore.loadKeyStore();
+        if(keyStore.startsWith("classpath:")) {
+            javaKeyStore.loadFromClassPath(keyStore.substring(10));
+        } else {
+            javaKeyStore.loadKeyStore();
+        }
         return javaKeyStore;
     }
 }

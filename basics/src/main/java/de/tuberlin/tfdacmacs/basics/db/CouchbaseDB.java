@@ -5,6 +5,7 @@ import com.couchbase.client.java.error.DocumentAlreadyExistsException;
 import com.couchbase.client.java.error.DocumentDoesNotExistException;
 import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesExistException;
 import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesNotExistException;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public abstract class CouchbaseDB<T extends Entity> {
     private final CouchbaseRepository<T, String> repository;
     private final Class<T> clazz;
 
+    @Getter
     private final Set<String> ids = new HashSet<>();
 
     /**

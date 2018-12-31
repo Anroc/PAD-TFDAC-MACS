@@ -12,7 +12,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
-import java.security.PublicKey;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,12 +25,10 @@ public class GlobalPublicParameterDTO extends Entity {
 
     public GlobalPublicParameterDTO(
             @NotNull CurveParameterDTO curveParameter,
-            @NotNull GeneratorDTO generator,
-            @NotNull RSAPublicKeyDTO rsaPublicKeyDTO) {
+            @NotNull GeneratorDTO generator) {
         super(ID);
         this.curveParameter = curveParameter;
         this.generator = generator;
-        this.rsaPublicKeyDTO = rsaPublicKeyDTO;
     }
 
     @NotNull
@@ -42,15 +39,10 @@ public class GlobalPublicParameterDTO extends Entity {
     @NotNull
     private GeneratorDTO generator;
 
-    @Field
-    @NotNull
-    private RSAPublicKeyDTO rsaPublicKeyDTO;
-
     public static GlobalPublicParameterDTO from(@NonNull GlobalPublicParameter gpp) {
         return new GlobalPublicParameterDTO(
                 CurveParameterDTO.from(gpp.getPairingParameters()),
-                GeneratorDTO.from(gpp.getG()),
-                RSAPublicKeyDTO.from(gpp.getRsaPublicKey())
+                GeneratorDTO.from(gpp.getG())
         );
     }
 
@@ -58,7 +50,6 @@ public class GlobalPublicParameterDTO extends Entity {
         PairingParameters pairingParameters = getCurveParameter().toPairingParameter();
         Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
         Element g = getGenerator().toElement(pairing.getG1());
-        PublicKey rsaPublicKey = getRsaPublicKeyDTO().toPublicKey();
-        return new GlobalPublicParameter(pairing, pairingParameters, g, rsaPublicKey);
+        return new GlobalPublicParameter(pairing, pairingParameters, g);
     }
 }

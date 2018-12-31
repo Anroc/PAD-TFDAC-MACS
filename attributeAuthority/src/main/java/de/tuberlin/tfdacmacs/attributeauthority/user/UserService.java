@@ -41,11 +41,6 @@ public class UserService {
         return userDB.findEntity(userId);
     }
 
-    public boolean isSignatureAuthentic(@NonNull String id, @NonNull String signatureId) {
-        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
-        return cryptEngine.isSignatureAuthentic(signatureId, id, gpp.getRsaPublicKey());
-    }
-
     public User createUser(@NonNull String id, Set<UserAttributeKey> attributes) {
         User user = new User(id);
         enrichWithUserAttributeSecretKeys(id, attributes);

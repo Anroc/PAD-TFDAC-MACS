@@ -1,8 +1,10 @@
 package de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,20 +21,20 @@ public class JavaKeyStore {
     private final String keyStoreName;
     private final String keyStorePassword;
 
-//    void createEmptyKeyStore() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-//        if(keyStoreType ==null || keyStoreType.isEmpty()){
-//            keyStoreType = KeyStore.getDefaultType();
-//        }
-//        keyStore = KeyStore.getInstance(keyStoreType);
-//        //load
-//        char[] pwdArray = keyStorePassword.toCharArray();
-//        keyStore.load(null, pwdArray);
-//
-//        // Save the keyStore
-//        FileOutputStream fos = new FileOutputStream(keyStoreName);
-//        keyStore.store(fos, pwdArray);
-//        fos.close();
-//    }
+    public void createEmptyKeyStore(String keyStoreType) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        if(keyStoreType ==null || keyStoreType.isEmpty()){
+            keyStoreType = KeyStore.getDefaultType();
+        }
+        keyStore = KeyStore.getInstance(keyStoreType);
+        //load
+        char[] pwdArray = keyStorePassword.toCharArray();
+        keyStore.load(null, pwdArray);
+
+        // Save the keyStore
+        FileOutputStream fos = new FileOutputStream(keyStoreName);
+        keyStore.store(fos, pwdArray);
+        fos.close();
+    }
 
     public void loadKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
         keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -40,11 +42,18 @@ public class JavaKeyStore {
         keyStore.load(new FileInputStream(keyStoreName), pwdArray);
     }
 
-    void setEntry(String alias, KeyStore.SecretKeyEntry secretKeyEntry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
+    public void loadFromClassPath(String name)
+            throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException {
+        keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        char[] pwdArray = keyStorePassword.toCharArray();
+        keyStore.load(ClassLoader.getSystemResourceAsStream(name), pwdArray);
+    }
+
+    public void setEntry(String alias, KeyStore.SecretKeyEntry secretKeyEntry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
         keyStore.setEntry(alias, secretKeyEntry, protectionParameter);
     }
 
-    KeyStore.Entry getEntry(String alias) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
+    public KeyStore.Entry getEntry(String alias) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
         KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(keyStorePassword.toCharArray());
         return keyStore.getEntry(alias, protParam);
     }
@@ -66,11 +75,15 @@ public class JavaKeyStore {
         return keyStore.getCertificate(alias);
     }
 
-    void deleteEntry(String alias) throws KeyStoreException {
+    public boolean containEntry(@NonNull String alias) throws KeyStoreException {
+        return keyStore.containsAlias(alias);
+    }
+
+    public void deleteEntry(String alias) throws KeyStoreException {
         keyStore.deleteEntry(alias);
     }
 
-    void deleteKeyStore() throws KeyStoreException, IOException {
+    public void deleteKeyStore() throws KeyStoreException, IOException {
         Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
@@ -80,7 +93,7 @@ public class JavaKeyStore {
         Files.delete(Paths.get(keyStoreName));
     }
 
-    KeyStore getKeyStore() {
+    public KeyStore getKeyStore() {
         return this.keyStore;
     }
 }

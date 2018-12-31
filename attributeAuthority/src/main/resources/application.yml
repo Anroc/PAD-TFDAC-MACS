@@ -15,14 +15,14 @@ spring:
 server:
   port: 9002
   ssl:
-    key-store: /home/anrock/Documents/Sem12_Inf/masterarbeit/tutorials/spring-security-x509/keystore/keystore.jks
+    key-store: classpath:aa-keystore.jks
     key-store-password: foobar
     key-alias: localhost
     ca-alias: ca
     key-password: foobar
     enabled: true
     client-auth: need
-    trust-store: /home/anrock/Documents/Sem12_Inf/masterarbeit/tutorials/spring-security-x509/keystore/truststore.jks
+    trust-store: classpath:aa-truststore.jks
     trust-store-password: foobar
 
 attribute-authority:

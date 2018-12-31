@@ -1,18 +1,19 @@
-package de.tuberlin.tfdacmacs.basics.user.data.dto;
+package de.tuberlin.tfdacmacs.basics.certificate.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreationRequest {
+public class CertificateResponse {
 
-    @Email
     @NotBlank
-    private String email;
+    private String id;
+
+    @NotBlank
+    private String certificate;
 }

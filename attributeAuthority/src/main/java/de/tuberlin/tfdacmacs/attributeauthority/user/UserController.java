@@ -9,7 +9,6 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
 import de.tuberlin.tfdacmacs.basics.exceptions.NotFoundException;
-import de.tuberlin.tfdacmacs.basics.exceptions.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,6 @@ import javax.validation.Valid;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @RestController
@@ -57,12 +54,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
-    public UserResponse getAttributeKeys(@PathVariable("email") String email,
-            @RequestHeader(AUTHORIZATION) String authenticationHeader) {
-
-        if( ! userService.isSignatureAuthentic(email, authenticationHeader)) {
-            throw new UnauthorizedException("CA signature is invalid.");
-        }
+    public UserResponse getAttributeKeys(@PathVariable("email") String email) {
         User user = userService.findUser(email).orElseThrow(
                 () -> new NotFoundException(email)
         );

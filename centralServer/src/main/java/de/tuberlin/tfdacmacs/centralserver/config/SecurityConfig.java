@@ -35,8 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
                 .antMatchers(HttpMethod.GET,"/v2/api-docs").permitAll()
-                .antMatchers(HttpMethod.PUT, "/users/*").permitAll() // secure only for AA members
-                .antMatchers(HttpMethod.POST,"/users").permitAll() // secure only for AA members
+                .antMatchers(HttpMethod.PUT, "/certificates/*").permitAll() // secure only for AA members
+                .antMatchers(HttpMethod.POST,"/certificates").permitAll() // secure only for AA members
+                .antMatchers(HttpMethod.GET,"/certificates/*").permitAll() // secure only for AA members
                 .antMatchers(HttpMethod.GET, "/gpp").permitAll()
                 .anyRequest().authenticated();
     }
@@ -49,6 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**")
-                .and().ignoring().antMatchers("/users/**", "/users");
+                .and().ignoring().antMatchers("/certificates/**", "/certificates");
     }
 }
