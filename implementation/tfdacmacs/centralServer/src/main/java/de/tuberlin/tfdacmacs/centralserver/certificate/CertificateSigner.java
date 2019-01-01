@@ -5,7 +5,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -44,7 +43,7 @@ public class CertificateSigner {
 
     private final CertificateConfig certificateConfig;
 
-    public X509Certificate sign(@NonNull CertificationRequest inputCSR, @NonNull PrivateKey caPrivate,
+    public X509Certificate sign(@NonNull PKCS10CertificationRequest inputCSR, @NonNull PrivateKey caPrivate,
             @NonNull X509Certificate caCertificate, @NonNull String id, @NonNull PublicKey clientKey)
             throws NoSuchProviderException, IOException, OperatorCreationException, CertificateException,
             NoSuchAlgorithmException {
@@ -55,7 +54,7 @@ public class CertificateSigner {
         AsymmetricKeyParameter caKeyParameter = PrivateKeyFactory.createKey(caPrivate.getEncoded());
         SubjectPublicKeyInfo keyInfo = SubjectPublicKeyInfo.getInstance(clientKey.getEncoded());
 
-        PKCS10CertificationRequest pk10Holder = new PKCS10CertificationRequest(inputCSR);
+        PKCS10CertificationRequest pk10Holder = new PKCS10CertificationRequest(inputCSR.toASN1Structure());
 
         GeneralNames subjectAltName = new GeneralNames(
                 new GeneralName[]{

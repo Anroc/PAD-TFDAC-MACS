@@ -1,13 +1,15 @@
-package de.tuberlin.tfdacmacs.centralserver.config;
+package de.tuberlin.tfdacmacs.centralserver.security.config;
 
+import de.tuberlin.tfdacmacs.centralserver.config.CredentialConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,8 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class BasicAuthSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CredentialConfig credentialConfig;
 
@@ -24,32 +28,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser(credentialConfig.getUsername()).password(passwordEncoder().encode(credentialConfig.getPassword()))
+                .roles("ADMIN")
                 .authorities("ROLE_ADMIN");
     }
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().realmName("Central Server")
+        http
+                .requestMatchers()
+                    .antMatchers("/authorities")
                 .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
-                .antMatchers(HttpMethod.GET,"/v2/api-docs").permitAll()
-                .antMatchers(HttpMethod.PUT, "/certificates/*").permitAll() // secure only for AA members
-                .antMatchers(HttpMethod.POST,"/certificates").permitAll() // secure only for AA members
-                .antMatchers(HttpMethod.GET,"/certificates/*").permitAll() // secure only for AA members
-                .antMatchers(HttpMethod.GET, "/gpp").permitAll()
-                .anyRequest().authenticated();
+                    .authorizeRequests().anyRequest().authenticated()
+                .and()
+                    .httpBasic()
+                        .realmName("Central Server")
+                .and()
+                    .csrf().disable();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**")
-                .and().ignoring().antMatchers("/certificates/**", "/certificates");
     }
 }

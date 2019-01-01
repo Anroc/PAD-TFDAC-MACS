@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.basics.certificate.data.dto;
+package de.tuberlin.tfdacmacs.basics.authority;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateRequest {
+public class AttributeAuthorityResponse {
 
     @NotBlank
-    private String certificateRequest;
+    private String id;
+    @NotBlank
+    private String certificateId;
 }

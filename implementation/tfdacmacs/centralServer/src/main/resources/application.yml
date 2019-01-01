@@ -21,14 +21,10 @@ server:
     key-alias: localhost
     ca-alias: ca
     key-password: foobar
-    enabled: false # TODO: enable, but restTempalte and eurka feign client will fail
+    enabled: true
     client-auth: want
     trust-store: classpath:ca-truststore.jks
     trust-store-password: foobar
-  security: # TODO: remove
-    user:
-      name: Admin
-      password: admin
 
 central-server:
   credentials:
@@ -45,7 +41,3 @@ spring:
     bucket:
       name: ca-test
       password: password
-
-server:
-  ssl:
-    enabled: false

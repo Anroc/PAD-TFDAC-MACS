@@ -16,8 +16,15 @@ public class Certificate extends Entity {
     @Nullable
     private X509Certificate certificate;
 
+    private String commonName;
+
     public Certificate(@NonNull String id) {
         super(id);
+    }
+
+    public Certificate(@NonNull String id, @NonNull String commonName) {
+        super(id);
+        this.commonName = commonName;
     }
 
     public Certificate(@NonNull String id, X509Certificate certificate) {
@@ -25,4 +32,8 @@ public class Certificate extends Entity {
         this.certificate = certificate;
     }
 
+    public Certificate(String id, X509Certificate certificate, String commonName) {
+        this(id, certificate);
+        setCommonName(commonName);
+    }
 }

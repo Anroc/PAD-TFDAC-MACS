@@ -5,6 +5,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +32,11 @@ public class HashGenerator {
         return this.messageDigest.digest();
     }
 
+    public String sha256HashWithSimpleEncoding(byte[] input) {
+        this.messageDigest.update(input);
+        return String.format("%040x", new BigInteger(1, this.messageDigest.digest()));
+    }
+
     public byte[] sha256Hash(byte[] input, int outputLength) {
         byte[] hash = sha256Hash(input);
         return Arrays.copyOf(hash, outputLength);
@@ -38,7 +44,6 @@ public class HashGenerator {
 
     public Element g1Hash(@NonNull GlobalPublicParameter gpp, @NonNull String input) {
         byte[] bytes = this.sha256Hash(input);
-        // TODO: check this
         return gpp.getPairing().getG1().newElementFromHash(bytes, 0, bytes.length);
     }
 }
