@@ -20,8 +20,8 @@ server:
     key-alias: localhost
     ca-alias: ca
     key-password: foobar
-    enabled: true
-    client-auth: need
+    enabled: false
+    # client-auth: need
     trust-store: classpath:aa-truststore.jks
     trust-store-password: foobar
 

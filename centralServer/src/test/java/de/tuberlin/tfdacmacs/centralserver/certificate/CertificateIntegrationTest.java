@@ -1,13 +1,12 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
-import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.basics.crypto.rsa.converter.KeyConverter;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.InitCertificateRequest;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificatePreparedResponse;
-import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.basics.crypto.rsa.converter.KeyConverter;
+import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
+import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -36,19 +35,6 @@ public class CertificateIntegrationTest extends IntegrationTestSuite {
     private KeyPair clientKeys = new StringAsymmetricCryptEngine(4096).generateKeyPair();
 
     @Test
-    public void createCertificate() {
-        InitCertificateRequest initCertificateRequest = new InitCertificateRequest(email);
-
-        ResponseEntity<CertificatePreparedResponse> userCreationResponseResponseEntity = restTemplate
-                .exchange("/certificates", HttpMethod.POST, new HttpEntity(initCertificateRequest), CertificatePreparedResponse.class);
-        assertThat(userCreationResponseResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
-        CertificatePreparedResponse body = userCreationResponseResponseEntity.getBody();
-        String id = body.getId();
-        assertThat(id).isNotBlank().isEqualTo(email);
-        assertThat(certificateDB.exist(id)).isTrue();
-    }
-
-    @Test
     public void getRootCA() {
         ResponseEntity<CertificateResponse> userCreationResponseResponseEntity = restTemplate
                 .exchange("/certificates/root", HttpMethod.GET, HttpEntity.EMPTY, CertificateResponse.class);
@@ -63,14 +49,15 @@ public class CertificateIntegrationTest extends IntegrationTestSuite {
     @Test
     public void signingRequest()
             throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
-        Certificate certificate = new Certificate(email);
-        certificateDB.insert(certificate);
+        User user = new User(email, "aa.tu-berlin.de");
+        userDB.insert(user);
+
 
         CertificateRequest certificateRequest = certificateRequestTestFactory.create(email, clientKeys);
         ResponseEntity<CertificateResponse> certificateResponseEntity = restTemplate
-                .exchange("/certificates/" + email, HttpMethod.PUT, new HttpEntity(certificateRequest),  CertificateResponse.class);
+                .exchange("/certificates", HttpMethod.POST, new HttpEntity(certificateRequest),  CertificateResponse.class);
 
-        assertThat(certificateResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        assertThat(certificateResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         CertificateResponse body = certificateResponseEntity.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getCertificate()).isNotNull();

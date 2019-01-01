@@ -13,7 +13,7 @@ public class GlobalPublicParameterIntegrationTest extends IntegrationTestSuite {
 
     @Test
     public void getGPP() {
-        GlobalPublicParameterDTO gpp = restTemplate.getForObject("/gpp", GlobalPublicParameterDTO.class);
+        GlobalPublicParameterDTO gpp = sslRestTemplate.getForObject("/gpp", GlobalPublicParameterDTO.class);
 
         assertThat(gpp.getCurveParameter()).isNotNull();
         CurveParameterDTO curveParameter = gpp.getCurveParameter();
