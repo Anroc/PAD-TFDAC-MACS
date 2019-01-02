@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.lib.factory;
+package de.tuberlin.tfdacmacs.attributes.factory;
 
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;

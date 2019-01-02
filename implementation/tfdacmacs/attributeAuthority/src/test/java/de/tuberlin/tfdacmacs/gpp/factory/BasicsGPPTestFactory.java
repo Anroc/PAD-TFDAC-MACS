@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.lib.factory;
+package de.tuberlin.tfdacmacs.gpp.factory;
 
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.CurveParameterDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GeneratorDTO;
