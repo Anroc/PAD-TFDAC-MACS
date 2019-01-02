@@ -21,12 +21,13 @@ dependencyManagement {
 
 
 dependencies {
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation('org.springframework.boot:spring-boot-starter')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('io.springfox:springfox-swagger-ui:2.9.2')
     compile('io.springfox:springfox-swagger2:2.9.2')
     compile('org.springframework.boot:spring-boot-starter-security')
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    testCompile('org.apache.httpcomponents:httpclient:4.5.6')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

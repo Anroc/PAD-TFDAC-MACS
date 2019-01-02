@@ -1,13 +1,13 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
-import de.tuberlin.tfdacmacs.basics.user.data.DeviceState;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import org.bouncycastle.operator.OperatorCreationException;

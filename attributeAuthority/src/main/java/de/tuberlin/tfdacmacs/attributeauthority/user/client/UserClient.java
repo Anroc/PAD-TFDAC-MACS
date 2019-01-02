@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.client;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate.db;
 
-import de.tuberlin.tfdacmacs.basics.db.CouchbaseDB;
+import de.tuberlin.tfdacmacs.lib.db.CouchbaseDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

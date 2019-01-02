@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.user.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.tuberlin.tfdacmacs.basics.db.Entity;
+import de.tuberlin.tfdacmacs.lib.db.Entity;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.user.events.CertificateCreatedEvent;
 import lombok.AllArgsConstructor;

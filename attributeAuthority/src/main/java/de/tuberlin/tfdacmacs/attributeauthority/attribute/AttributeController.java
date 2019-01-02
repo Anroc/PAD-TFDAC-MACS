@@ -1,11 +1,11 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCreationRequest;
-import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
-import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
-import de.tuberlin.tfdacmacs.basics.attributes.data.dto.PublicAttributeResponse;
-import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
-import de.tuberlin.tfdacmacs.basics.exceptions.NotFoundException;
+import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
+import de.tuberlin.tfdacmacs.lib.exceptions.BadRequestException;
+import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

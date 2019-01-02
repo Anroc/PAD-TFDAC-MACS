@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.basics.gpp.GlobalPublicParameterProvider;
+import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;

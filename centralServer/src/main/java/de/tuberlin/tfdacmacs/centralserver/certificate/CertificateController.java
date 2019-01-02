@@ -1,10 +1,10 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
-import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
-import de.tuberlin.tfdacmacs.basics.exceptions.NotFoundException;
+import de.tuberlin.tfdacmacs.lib.exceptions.BadRequestException;
+import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;

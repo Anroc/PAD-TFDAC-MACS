@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate.factory;
 
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;

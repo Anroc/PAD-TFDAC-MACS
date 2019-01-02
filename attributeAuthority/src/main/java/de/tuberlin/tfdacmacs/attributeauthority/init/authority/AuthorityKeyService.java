@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.init.authority;
 import de.tuberlin.tfdacmacs.attributeauthority.init.authority.events.AuthorityKeyCreatedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.AuthorityKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
-import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
+import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;

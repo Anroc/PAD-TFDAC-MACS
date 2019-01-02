@@ -1,10 +1,10 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import com.sun.jersey.core.util.Base64;
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.CurveParameterDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GeneratorDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.CurveParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GeneratorDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

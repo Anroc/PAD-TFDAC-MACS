@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.user.db;
 
-import de.tuberlin.tfdacmacs.basics.db.CouchbaseDB;
+import de.tuberlin.tfdacmacs.lib.db.CouchbaseDB;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

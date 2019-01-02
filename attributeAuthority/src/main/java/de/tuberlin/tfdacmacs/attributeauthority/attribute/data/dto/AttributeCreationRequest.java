@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto;
 
-import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

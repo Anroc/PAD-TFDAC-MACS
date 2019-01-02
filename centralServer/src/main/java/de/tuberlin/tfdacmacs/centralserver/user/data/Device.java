@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.user.data;
 
-import de.tuberlin.tfdacmacs.basics.user.data.DeviceState;
+import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

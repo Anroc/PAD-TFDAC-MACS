@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import org.junit.Before;
