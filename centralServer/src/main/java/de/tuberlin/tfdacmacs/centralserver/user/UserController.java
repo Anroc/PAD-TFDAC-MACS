@@ -1,16 +1,15 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
-import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesExistException;
-import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
 import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.centralserver.user.data.Device;
 import de.tuberlin.tfdacmacs.centralserver.user.data.EncryptedAttributeValueKey;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
+import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesExistException;
+import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
+import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
+import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +55,52 @@ public class UserController {
         String authorityId = authenticationFacade.getId();
         List<User> users = userService.findUsersByAuthorityId(authorityId);
         return users.stream().map(this::toUserResponse).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{userId}/devices/{deviceId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public DeviceResponse getDevice(
+            @PathVariable("userId") String userId,
+            @PathVariable("deviceId") String deviceId) {
+        User user = userService.findUser(userId).orElseThrow(
+                () -> new NotFoundException(userId)
+        );
+
+        Device device = user.findDevice(deviceId).orElseThrow(
+                () -> new ServiceException("Device with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, deviceId)
+        );
+
+        if(device.getDeviceState() != DeviceState.ACTIVE) {
+            throw new ServiceException("Device is not active.", HttpStatus.PRECONDITION_FAILED);
+        }
+
+        return toDeviceResponse(device);
+    }
+
+    @PutMapping("/{userId}/devices/{deviceId}")
+    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    public DeviceResponse updateDevice(
+            @PathVariable("userId") String userId,
+            @PathVariable("deviceId") String deviceId,
+            @Valid @RequestBody DeviceUpdateRequest deviceUpdateRequest) {
+        User user = userService.findUser(userId).orElseThrow(
+                () -> new NotFoundException(userId)
+        );
+
+        Set<EncryptedAttributeValueKey> encryptedAttributeValueKeySet = deviceUpdateRequest.getEncryptedAttributeValueKeys()
+                .stream()
+                .map(dto -> new EncryptedAttributeValueKey(dto.getAttributeValueId(), dto.getEncryptedKey()))
+                .collect(Collectors.toSet());
+
+        Device device = user.findDevice(deviceId).orElseThrow(
+                () -> new ServiceException("Device with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, deviceId)
+        );
+
+        device.setDeviceState(deviceUpdateRequest.getDeviceState());
+        device.setAttributeValueKeys(encryptedAttributeValueKeySet);
+        userService.updateUser(user);
+
+        return toDeviceResponse(device);
     }
 
     private UserResponse toUserResponse(User user) {

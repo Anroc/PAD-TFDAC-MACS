@@ -3,17 +3,17 @@ package de.tuberlin.tfdacmacs.attributeauthority.user;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeService;
 import de.tuberlin.tfdacmacs.attributeauthority.init.authority.AuthorityKeyService;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
+import de.tuberlin.tfdacmacs.attributeauthority.user.client.UserClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserCreatedEvent;
-import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
-import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
-import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +31,14 @@ public class UserService {
     private final GPPService gppService;
     private final AttributeService attributeService;
     private final AuthorityKeyService authorityKeyService;
+    private final UserClient userClient;
 
     private final UserDB userDB;
-    private final StringAsymmetricCryptEngine cryptEngine;
 
     private final AttributeValueKeyGenerator attributeValueKeyGenerator;
 
     public Optional<User> findUser(@NonNull String userId) {
-        return userDB.findEntity(userId);
+        return userDB.findEntity(userId).map(userClient::extendWithCAUser);
     }
 
     public User createUser(@NonNull String id, Set<UserAttributeKey> attributes) {
@@ -80,5 +80,11 @@ public class UserService {
                         String.format("Could not find attribute with id [%s]", userAttributeKey.getAttributeId())));
         return attributeService
                 .getOrCreateAttributeKey(attribute, userAttributeKey.getValue(), gpp);
+    }
+
+    public User approve(User user, String deviceId) {
+        user = user.approve(deviceId);
+        userDB.update(user);
+        return user;
     }
 }

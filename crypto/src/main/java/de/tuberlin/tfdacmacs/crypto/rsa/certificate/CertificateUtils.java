@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.certificate.factory;
+package de.tuberlin.tfdacmacs.crypto.rsa.certificate;
 
 import com.google.common.collect.Lists;
 import org.bouncycastle.asn1.x500.RDN;

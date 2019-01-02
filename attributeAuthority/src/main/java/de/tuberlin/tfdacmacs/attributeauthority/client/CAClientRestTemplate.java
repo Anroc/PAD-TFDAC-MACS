@@ -5,6 +5,8 @@ import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +107,22 @@ public class CAClientRestTemplate implements CAClient {
     }
 
     @Override
+    public UserResponse getUser(String id) {
+        return request(String.format("/users/%s", id), HttpMethod.GET, UserResponse.class, null);
+    }
+
+    @Override
+    public DeviceResponse updateDevice(String userId, String deviceId, DeviceUpdateRequest deviceUpdateRequest) {
+        return request(String.format("/users/%s/devices/%s", userId, deviceId), HttpMethod.PUT, DeviceResponse.class, deviceUpdateRequest);
+    }
+
+    @Override
     public CertificateResponse getCentralAuthorityCertificate() {
-        return request("/certificates/root", HttpMethod.GET, CertificateResponse.class, null);
+        return getCertificate("root");
+    }
+
+    @Override
+    public CertificateResponse getCertificate(String id) {
+        return request(String.format("/certificates/%s", id), HttpMethod.GET, CertificateResponse.class, null);
     }
 }
