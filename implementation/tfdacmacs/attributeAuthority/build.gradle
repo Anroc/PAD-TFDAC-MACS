@@ -30,5 +30,4 @@ dependencies {
     compile('org.apache.httpcomponents:httpclient:4.5.6')
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
