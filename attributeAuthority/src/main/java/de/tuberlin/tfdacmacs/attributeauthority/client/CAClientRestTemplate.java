@@ -8,6 +8,7 @@ import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
@@ -26,6 +27,7 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CAClientRestTemplate implements CAClient {
@@ -56,6 +58,8 @@ public class CAClientRestTemplate implements CAClient {
     }
 
     private <T> T request(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+        log.info("Asking CA for [{}:{}]", httpMethod, url);
+
         ResponseEntity<T> response = restTemplate.exchange(
                 url,
                 httpMethod,
@@ -64,10 +68,13 @@ public class CAClientRestTemplate implements CAClient {
         );
 
         postProcessResponse(response, url, httpMethod);
+        log.info("Asking CA for [{}:{}]: {}", httpMethod, url, response.getStatusCode());
         return response.getBody();
     }
 
     private <T> List<T> listRequest(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+        log.info("Asking CA for [{}:{}]", httpMethod, url);
+
         ResponseEntity<List<T>> response = restTemplate.exchange(
                 url,
                 httpMethod,
@@ -76,6 +83,7 @@ public class CAClientRestTemplate implements CAClient {
         );
 
         postProcessResponse(response, url, httpMethod);
+        log.info("Asking CA for [{}:{}]: {}", httpMethod, url, response.getStatusCode());
         return response.getBody();
     }
 
