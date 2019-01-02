@@ -19,4 +19,7 @@ public class AttributeAuthorityConfig {
     private String id;
 
     private boolean requestGPPOnInit = true;
+
+    @NotBlank
+    private String caRootUrl;
 }

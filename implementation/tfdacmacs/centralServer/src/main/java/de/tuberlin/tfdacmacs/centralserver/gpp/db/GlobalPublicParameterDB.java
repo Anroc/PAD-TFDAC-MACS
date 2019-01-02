@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp.db;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;

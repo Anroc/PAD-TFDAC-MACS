@@ -27,6 +27,7 @@ server:
 
 attribute-authority:
   id: "aa.tu-berlin.de"
+  caRootUrl: "https://localhost:9001/"
 ---
 spring:
   profiles: test

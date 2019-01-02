@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
 import de.tuberlin.tfdacmacs.basics.config.KeyStoreConfig;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.util.HashGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.rsa.certificate.JavaKeyStore;
+import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
+import de.tuberlin.tfdacmacs.crypto.rsa.certificate.JavaKeyStore;
 import de.tuberlin.tfdacmacs.basics.exceptions.ServiceException;
 import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;

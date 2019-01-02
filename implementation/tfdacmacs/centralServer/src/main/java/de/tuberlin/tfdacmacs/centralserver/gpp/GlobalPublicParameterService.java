@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
