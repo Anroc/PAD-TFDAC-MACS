@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.user.events;
 
-import de.tuberlin.tfdacmacs.basics.events.DomainEvent;
+import de.tuberlin.tfdacmacs.lib.events.DomainEvent;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import lombok.Data;

@@ -1,9 +1,9 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.CurveParameterDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GeneratorDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.CurveParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GeneratorDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

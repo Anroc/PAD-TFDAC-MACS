@@ -2,8 +2,8 @@ package de.tuberlin.tfdacmacs.centralserver.gpp.db;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;

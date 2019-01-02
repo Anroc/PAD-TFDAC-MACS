@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.authority.data;
 
-import de.tuberlin.tfdacmacs.basics.db.Entity;
+import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

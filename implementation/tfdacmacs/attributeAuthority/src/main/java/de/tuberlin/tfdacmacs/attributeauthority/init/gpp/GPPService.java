@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.init.gpp;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
+import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;

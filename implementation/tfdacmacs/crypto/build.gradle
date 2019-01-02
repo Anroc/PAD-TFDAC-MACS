@@ -1,0 +1,25 @@
+plugins { id "io.spring.dependency-management" version "1.0.5.RELEASE" }
+
+
+dependencyManagement {
+    imports { mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE") }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'tfdacmacs-crypto'
+            from components.java
+        }
+    }
+}
+
+dependencies {
+    compile('net.java.dev.jna:jna:5.1.0')
+    compile('it.unisa.dia.gas:jpbc-pbc:2.0.0')
+    compile('org.bouncycastle:bcprov-jdk15on:1.60')
+    compile('org.bouncycastle:bcpkix-jdk15on:1.60')
+    compile('javax.validation:validation-api:2.0.1.Final')
+    compile('org.springframework.boot:spring-boot-starter')
+    testCompile('org.assertj:assertj-core:3.11.1')
+}

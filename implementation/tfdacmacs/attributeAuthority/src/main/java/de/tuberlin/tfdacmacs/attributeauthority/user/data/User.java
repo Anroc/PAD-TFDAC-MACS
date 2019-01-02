@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
-import de.tuberlin.tfdacmacs.basics.db.Entity;
+import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

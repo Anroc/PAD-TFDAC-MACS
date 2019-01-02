@@ -4,12 +4,12 @@ import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
+import de.tuberlin.tfdacmacs.lib.factory.AttributeTestFactory;
+import de.tuberlin.tfdacmacs.lib.factory.BasicsGPPTestFactory;
+import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;
-import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
-import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.basics.gpp.events.GlobalPublicParameterChangedEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -54,7 +54,7 @@ public abstract class IntegrationTestSuite {
 
     // Factories
     @Autowired
-    protected GPPTestFactory gppTestFactory;
+    protected BasicsGPPTestFactory gppTestFactory;
     @Autowired
     protected AttributeTestFactory attributeTestFactory;
 

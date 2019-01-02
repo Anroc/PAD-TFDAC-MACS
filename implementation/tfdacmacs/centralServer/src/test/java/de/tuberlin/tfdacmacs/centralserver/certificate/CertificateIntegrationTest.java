@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;

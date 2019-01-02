@@ -1,11 +1,11 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
-import de.tuberlin.tfdacmacs.basics.db.exception.EntityDoesExistException;
-import de.tuberlin.tfdacmacs.basics.exceptions.ServiceException;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.basics.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesExistException;
+import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
 import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.centralserver.user.data.Device;

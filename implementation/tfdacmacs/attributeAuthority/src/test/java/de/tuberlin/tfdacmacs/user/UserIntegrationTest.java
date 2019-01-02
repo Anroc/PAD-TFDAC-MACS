@@ -8,8 +8,8 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequ
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueResponse;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.CreateUserRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.UserResponse;
-import de.tuberlin.tfdacmacs.basics.attributes.data.AttributeType;
-import de.tuberlin.tfdacmacs.basics.attributes.data.dto.PublicAttributeResponse;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.*;

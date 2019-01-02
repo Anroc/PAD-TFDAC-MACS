@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute.db;
 
-import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
-import de.tuberlin.tfdacmacs.basics.db.CouchbaseDB;
+import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.db.CouchbaseDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
