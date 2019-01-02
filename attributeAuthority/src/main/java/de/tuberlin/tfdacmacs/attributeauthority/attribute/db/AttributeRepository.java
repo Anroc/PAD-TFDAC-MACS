@@ -10,6 +10,6 @@ import java.util.stream.Stream;
 @Repository
 public interface AttributeRepository extends CouchbaseRepository<Attribute, String> {
 
-    @Query("#{#n1ql.selectEntity} WHERE `_class` = 'de.tuberlin.tfdacmacs.basics.attributes.data.Attribute'")
+    @Query("#{#n1ql.selectEntity} WHERE `_class` = 'de.tuberlin.tfdacmacs.lib.attributes.data.Attribute'")
     Stream<Attribute> findAllByClass();
 }
