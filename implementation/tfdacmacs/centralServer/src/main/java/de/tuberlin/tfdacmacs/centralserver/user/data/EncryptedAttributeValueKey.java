@@ -12,5 +12,7 @@ import javax.validation.constraints.NotBlank;
 public class EncryptedAttributeValueKey {
 
     @NotBlank
-    private String encryptedkey;
+    private String attributeValueId;
+    @NotBlank
+    private String encryptedKey;
 }

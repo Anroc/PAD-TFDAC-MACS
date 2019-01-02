@@ -28,7 +28,6 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    // TODO: secure for admin
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         Set<UserAttributeKey> preKeys = createUserRequest.getAttributeValueRequests()
                 .stream()
@@ -58,6 +57,17 @@ public class UserController {
         User user = userService.findUser(email).orElseThrow(
                 () -> new NotFoundException(email)
         );
+        return UserResponse.from(user);
+    }
+
+    @PutMapping("/{email}/approve/{deviceId}")
+    public UserResponse approve(@PathVariable("email") String email, @PathVariable("deviceId") String deviceId) {
+        User user = userService.findUser(email).orElseThrow(
+                () -> new NotFoundException(email)
+        );
+
+        userService.approve(user, deviceId);
+
         return UserResponse.from(user);
     }
 }

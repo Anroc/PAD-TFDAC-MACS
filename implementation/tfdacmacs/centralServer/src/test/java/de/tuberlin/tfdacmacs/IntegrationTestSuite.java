@@ -5,7 +5,7 @@ import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
-import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateUtils;
+import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.centralserver.config.CredentialConfig;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;

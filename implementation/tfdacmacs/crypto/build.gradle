@@ -21,5 +21,6 @@ dependencies {
     compile('org.bouncycastle:bcpkix-jdk15on:1.60')
     compile('javax.validation:validation-api:2.0.1.Final')
     compile('org.springframework.boot:spring-boot-starter')
+    compile('com.google.guava:guava:27.0.1-jre')
     testCompile('org.assertj:assertj-core:3.11.1')
 }

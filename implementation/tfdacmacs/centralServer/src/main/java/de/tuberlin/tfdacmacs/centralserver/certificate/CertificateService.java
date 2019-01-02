@@ -117,7 +117,7 @@ public class CertificateService {
         PublicKey publicKey = extractPublicKey(certificationRequest);
         String commonName = extractCommonName(certificationRequest);
 
-        String certificateId  = hashGenerator.sha256HashWithSimpleEncoding(publicKey.getEncoded());
+        String certificateId  = hashGenerator.fingerprint(publicKey.getEncoded());
         Certificate certificate = new Certificate(certificateId, commonName);
         if(certificateDB.exist(certificateId)){
             throw new ServiceException("Certificate for public key [%s] already exist.", HttpStatus.UNPROCESSABLE_ENTITY, certificateId);

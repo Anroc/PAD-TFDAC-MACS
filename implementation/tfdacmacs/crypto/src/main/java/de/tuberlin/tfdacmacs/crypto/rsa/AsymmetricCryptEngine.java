@@ -3,9 +3,12 @@ package de.tuberlin.tfdacmacs.crypto.rsa;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import java.nio.charset.Charset;
 import java.security.*;
 
 /**
@@ -77,6 +80,24 @@ public abstract class AsymmetricCryptEngine<T> extends CypherProcessor {
             IllegalBlockSizeException;
 
     /**
+     * Encrypts the given data with the given key.
+     *
+     * @param data the data that shell be encrypted
+     * @param key  the key that will be used (either public or private)
+     * @return the base64 encoded encrypted string.
+     * @throws BadPaddingException       on padding mismatch
+     * @throws InvalidKeyException       on wrong cipher instance
+     * @throws IllegalBlockSizeException on wrong alignment
+     */
+    public String encryptRaw(byte[] data, Key key) throws BadPaddingException, InvalidKeyException,
+            IllegalBlockSizeException {
+        return new String(
+                Base64.encode(process(data, key, Cipher.ENCRYPT_MODE)),
+                Charset.forName(CHAR_ENCODING)
+        );
+    }
+
+    /**
      * Decrypts the given data with the given key.
      *
      * @param data the base64 encoded data that shell be decrypted
@@ -89,6 +110,22 @@ public abstract class AsymmetricCryptEngine<T> extends CypherProcessor {
     abstract public T decrypt(String data, Key key)
             throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException;
+
+    /**
+     * Decrypts the given data with the given key.
+     *
+     * @param data the base64 encoded data that shell be decrypted
+     * @param key  the key that will be used (either public or private)
+     * @return the plain string
+     * @throws BadPaddingException       on padding mismatch
+     * @throws InvalidKeyException       on wrong cipher instance
+     * @throws IllegalBlockSizeException on wrong alignment
+     */
+    public byte[] decryptRaw(String data, Key key)
+            throws BadPaddingException, InvalidKeyException,
+            IllegalBlockSizeException {
+        return process(Base64.decode(data), key, Cipher.DECRYPT_MODE);
+    }
 
     /**
      * Returns a mac of the given data.

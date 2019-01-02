@@ -1,9 +1,9 @@
 package de.tuberlin.tfdacmacs.centralserver.user.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.tuberlin.tfdacmacs.lib.db.Entity;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.user.events.CertificateCreatedEvent;
+import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ import lombok.NonNull;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,5 +43,10 @@ public class User extends Entity {
     @JsonIgnore
     public Set<String> getCertificateIds() {
         return this.devices.stream().map(Device::getCertificateId).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Optional<Device> findDevice(@NonNull String deviceId) {
+        return getDevices().stream().filter(device -> device.getCertificateId().equals(deviceId)).findFirst();
     }
 }

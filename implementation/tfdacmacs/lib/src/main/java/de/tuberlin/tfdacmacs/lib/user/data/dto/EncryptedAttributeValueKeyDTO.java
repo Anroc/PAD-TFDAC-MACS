@@ -1,7 +1,18 @@
 package de.tuberlin.tfdacmacs.lib.user.data.dto;
 
-/**
- * Created by Marvin Petzolt on 01.01.19.
- */
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EncryptedAttributeValueKeyDTO {
+
+    @NotBlank
+    private String attributeValueId;
+    @NotBlank
+    private String encryptedKey;
 }
