@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data.dto;
 
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

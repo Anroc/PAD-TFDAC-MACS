@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.keys.UserAttributeValueKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

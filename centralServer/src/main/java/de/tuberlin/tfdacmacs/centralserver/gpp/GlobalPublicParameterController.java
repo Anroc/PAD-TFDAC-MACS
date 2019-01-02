@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.CurveParameterDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GeneratorDTO;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;

@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client;
 
-import de.tuberlin.tfdacmacs.attributeauthority.feign.CAClient;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

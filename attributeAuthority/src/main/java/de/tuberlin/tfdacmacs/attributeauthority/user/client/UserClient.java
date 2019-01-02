@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
-import de.tuberlin.tfdacmacs.attributeauthority.feign.CAClient;
+import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.basics.user.data.dto.UserCreationRequest;
 import lombok.NonNull;

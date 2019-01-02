@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs.centralserver.authority;
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
 import de.tuberlin.tfdacmacs.basics.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.basics.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.basics.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.junit.Test;

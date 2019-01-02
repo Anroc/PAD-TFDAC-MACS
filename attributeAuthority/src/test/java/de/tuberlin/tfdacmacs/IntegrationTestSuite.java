@@ -2,10 +2,10 @@ package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeController;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
-import de.tuberlin.tfdacmacs.attributeauthority.feign.CAClient;
+import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.AttributeValueKeyGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.basics.factory.AttributeTestFactory;
 import de.tuberlin.tfdacmacs.basics.factory.GPPTestFactory;
 import de.tuberlin.tfdacmacs.basics.gpp.data.dto.GlobalPublicParameterDTO;
