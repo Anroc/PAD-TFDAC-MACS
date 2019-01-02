@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.lib.factory;
+package de.tuberlin.tfdacmacs.attributes.factory;
 
 import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
