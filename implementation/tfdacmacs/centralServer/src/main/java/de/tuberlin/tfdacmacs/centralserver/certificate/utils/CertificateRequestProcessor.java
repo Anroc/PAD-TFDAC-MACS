@@ -10,6 +10,6 @@ public class CertificateRequestProcessor extends CertificateSigner {
 
     @Autowired
     public CertificateRequestProcessor(CertificateConfig certificateConfig) {
-        super(certificateConfig.getDomain(), certificateConfig.getIp(), certificateConfig.getValidForDays());
+        super(certificateConfig.getDomains(), certificateConfig.getIps(), certificateConfig.getValidForDays());
     }
 }

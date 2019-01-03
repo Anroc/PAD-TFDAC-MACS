@@ -31,8 +31,14 @@ central-server:
     username: admin
     password: password
   certificate:
-    domain: localhost
-    ip: 127.0.0.1
+    domains:
+      - localhost
+      - server.vpn
+      - undo.life
+    ips:
+      - 127.0.0.1
+      - 10.8.0.1
+      - 81.169.220.55
 ---
 spring:
   profiles: test

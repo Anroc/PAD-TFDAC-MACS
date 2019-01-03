@@ -15,7 +15,7 @@ spring:
 server:
   port: 9002
   ssl:
-    key-store: classpath:aa-keystore.jks
+    key-store: classpath:aa-authority-keystore.jks
     key-store-password: foobar
     key-alias: localhost
     ca-alias: ca

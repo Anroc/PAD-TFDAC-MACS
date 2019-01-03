@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 @Configuration
@@ -13,9 +14,9 @@ import javax.validation.constraints.NotBlank;
 public class CertificateConfig {
 
     @NotBlank
-    private String ip;
+    private List<String> ips;
     @NotBlank
-    private String domain;
+    private List<String> domains;
     @Min(1)
     private long validForDays = 365L;
 }
