@@ -7,8 +7,8 @@ import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.utils.CertificateRequestProcessor;
 import de.tuberlin.tfdacmacs.centralserver.user.UserService;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
-import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.JavaKeyStore;
+import de.tuberlin.tfdacmacs.lib.certificate.util.SpringContextAwareCertificateUtils;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
 import lombok.NonNull;
@@ -44,7 +44,7 @@ public class CertificateService {
     private final CertificateDB certificateDB;
     private final UserService userService;
     private final AttributeAuthorityService attributeAuthorityService;
-    private final HashGenerator hashGenerator;
+    private final SpringContextAwareCertificateUtils certificateUtils;
 
     @EventListener(ApplicationReadyEvent.class)
     public void bootstrap() {
@@ -118,7 +118,7 @@ public class CertificateService {
         PublicKey publicKey = extractPublicKey(certificationRequest);
         String commonName = extractCommonName(certificationRequest);
 
-        String certificateId  = hashGenerator.fingerprint(publicKey.getEncoded());
+        String certificateId  = certificateUtils.fingerprint(publicKey);
         Certificate certificate = new Certificate(certificateId, commonName);
         if(certificateDB.exist(certificateId)){
             throw new ServiceException("Certificate for public key [%s] already exist.", HttpStatus.UNPROCESSABLE_ENTITY, certificateId);

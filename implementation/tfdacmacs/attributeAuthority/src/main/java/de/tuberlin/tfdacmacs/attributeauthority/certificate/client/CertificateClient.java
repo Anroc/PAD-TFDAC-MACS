@@ -30,10 +30,10 @@ public class CertificateClient {
         return certificate;
     }
 
-    private Certificate mapToCertificate(CertificateResponse centralAuthorityCertificate) {
+    private Certificate mapToCertificate(@NonNull CertificateResponse certificateResponse) {
         return new Certificate(
-                    centralAuthorityCertificate.getId(),
-                    KeyConverter.from(centralAuthorityCertificate.getCertificate()).toX509Certificate()
+                    certificateResponse.getId(),
+                    KeyConverter.from(certificateResponse.getCertificate()).toX509Certificate()
             );
     }
 

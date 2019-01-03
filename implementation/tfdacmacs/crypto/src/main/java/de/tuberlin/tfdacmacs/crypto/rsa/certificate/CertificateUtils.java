@@ -2,7 +2,6 @@ package de.tuberlin.tfdacmacs.crypto.rsa.certificate;
 
 import com.google.common.collect.Lists;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -16,13 +15,45 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.Collection;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class CertificateUtils {
+
+    private final MessageDigest md5;
+
+    public CertificateUtils() {
+        try {
+            this.md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String fingerprint(@NonNull X509Certificate x509Certificate) {
+        return fingerprint(x509Certificate.getPublicKey());
+    }
+
+    public String fingerprint(@NonNull PublicKey publicKey) {
+        byte[] input = publicKey.getEncoded();
+        this.md5.update(input);
+        byte[] digest = this.md5.digest();
+
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < digest.length-1; i++) {
+            stringBuilder.append(String.format("%2x", digest[i]));
+            stringBuilder.append(':');
+        }
+        return stringBuilder.append(String.format("%2x", digest[digest.length-1]))
+                .toString();
+    }
+
 
     public String extractCommonName(@NonNull X509Certificate x509Certificate) {
         try {
