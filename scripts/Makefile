@@ -22,35 +22,35 @@ all:	clean create-keystore add-host create-truststore add-client
 
 create-keystore:
 	# Generate a certificate authority (CA)
-	keytool -genkey -alias ca -ext san=dns:localhost,ip:127.0.0.1 -ext BC=ca:true \
+	keytool -genkey -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -ext BC=ca:true \
 	    -keyalg RSA -keysize 4096 -sigalg SHA512withRSA -keypass $(PASSWORD) \
 	    -validity 3650 -dname $(DNAME_CA) \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 
 add-host:
 	# Generate a host certificate
-	keytool -genkey -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1  \
+	keytool -genkey -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55  \
 	    -keyalg RSA -keysize 4096 -sigalg SHA512withRSA -keypass $(PASSWORD) \
 	    -validity 3650 -dname $(DNAME_HOST) \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 	# Generate a host certificate signing request
-	keytool -certreq -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1 -ext BC=ca:true \
+	keytool -certreq -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -ext BC=ca:true \
 	    -keyalg RSA -keysize 4096 -sigalg SHA512withRSA \
 	    -validity 3650 -file "$(HOSTNAME).csr" \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 	# Generate signed certificate with the certificate authority
-	keytool -gencert -alias ca -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -gencert -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -validity 3650 -sigalg SHA512withRSA \
 	    -infile "$(HOSTNAME).csr" -outfile "$(HOSTNAME).crt" -rfc \
 	    -keystore $(KEYSTORE_OTHER) -storepass $(PASSWORD_OTHER)
 	# Import signed certificate into the keystore
-	keytool -import -trustcacerts -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -import -trustcacerts -alias $(HOSTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -file "$(HOSTNAME).crt" \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 
 export-authority:
 	# Export certificate authority
-	keytool -export -alias ca -ext san=dns:localhost,ip:127.0.0.1 -file ca.crt -rfc \
+	keytool -export -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -file ca.crt -rfc \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 
 export-ca-privatekey:
@@ -59,40 +59,45 @@ export-ca-privatekey:
 
 create-truststore:
 	# Import certificate authority into a new truststore
-	keytool -import -trustcacerts -noprompt -alias ca -ext san=dns:localhost,ip:127.0.0.1 -file ca.crt \
+	keytool -import -trustcacerts -noprompt -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -file ca.crt \
 	    -keystore $(TRUSTSTORE) -storepass $(PASSWORD)
 
 import-ca:
-	keytool -import -trustcacerts -noprompt -alias ca -ext san=dns:localhost,ip:127.0.0.1 -file ca.crt \
+	keytool -import -trustcacerts -noprompt -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -file ca.crt \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 
 client-keystore:
-    # create crt and key files from signingRequest test
-    openssl pkcs12 -export -clcerts -in test@tu-berlin.de.crt -inkey test@tu-berlin.de.key -out test@tu-berlin.de.p12
-    keytool -importkeystore -destkeystore aa-client-keystore.jks -srckeystore test@tu-berlin.de.p12 -srcstoretype PKCS12
+	# create crt and key files from signingRequest test
+	openssl pkcs12 -export -clcerts -in test@tu-berlin.de.crt -inkey test@tu-berlin.de.key -out test@tu-berlin.de.p12
+	keytool -importkeystore -destkeystore aa-client-keystore.jks -srckeystore test@tu-berlin.de.p12 -srcstoretype PKCS12
+
+authority-keystore:
+	# create crt and key files from signingRequest test
+	openssl pkcs12 -export -clcerts -in aa.tu-berlin.de.crt -inkey aa.tu-berlin.de.key -out aa.tu-berlin.de.p12
+	keytool -importkeystore -destkeystore aa-authority-keystore.jks -srckeystore aa.tu-berlin.de.p12 -srcstoretype PKCS12
 
 add-client:
 	# Generate client certificate
-	keytool -genkey -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -genkey -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -keyalg RSA -keysize 4096 -sigalg SHA512withRSA -keypass $(PASSWORD) \
 	    -validity 3650 -dname $(DNAME_CLIENT) \
 	    -keystore $(TRUSTSTORE) -storepass $(PASSWORD)
 	# Generate a host certificate signing request
-	keytool -certreq -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1 -ext  BC=ca:true \
+	keytool -certreq -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 -ext  BC=ca:true \
 	    -keyalg RSA -keysize 4096 -sigalg SHA512withRSA \
 	    -validity 3650 -file "$(CLIENTNAME).csr" \
 	    -keystore $(TRUSTSTORE) -storepass $(PASSWORD)
 	# Generate signed certificate with the certificate authority
-	keytool -gencert -alias ca -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -gencert -alias ca -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -validity 3650 -sigalg SHA512withRSA \
 	    -infile "$(CLIENTNAME).csr" -outfile "$(CLIENTNAME).crt" -rfc \
 	    -keystore $(KEYSTORE) -storepass $(PASSWORD)
 	# Import signed certificate into the truststore
-	keytool -import -trustcacerts -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -import -trustcacerts -alias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -file "$(CLIENTNAME).crt" \
 	    -keystore $(TRUSTSTORE) -storepass $(PASSWORD)
 	# Export private certificate for importing into a browser
-	keytool -importkeystore -srcalias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1 \
+	keytool -importkeystore -srcalias $(CLIENTNAME) -ext san=dns:localhost,ip:127.0.0.1,dns:server.vpn,ip:10.8.0.1,dns:undo.life,ip:81.169.220.55 \
 	    -srckeystore $(TRUSTSTORE) -srcstorepass $(PASSWORD) \
 	    -destkeystore "$(CLIENTNAME).p12" -deststorepass $(PASSWORD) \
 	    -deststoretype PKCS12

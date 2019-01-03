@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateSigner;
 import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.assertj.core.util.Lists;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -35,7 +36,7 @@ public class CertificateTestFactory {
     private AsymmetricCryptEngine<?> cryptEngine = new StringAsymmetricCryptEngine();
     private KeyPair keyPair = cryptEngine.generateKeyPair();
 
-    private final CertificateSigner certificateSigner = new CertificateSigner("localhost", "127.0.0.1", 365);
+    private final CertificateSigner certificateSigner = new CertificateSigner(Lists.newArrayList("localhost"), Lists.newArrayList("127.0.0.1"), 365);
     private final CertificateRequestFactory certificateRequestFactory;
 
     public X509Certificate createRootCertificate()

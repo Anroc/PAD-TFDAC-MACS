@@ -93,6 +93,21 @@ public abstract class IntegrationTestSuite {
         sslRestTemplate();
     }
 
+    protected void externSslRestTemplate() {
+        try {
+            SSLContext sslContext = SSLContexts
+                    .custom()
+                    .loadTrustMaterial(ResourceUtils.getFile("classpath:ca-truststore.jks"), "foobar".toCharArray())
+                    .build();
+            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+            HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+            restTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("https://server.vpn:9001/"));
+            ((HttpComponentsClientHttpRequestFactory) restTemplate.getRestTemplate().getRequestFactory()).setHttpClient(httpClient);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected void sslRestTemplate() {
         try {
             SSLContext sslContext = SSLContexts

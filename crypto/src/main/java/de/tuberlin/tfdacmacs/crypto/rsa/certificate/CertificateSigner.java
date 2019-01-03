@@ -32,7 +32,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 @Slf4j
@@ -40,8 +42,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class CertificateSigner {
 
-    private final String domain;
-    private final String ip;
+    private final List<String> domains;
+    private final List<String> ips;
     private final long validForDays;
 
     public X509Certificate sign(@NonNull PKCS10CertificationRequest inputCSR, @NonNull PrivateKey caPrivate,
@@ -57,11 +59,10 @@ public class CertificateSigner {
 
         PKCS10CertificationRequest pk10Holder = new PKCS10CertificationRequest(inputCSR.toASN1Structure());
 
-        GeneralNames subjectAltName = new GeneralNames(
-                new GeneralName[]{
-                        new GeneralName(GeneralName.dNSName, getDomain()),
-                        new GeneralName(GeneralName.iPAddress, getIp())
-                });
+        List<GeneralName> generalNames = new ArrayList<>();
+        getDomains().stream().map(domainName -> new GeneralName(GeneralName.dNSName, domainName)).forEach(generalNames::add);
+        getIps().stream().map(ip -> new GeneralName(GeneralName.iPAddress, ip)).forEach(generalNames::add);
+        GeneralNames subjectAltName = new GeneralNames(generalNames.toArray(new GeneralName[]{}));
 
         JcaX509ExtensionUtils jcaX509ExtensionUtils = new JcaX509ExtensionUtils();
         AuthorityKeyIdentifier authorityKeyIdentifier = jcaX509ExtensionUtils.createAuthorityKeyIdentifier(caCertificate);

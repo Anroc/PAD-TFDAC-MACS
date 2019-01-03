@@ -18,7 +18,7 @@ public class GlobalPublicParameterController {
     private final GlobalPublicParameterService gppService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') || hasRole('ROLE_AUTHORITY')")
     public GlobalPublicParameterDTO getGlobalPublicParameter() {
         GlobalPublicParameter globalPublicParameter = gppService.getGlobalPublicParameter();
 
