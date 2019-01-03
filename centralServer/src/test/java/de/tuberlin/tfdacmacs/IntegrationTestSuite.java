@@ -3,7 +3,7 @@ package de.tuberlin.tfdacmacs;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
-import de.tuberlin.tfdacmacs.centralserver.certificate.utils.SpringContextAwareCertificateUtils;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.SpringContextAwareCertificateUtils;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.security.config.CredentialConfig;

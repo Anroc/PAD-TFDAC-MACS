@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
+import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.DeviceApprovedEvent;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.Data;
@@ -10,10 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -31,19 +30,23 @@ public class User extends Entity {
     @NotNull
     private Set<UserAttributeKey> attributes;
 
-    private Map<String, X509Certificate> devices = new HashMap<>();
-
-    private Map<String, X509Certificate> unapprovedDevices = new HashMap<>();
+    private Set<Certificate> devices = new HashSet<>();
+    private Set<Certificate> unapprovedDevices = new HashSet<>();
 
     public User approve(@NonNull String deviceId) {
-        if(! unapprovedDevices.containsKey(deviceId)) {
-            X509Certificate x509Certificate = unapprovedDevices.get(deviceId);
-            devices.putIfAbsent(deviceId, x509Certificate);
-            unapprovedDevices.remove(deviceId);
-            registerDomainEvent(new DeviceApprovedEvent(this, deviceId, x509Certificate));
+        Optional<Certificate> certificateOptional = find(unapprovedDevices, deviceId);
+        if(certificateOptional.isPresent()) {
+            Certificate certificate = certificateOptional.get();
+            devices.add(certificate);
+            unapprovedDevices.remove(certificate);
+            registerDomainEvent(new DeviceApprovedEvent(this, certificate));
         } else {
             log.warn("User [{}] does not contain [{}] in unapprovedDevices.", getId(), deviceId);
         }
         return this;
+    }
+
+    private Optional<Certificate> find(Set<Certificate> certificates, String id) {
+        return certificates.stream().filter(certificate -> certificate.getId().equals(id)).findFirst();
     }
 }
