@@ -26,11 +26,9 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        // TODO:include me
-                        // sh('./gradlew clean test')
+                        sh('./gradlew clean test')
                     } finally {
-                        // TODO:include me
-                        //step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
                     }
                 }
             }
@@ -58,8 +56,8 @@ node {
                     filter: '**/*.jar');
 
 
-                echo "Deploy artifacts."
-                sh('/var/lib/jenkins/deploy/deploy.sh')
+                // echo "Deploy artifacts."
+                // sh('/var/lib/jenkins/deploy/deploy.sh')
             }
         }
         currentBuild.result = 'SUCCESS'
