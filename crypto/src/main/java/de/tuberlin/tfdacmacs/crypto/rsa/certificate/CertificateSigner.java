@@ -18,7 +18,6 @@ import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,7 +36,6 @@ import java.util.Date;
 import java.util.Random;
 
 @Slf4j
-@Component
 @Data
 @RequiredArgsConstructor
 public class CertificateSigner {
