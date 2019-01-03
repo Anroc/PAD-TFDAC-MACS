@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.config;
+package de.tuberlin.tfdacmacs.centralserver.certificate.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

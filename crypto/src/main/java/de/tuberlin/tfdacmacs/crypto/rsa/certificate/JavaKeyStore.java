@@ -29,7 +29,13 @@ public class JavaKeyStore {
         //load
         char[] pwdArray = keyStorePassword.toCharArray();
         keyStore.load(null, pwdArray);
+        save(pwdArray);
+        return;
 
+    }
+
+    public void save(char[] pwdArray)
+            throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         // Save the keyStore
         FileOutputStream fos = new FileOutputStream(keyStoreName);
         keyStore.store(fos, pwdArray);

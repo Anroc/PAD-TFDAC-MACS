@@ -1,6 +1,5 @@
 package de.tuberlin.tfdacmacs.centralserver.security.config;
 
-import de.tuberlin.tfdacmacs.centralserver.config.CredentialConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.centralserver.certificate;
+package de.tuberlin.tfdacmacs.crypto.rsa.certificate;
 
-import de.tuberlin.tfdacmacs.centralserver.config.CertificateConfig;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +38,13 @@ import java.util.Random;
 
 @Slf4j
 @Component
+@Data
 @RequiredArgsConstructor
 public class CertificateSigner {
 
-    private final CertificateConfig certificateConfig;
+    private final String domain;
+    private final String ip;
+    private final long validForDays;
 
     public X509Certificate sign(@NonNull PKCS10CertificationRequest inputCSR, @NonNull PrivateKey caPrivate,
             @NonNull X509Certificate caCertificate, @NonNull String id, @NonNull PublicKey clientKey)
@@ -58,8 +61,8 @@ public class CertificateSigner {
 
         GeneralNames subjectAltName = new GeneralNames(
                 new GeneralName[]{
-                        new GeneralName(GeneralName.dNSName, certificateConfig.getDomain()),
-                        new GeneralName(GeneralName.iPAddress, certificateConfig.getIp())
+                        new GeneralName(GeneralName.dNSName, getDomain()),
+                        new GeneralName(GeneralName.iPAddress, getIp())
                 });
 
         JcaX509ExtensionUtils jcaX509ExtensionUtils = new JcaX509ExtensionUtils();
@@ -71,7 +74,7 @@ public class CertificateSigner {
                 X500Name.getInstance(caCertificate.getSubjectX500Principal().getEncoded()),
                 new BigInteger(32, new Random()),
                 new Date(),
-                new Date(Instant.now().plus(certificateConfig.getValidForDays(), ChronoUnit.DAYS).toEpochMilli()),
+                new Date(Instant.now().plus(getValidForDays(), ChronoUnit.DAYS).toEpochMilli()),
                 pk10Holder.getSubject(),
                 keyInfo);
         myCertificateGenerator.addExtension(new Extension(

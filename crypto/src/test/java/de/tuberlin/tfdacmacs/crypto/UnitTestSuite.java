@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.aes.AESEncryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -28,6 +29,8 @@ public class UnitTestSuite {
 
     protected ABEEncryptor abeEncryptor = new ABEEncryptor();
     protected ABEDecryptor abeDecryptor = new ABEDecryptor(hashGenerator);
+
+    protected CertificateRequestFactory certificateRequestFactory = new CertificateRequestFactory();
 
     protected PairingCryptEngine pairingCryptEngine =
             new PairingCryptEngine(aesEncryptor, aesDecryptor, abeEncryptor, abeDecryptor);

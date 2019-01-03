@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.config;
+package de.tuberlin.tfdacmacs.centralserver.security.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

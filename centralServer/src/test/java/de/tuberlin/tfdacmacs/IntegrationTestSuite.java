@@ -1,15 +1,15 @@
 package de.tuberlin.tfdacmacs;
 
-import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
-import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
-import de.tuberlin.tfdacmacs.centralserver.config.CredentialConfig;
+import de.tuberlin.tfdacmacs.centralserver.certificate.utils.SpringContextAwareCertificateUtils;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
+import de.tuberlin.tfdacmacs.centralserver.security.config.CredentialConfig;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -65,7 +65,7 @@ public abstract class IntegrationTestSuite {
     @Autowired
     protected StringAsymmetricCryptEngine cryptEngine;
     @Autowired
-    protected CertificateUtils certificateUtils;
+    protected SpringContextAwareCertificateUtils certificateUtils;
 
     // test factories
     @Autowired

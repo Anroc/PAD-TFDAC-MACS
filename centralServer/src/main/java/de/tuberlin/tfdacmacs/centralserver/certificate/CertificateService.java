@@ -1,15 +1,16 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
-import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
-import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
-import de.tuberlin.tfdacmacs.crypto.rsa.certificate.JavaKeyStore;
-import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
 import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
+import de.tuberlin.tfdacmacs.centralserver.certificate.utils.CertificateRequestProcessor;
 import de.tuberlin.tfdacmacs.centralserver.user.UserService;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
+import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
+import de.tuberlin.tfdacmacs.crypto.rsa.certificate.JavaKeyStore;
+import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
+import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class CertificateService {
 
     private final JavaKeyStore javaKeyStore;
     private final KeyStoreConfig keyStoreConfig;
-    private final CertificateSigner certificateSigner;
+    private final CertificateRequestProcessor certificateRequestProcessor;
     private final CertificateDB certificateDB;
     private final UserService userService;
     private final AttributeAuthorityService attributeAuthorityService;
@@ -139,7 +140,8 @@ public class CertificateService {
         try{
             PrivateKey key = (PrivateKey) javaKeyStore.getKeyEntry(keyStoreConfig.getCaAlias(), keyStoreConfig.getKeyPassword());
             X509Certificate caCertificate = getCertificateAuthorityCertificate();
-            return certificateSigner.sign(certificateRequest, key, caCertificate, certificate.getId(), extractPublicKey(certificateRequest));
+            return certificateRequestProcessor
+                    .sign(certificateRequest, key, caCertificate, certificate.getId(), extractPublicKey(certificateRequest));
         } catch (UnrecoverableEntryException | NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException | IOException | OperatorCreationException | CertificateException e) {
             throw new RuntimeException(e);
         }
@@ -151,10 +153,6 @@ public class CertificateService {
         } catch (KeyStoreException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean matchesCommonName(@NonNull PKCS10CertificationRequest certificationRequest, @NonNull String id) {
-        return extractCommonName(certificationRequest).equals(id);
     }
 
     private String extractCommonName(PKCS10CertificationRequest certificationRequest) {
