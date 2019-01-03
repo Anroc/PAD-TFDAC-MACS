@@ -1,9 +1,8 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.basics.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
-import de.tuberlin.tfdacmacs.centralserver.key.KeyService;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class GlobalPublicParameterService {
 
     private final PairingGenerator pairingGenerator;
-    private final KeyService keyService;
     private final GlobalPublicParameterDB globalPublicParameterDB;
 
     public GlobalPublicParameter getGlobalPublicParameter() {
@@ -36,7 +34,7 @@ public class GlobalPublicParameterService {
         PairingParameters pairingParameters = pairingGenerator.generateNewTypeACurveParameter();
         Pairing pairing = pairingGenerator.setupPairing(pairingParameters);
         Element g = pairing.getG1().newRandomElement().getImmutable();
-        return new GlobalPublicParameter(pairing, pairingParameters, g, keyService.getPublicKey());
+        return new GlobalPublicParameter(pairing, pairingParameters, g);
     }
 
 

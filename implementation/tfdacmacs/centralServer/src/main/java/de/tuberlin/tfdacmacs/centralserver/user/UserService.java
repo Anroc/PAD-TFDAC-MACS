@@ -1,26 +1,35 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
-import de.tuberlin.tfdacmacs.centralserver.key.KeyService;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserDB userDB;
-    private final KeyService keyService;
 
-    public boolean existUser(@NonNull String id) {
-        return userDB.exist(id);
-    }
-
-    public User createUser(String email) {
-        User user = new User(email, keyService.sign(email));
+    public User insertUser(@NonNull User user) {
         userDB.insert(user);
         return user;
+    }
+
+    public User updateUser(@NonNull User user) {
+        userDB.update(user);
+        return user;
+    }
+
+    public Optional<User> findUser(@NonNull String userId) {
+        return userDB.findEntity(userId);
+    }
+
+    public List<User> findUsersByAuthorityId(@NonNull String authorityId) {
+        return userDB.findUsersByAuthorityId(authorityId);
     }
 }

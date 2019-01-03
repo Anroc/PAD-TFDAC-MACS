@@ -15,6 +15,24 @@ spring:
 
 server:
   port: 9001
+  ssl:
+    key-store: classpath:ca-keystore.jks
+    key-store-password: foobar
+    key-alias: localhost
+    ca-alias: ca
+    key-password: foobar
+    enabled: true
+    client-auth: want
+    trust-store: classpath:ca-truststore.jks
+    trust-store-password: foobar
+
+central-server:
+  credentials:
+    username: admin
+    password: password
+  certificate:
+    domain: localhost
+    ip: 127.0.0.1
 ---
 spring:
   profiles: test

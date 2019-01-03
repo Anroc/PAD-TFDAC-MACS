@@ -14,9 +14,20 @@ spring:
       password: foobar
 server:
   port: 9002
+  ssl:
+    key-store: classpath:aa-keystore.jks
+    key-store-password: foobar
+    key-alias: localhost
+    ca-alias: ca
+    key-password: foobar
+    enabled: false
+    # client-auth: need
+    trust-store: classpath:aa-truststore.jks
+    trust-store-password: foobar
 
 attribute-authority:
   id: "aa.tu-berlin.de"
+  caRootUrl: "https://localhost:9001/"
 ---
 spring:
   profiles: test
@@ -27,4 +38,4 @@ spring:
       password: password
 
 attribute-authority:
-  requestGPPOnInit: false
+  request-ca-on-init: false

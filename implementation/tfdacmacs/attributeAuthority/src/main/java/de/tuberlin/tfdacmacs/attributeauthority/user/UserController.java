@@ -6,10 +6,9 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.CreateUserRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.UserResponse;
-import de.tuberlin.tfdacmacs.basics.attributes.data.Attribute;
-import de.tuberlin.tfdacmacs.basics.exceptions.BadRequestException;
-import de.tuberlin.tfdacmacs.basics.exceptions.NotFoundException;
-import de.tuberlin.tfdacmacs.basics.exceptions.UnauthorizedException;
+import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.exceptions.BadRequestException;
+import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,6 @@ import javax.validation.Valid;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,7 +28,6 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    // TODO: secure for admin
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         Set<UserAttributeKey> preKeys = createUserRequest.getAttributeValueRequests()
                 .stream()
@@ -57,15 +53,21 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
-    public UserResponse getAttributeKeys(@PathVariable("email") String email,
-            @RequestHeader(AUTHORIZATION) String authenticationHeader) {
-
-        if( ! userService.isSignatureAuthentic(email, authenticationHeader)) {
-            throw new UnauthorizedException("CA signature is invalid.");
-        }
+    public UserResponse getAttributeKeys(@PathVariable("email") String email) {
         User user = userService.findUser(email).orElseThrow(
                 () -> new NotFoundException(email)
         );
+        return UserResponse.from(user);
+    }
+
+    @PutMapping("/{email}/approve/{deviceId}")
+    public UserResponse approve(@PathVariable("email") String email, @PathVariable("deviceId") String deviceId) {
+        User user = userService.findUser(email).orElseThrow(
+                () -> new NotFoundException(email)
+        );
+
+        userService.approve(user, deviceId);
+
         return UserResponse.from(user);
     }
 }
