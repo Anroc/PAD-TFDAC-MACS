@@ -17,6 +17,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.gpp.factory.BasicsGPPTestFactory;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.util.SpringContextAwareCertificateUtils;
+import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import org.bouncycastle.cert.CertIOException;
@@ -45,6 +46,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -93,6 +95,8 @@ public abstract class IntegrationTestSuite {
     protected AttributeAuthorityConfig attributeAuthorityConfig;
     @SpyBean
     protected SpringContextAwareCertificateUtils certificateUtils;
+    @Autowired
+    protected GlobalPublicParameterProvider globalPublicParameterProvider;
 
     // statics
     protected X509Certificate rootCertificate;
@@ -140,6 +144,13 @@ public abstract class IntegrationTestSuite {
             return null;
         };
         doAnswer(answer).when(certificateUtils).validateCertificate(any(X509Certificate.class), any(X509Certificate.class));
+    }
+
+    public void assertSameElements(byte[] actual, byte[] expected) {
+        assertThat(actual.length).isEqualTo(expected.length);
+        for(int i = 0; i<actual.length; i ++) {
+            assertThat(actual[i]).isSameAs(expected[i]);
+        }
     }
 
     @After

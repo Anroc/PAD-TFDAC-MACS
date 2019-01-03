@@ -47,13 +47,20 @@ public class CertificateUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < digest.length-1; i++) {
-            stringBuilder.append(String.format("%2x", digest[i]));
+            stringBuilder.append(toHex(digest[i]));
             stringBuilder.append(':');
         }
-        return stringBuilder.append(String.format("%2x", digest[digest.length-1]))
+        return stringBuilder.append(toHex(digest[digest.length - 1]))
                 .toString();
     }
 
+    private String toHex(byte digest) {
+        String hex = String.format("%2x", digest);
+        if(hex.length() == 1) {
+            hex = "0" + hex;
+        }
+        return hex;
+    }
 
     public String extractCommonName(@NonNull X509Certificate x509Certificate) {
         try {

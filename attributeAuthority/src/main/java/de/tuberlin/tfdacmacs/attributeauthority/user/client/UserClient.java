@@ -49,7 +49,7 @@ public class UserClient {
         return user;
     }
 
-    public void updateDeviceForEncryptedAttributeValueKeys(@NonNull String userId, @NonNull String deviceId, @NonNull Map<String, String> encryptedAttributeValueKeys) {
+    public void updateDeviceForEncryptedAttributeValueKeys(@NonNull String userId, @NonNull String deviceId, @NonNull String encryptedKey, @NonNull Map<String, String> encryptedAttributeValueKeys) {
         Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeyDTOs = encryptedAttributeValueKeys.entrySet()
                 .stream()
                 .map(entry -> new EncryptedAttributeValueKeyDTO(entry.getKey(), entry.getValue()))
@@ -58,7 +58,7 @@ public class UserClient {
         caClient.updateDevice(
                 userId,
                 deviceId,
-                new DeviceUpdateRequest(DeviceState.ACTIVE, encryptedAttributeValueKeyDTOs)
+                new DeviceUpdateRequest(DeviceState.ACTIVE, encryptedKey, encryptedAttributeValueKeyDTOs)
         );
     }
 

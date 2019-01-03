@@ -14,6 +14,8 @@ public class DeviceResponse {
 
     private String certificateId;
     private DeviceState deviceState;
+
+    private String encryptedKey;
     private Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys;
 
 }
