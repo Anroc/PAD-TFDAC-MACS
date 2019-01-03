@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user.data.dto;
 
+import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
@@ -10,8 +11,9 @@ import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -39,9 +41,9 @@ public class UserResponse {
 
     }
 
-    private static List<CertificateResponse> toCertificateResponseList(@NonNull Map<String, X509Certificate> devices) {
-        return devices.entrySet().stream()
-                .map(entry -> new CertificateResponse(entry.getKey(), KeyConverter.from(entry.getValue()).toBase64()))
+    private static List<CertificateResponse> toCertificateResponseList(@NonNull Set<Certificate> devices) {
+        return devices.stream()
+                .map(entry -> new CertificateResponse(entry.getId(), KeyConverter.from(entry.getCertificate()).toBase64()))
                 .collect(Collectors.toList());
     }
 }

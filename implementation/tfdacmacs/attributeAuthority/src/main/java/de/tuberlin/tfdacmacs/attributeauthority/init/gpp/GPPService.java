@@ -22,7 +22,7 @@ public class GPPService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initGPP() {
-        if(config.isRequestGPPOnInit()) {
+        if(config.isRequestCaOnInit()) {
             retrieveGPP();
         }
     }

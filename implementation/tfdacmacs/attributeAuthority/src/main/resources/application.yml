@@ -38,4 +38,4 @@ spring:
       password: password
 
 attribute-authority:
-  requestGPPOnInit: false
+  request-ca-on-init: false

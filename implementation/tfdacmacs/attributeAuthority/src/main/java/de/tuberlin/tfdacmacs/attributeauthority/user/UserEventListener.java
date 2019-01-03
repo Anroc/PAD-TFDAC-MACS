@@ -38,7 +38,7 @@ public class UserEventListener {
     public void handleDeviceApprovedEvent(DeviceApprovedEvent deviceApprovedEvent) {
         User user = deviceApprovedEvent.getSource();
         log.info("Received approval request for user [{}]", user.getId());
-        X509Certificate x509Certificate = deviceApprovedEvent.getX509Certificate();
+        X509Certificate x509Certificate = deviceApprovedEvent.getCertificate().getCertificate();
         PublicKey publicKey = x509Certificate.getPublicKey();
 
         Set<UserAttributeKey> attributes = user.getAttributes();
@@ -46,7 +46,7 @@ public class UserEventListener {
 
         userClient.updateDeviceForEncryptedAttributeValueKeys(
                 user.getId(),
-                deviceApprovedEvent.getDeviceId(),
+                deviceApprovedEvent.getCertificate().getId(),
                 encryptedAttributeValueKeys
         );
         log.info("Successfully encrypted attributes of user [{}] for CA.", user.getId());

@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.centralserver.certificate.utils;
+package de.tuberlin.tfdacmacs.lib.certificate.util;
 
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
