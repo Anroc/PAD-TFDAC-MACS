@@ -1,10 +1,16 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
+import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
+import de.tuberlin.tfdacmacs.centralserver.user.data.Device;
+import de.tuberlin.tfdacmacs.centralserver.user.data.EncryptedAttributeValueKey;
+import de.tuberlin.tfdacmacs.centralserver.user.data.User;
+import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
-import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
-import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,20 +26,17 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class UserIntegrationTest extends IntegrationTestSuite {
 
-    private String email = "test@tu-berlin.de";
-    private String aid = "aa.tu-berlin.de";
-
     @Before
     public void setup() {
-        mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
-
         AttributeAuthority attributeAuthority = new AttributeAuthority(aid, UUID.randomUUID().toString());
         attributeAuthorityDB.insert(attributeAuthority);
     }
 
     @Test
     public void createUser() {
-        UserCreationRequest creationRequest = new UserCreationRequest(email, aid);
+        mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
+
+        UserCreationRequest creationRequest = new UserCreationRequest(email);
 
         ResponseEntity<UserResponse> userCreationResponseResponseEntity = sslRestTemplate
                 .exchange("/users", HttpMethod.POST, new HttpEntity(creationRequest), UserResponse.class);
@@ -48,6 +51,8 @@ public class UserIntegrationTest extends IntegrationTestSuite {
 
     @Test
     public void findUsers() {
+        mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
+
         String user1Id = UUID.randomUUID().toString();
         String user2Id = UUID.randomUUID().toString();
         String aid2 = UUID.randomUUID().toString();
@@ -65,5 +70,45 @@ public class UserIntegrationTest extends IntegrationTestSuite {
         List<UserResponse> body = response.getBody();
         assertThat(body).hasSize(1);
         assertThat(body.get(0).getId()).isEqualTo(user1Id);
+    }
+
+    @Test
+    public void getDevice_returnError_whileAdminApprovalNeeded() {
+        String certId = UUID.randomUUID().toString();
+        User user = new User(email, aid);
+        Device device = new Device(certId, null, Sets.newHashSet(), DeviceState.WAITING_FOR_APPROVAL);
+        user.setDevices(Sets.newHashSet(device));
+        userDB.insert(user);
+
+        ResponseEntity<DeviceResponse> response = sslRestTemplate
+                .exchange(String.format("/users/%s/devices/%s", email, device.getCertificateId()), HttpMethod.GET, HttpEntity.EMPTY, DeviceResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @Test
+    public void getDevice_passes() {
+        String certId = UUID.randomUUID().toString();
+        String encryptedKey = "someKey";
+        String attributeValueId = "aa.tu-berlin.de:role:student";
+        String attributeEncryptedValue = "somevalue";
+        User user = new User(email, aid);
+        Device device = new Device(certId,encryptedKey , Sets.newHashSet(new EncryptedAttributeValueKey(attributeValueId, attributeEncryptedValue)), DeviceState.ACTIVE);
+        user.setDevices(Sets.newHashSet(device));
+        userDB.insert(user);
+
+        ResponseEntity<DeviceResponse> response = sslRestTemplate
+                .exchange(String.format("/users/%s/devices/%s", email, device.getCertificateId()), HttpMethod.GET, HttpEntity.EMPTY, DeviceResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        DeviceResponse body = response.getBody();
+        assertThat(body.getCertificateId()).isEqualTo(certId);
+        assertThat(body.getDeviceState()).isEqualByComparingTo(DeviceState.ACTIVE);
+        assertThat(body.getEncryptedKey()).isEqualTo(encryptedKey);
+        assertThat(body.getEncryptedAttributeValueKeys()).hasSize(1);
+        EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = body.getEncryptedAttributeValueKeys().stream()
+                .findFirst().get();
+        assertThat(encryptedAttributeValueKeyDTO.getAttributeValueId()).isEqualTo(attributeValueId);
+        assertThat(encryptedAttributeValueKeyDTO.getEncryptedKey()).isEqualTo(attributeEncryptedValue);
     }
 }
