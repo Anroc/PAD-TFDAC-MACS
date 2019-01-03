@@ -23,7 +23,7 @@ node {
         java: {
             stage('gradle test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                sh('printenv')
+                // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
                         sh('./gradlew clean test')
@@ -32,12 +32,32 @@ node {
                     }
                 }
             }
+            stage('gralde bootjar') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // echo pwd()
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew bootjar')
+                    } finally {
+                        archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
+                    }
+                }
+            }
             
         }
 
         stage('deploy') {
             if("${env.BRANCH_NAME}" == "master") {
-                echo "TODO: Restart/start server"
+                copyArtifacts(
+                    projectName: "${env.JOB_NAME}", 
+                    selector: specific("${BUILD_NUMBER}"),
+                    target: '/var/lib/jenkins/deploy/',
+                    flatten: true, 
+                    filter: '**/*.jar');
+
+
+                // echo "Deploy artifacts."
+                // sh('/var/lib/jenkins/deploy/deploy.sh')
             }
         }
         currentBuild.result = 'SUCCESS'
