@@ -17,6 +17,8 @@ public class Device {
 
     @NotBlank
     private String certificateId;
+
+    private String encryptedKey;
     @NotNull
     private Set<EncryptedAttributeValueKey> attributeValueKeys = new HashSet<>();
     @NotNull

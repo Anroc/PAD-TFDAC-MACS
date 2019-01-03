@@ -96,6 +96,7 @@ public class UserController {
                 () -> new ServiceException("Device with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, deviceId)
         );
 
+        device.setEncryptedKey(deviceUpdateRequest.getEncryptedKey());
         device.setDeviceState(deviceUpdateRequest.getDeviceState());
         device.setAttributeValueKeys(encryptedAttributeValueKeySet);
         userService.updateUser(user);
@@ -115,6 +116,7 @@ public class UserController {
         return new DeviceResponse(
                 device.getCertificateId(),
                 device.getDeviceState(),
+                device.getEncryptedKey(),
                 device.getAttributeValueKeys().stream().map(this::toEncryptedAttributeValueKeyDTO).collect(Collectors.toSet())
         );
     }
