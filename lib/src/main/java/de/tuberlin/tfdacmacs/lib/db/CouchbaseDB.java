@@ -14,7 +14,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.data.couchbase.repository.CouchbaseRepository;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @Slf4j
@@ -107,6 +109,7 @@ public abstract class CouchbaseDB<T extends Entity> {
 
     /**
      * Checks whether the given id exist.
+     * <b>Does not check for class value</b>
      *
      * @param id NotNull: the id
      * @return true if an entity with the id exist, else false.

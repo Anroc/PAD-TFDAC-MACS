@@ -13,7 +13,4 @@ public class UserCreationRequest {
 
     @NotBlank
     private String id;
-
-    @NotBlank
-    private String authorityId;
 }

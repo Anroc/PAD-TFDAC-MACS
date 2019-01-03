@@ -33,11 +33,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
     public UserResponse createUser(@Valid @RequestBody UserCreationRequest userCreationRequest) {
-        User user = new User(userCreationRequest.getId(), userCreationRequest.getAuthorityId());
-        user.setAuthorityId(userCreationRequest.getAuthorityId());
+        User user = new User(userCreationRequest.getId(), authenticationFacade.getId());
+        user.setAuthorityId(authenticationFacade.getId());
 
-        if( !attributeAuthorityService.exist(userCreationRequest.getAuthorityId())) {
-            throw new ServiceException("Authority with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, userCreationRequest.getAuthorityId());
+        if( !attributeAuthorityService.exist(authenticationFacade.getId())) {
+            throw new ServiceException("Authority with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, authenticationFacade.getId());
         }
 
         try{
@@ -66,6 +66,10 @@ public class UserController {
                 () -> new NotFoundException(userId)
         );
 
+        if(! authenticationFacade.getId().equals(user.getId())) {
+            throw new ServiceException("User is not allowed to access other users except himself.", HttpStatus.FORBIDDEN);
+        }
+
         Device device = user.findDevice(deviceId).orElseThrow(
                 () -> new ServiceException("Device with id [%s] does not exist.", HttpStatus.UNPROCESSABLE_ENTITY, deviceId)
         );
@@ -83,9 +87,14 @@ public class UserController {
             @PathVariable("userId") String userId,
             @PathVariable("deviceId") String deviceId,
             @Valid @RequestBody DeviceUpdateRequest deviceUpdateRequest) {
+
         User user = userService.findUser(userId).orElseThrow(
                 () -> new NotFoundException(userId)
         );
+
+        if(! authenticationFacade.getId().equals(user.getAuthorityId())) {
+            throw new ServiceException("User does not relay in your domain.", HttpStatus.FORBIDDEN);
+        }
 
         Set<EncryptedAttributeValueKey> encryptedAttributeValueKeySet = deviceUpdateRequest.getEncryptedAttributeValueKeys()
                 .stream()
@@ -122,6 +131,9 @@ public class UserController {
     }
 
     private EncryptedAttributeValueKeyDTO toEncryptedAttributeValueKeyDTO(EncryptedAttributeValueKey encryptedAttributeValueKey) {
-        return new EncryptedAttributeValueKeyDTO();// TODO implement
+        return new EncryptedAttributeValueKeyDTO(
+                encryptedAttributeValueKey.getAttributeValueId(),
+                encryptedAttributeValueKey.getEncryptedKey()
+        );
     }
 }

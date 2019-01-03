@@ -3,7 +3,6 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.client;
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.client.CertificateClient;
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
-import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
@@ -23,11 +22,10 @@ public class UserClient {
 
     private final CAClient caClient;
     private final CertificateClient certificateClient;
-    private final AttributeAuthorityConfig config;
 
     public void createUserForCA(@NonNull User user) {
         log.info("Requesting user creation on CA site.");
-        caClient.createUser(new UserCreationRequest(user.getId(), config.getId()));
+        caClient.createUser(new UserCreationRequest(user.getId()));
     }
 
     public User extendWithCAUser(@NonNull User user) {
