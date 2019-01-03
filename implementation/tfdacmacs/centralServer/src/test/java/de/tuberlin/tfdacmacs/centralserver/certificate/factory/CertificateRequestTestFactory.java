@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate.factory;
 
+import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import lombok.RequiredArgsConstructor;

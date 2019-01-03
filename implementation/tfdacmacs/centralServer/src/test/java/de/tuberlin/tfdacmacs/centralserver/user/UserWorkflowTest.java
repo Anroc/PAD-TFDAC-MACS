@@ -80,7 +80,7 @@ public class UserWorkflowTest extends IntegrationTestSuite {
         assertThat(currentCertificate.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         x509Certificate = KeyConverter.from(currentCertificate.getBody().getCertificate())
                 .toX509Certificate();
-        //certificateUtils.validateCertificate(x509Certificate, rootX509Certificate);
+        certificateUtils.validateCertificate(x509Certificate, rootX509Certificate);
         assertThat(certificateUtils.extractCommonName(x509Certificate)).isEqualTo(email);
     }
 }
