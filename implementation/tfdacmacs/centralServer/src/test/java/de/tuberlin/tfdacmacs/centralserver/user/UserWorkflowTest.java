@@ -57,8 +57,7 @@ public class UserWorkflowTest extends IntegrationTestSuite {
         assertThat(certificateResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         X509Certificate x509Certificate = KeyConverter.from(certificateResponseEntity.getBody().getCertificate())
                 .toX509Certificate();
-        // todo fix me:
-        // certificateUtils.validateCertificate(x509Certificate, rootX509Certificate);
+        certificateUtils.validateCertificate(x509Certificate, rootX509Certificate);
         assertThat(certificateUtils.extractCommonName(x509Certificate)).isEqualTo(email);
 
         // 2. admin pulls users and sees new user
