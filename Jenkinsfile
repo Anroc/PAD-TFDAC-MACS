@@ -47,7 +47,7 @@ node {
         }
 
         stage('deploy') {
-            if("${env.BRANCH_NAME}" == "automatic-deply") {
+            if("${env.BRANCH_NAME}" == "master") {
                 copyArtifacts(
                     projectName: "${env.JOB_NAME}", 
                     selector: specific("${BUILD_NUMBER}"),
