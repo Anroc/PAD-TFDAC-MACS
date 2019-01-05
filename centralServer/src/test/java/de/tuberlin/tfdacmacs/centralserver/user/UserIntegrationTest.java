@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
 import com.google.common.collect.Sets;
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.centralserver.user.data.Device;
 import de.tuberlin.tfdacmacs.centralserver.user.data.EncryptedAttributeValueKey;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-public class UserIntegrationTest extends IntegrationTestSuite {
+public class UserRestTest extends RestTestSuite {
 
     @Before
     public void setup() {

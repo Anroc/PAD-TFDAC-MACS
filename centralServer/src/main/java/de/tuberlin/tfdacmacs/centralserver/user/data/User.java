@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -25,7 +26,12 @@ public class User extends Entity {
     private String authorityId;
 
     @NotNull
+    @Valid
     private Set<Device> devices = new HashSet<>();
+
+    @NotNull
+    @Valid
+    private Set<EncryptedTwoFactorKey> twoFactorKeys = new HashSet<>();
 
     public User(@NonNull String id, @NotBlank String authorityId) {
         super(id);

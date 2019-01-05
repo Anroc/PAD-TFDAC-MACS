@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -29,7 +29,7 @@ import java.security.cert.X509Certificate;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-public class CertificateIntegrationTest extends IntegrationTestSuite {
+public class CertificateRestTest extends RestTestSuite {
 
     private String email = "test@tu-berlin.de";
     private KeyPair clientKeys = new StringAsymmetricCryptEngine(4096).generateKeyPair();

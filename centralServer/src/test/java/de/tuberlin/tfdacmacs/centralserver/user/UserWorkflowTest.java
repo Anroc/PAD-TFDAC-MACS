@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.user;
 
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UserWorkflowTest extends IntegrationTestSuite {
+public class UserWorkflowTest extends RestTestSuite {
 
     private String email = "test@tu-berlin.de";
     private String aid = "aa.tu-berlin.de";

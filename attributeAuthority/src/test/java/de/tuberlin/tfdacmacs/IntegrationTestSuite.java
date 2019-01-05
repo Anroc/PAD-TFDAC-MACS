@@ -55,7 +55,7 @@ import static org.mockito.Mockito.doReturn;
 @SpringBootTest(classes = AttributeAuthorityApplication.class,
         webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public abstract class IntegrationTestSuite {
+public abstract class RestTestSuite {
 
     @Autowired
     protected TestRestTemplate restTemplate;

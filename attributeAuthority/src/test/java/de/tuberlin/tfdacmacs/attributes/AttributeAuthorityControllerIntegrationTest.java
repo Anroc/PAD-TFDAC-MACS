@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.attributes;
 
 import com.google.common.collect.Lists;
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AttributeAuthorityControllerIntegrationTest extends IntegrationTestSuite {
+public class AttributeAuthorityControllerRestTest extends RestTestSuite {
 
     private Attribute attribute;
 

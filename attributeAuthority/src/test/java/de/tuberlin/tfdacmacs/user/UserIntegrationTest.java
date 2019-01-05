@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.user;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequest;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-public class UserIntegrationTest extends IntegrationTestSuite {
+public class UserRestTest extends RestTestSuite {
 
     private String attributeId;
     private String email;
