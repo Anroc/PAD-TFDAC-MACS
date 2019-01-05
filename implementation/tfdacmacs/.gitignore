@@ -28,3 +28,9 @@ out/
 *.class
 *.so
 .attach_*
+tmp/
+scripts/*.csr
+scripts/*.crt
+scripts/*.jks
+scripts/*.key
+scripts/*.p12

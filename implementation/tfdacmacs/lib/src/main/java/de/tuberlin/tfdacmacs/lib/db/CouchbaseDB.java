@@ -44,7 +44,7 @@ public abstract class CouchbaseDB<T extends Entity> {
      */
     public Optional<T> findEntity(@NonNull String id) {
         try {
-            return Optional.of(template.findById(id, clazz));
+            return Optional.ofNullable(template.findById(id, clazz));
         } catch (DocumentDoesNotExistException e) {
             log.debug("Document with id {} does not exist.", id, e);
             return Optional.empty();

@@ -35,7 +35,7 @@ import javax.net.ssl.SSLContext;
 @SpringBootTest(classes = CentralServerApplication.class,
         webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public abstract class IntegrationTestSuite {
+public abstract class RestTestSuite {
 
     protected static final String CLIENT_KEYSTORE = "classpath:ca-client-keystore.jks";
     protected static final String AUTHORITY_KEYSTORE = "classpath:ca-authority-keystore.jks";

@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.CurveParameterDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GeneratorDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class GlobalPublicParameterIntegrationTest extends IntegrationTestSuite {
+public class GlobalPublicParameterRestTest extends RestTestSuite {
 
     @Test
     public void getGPP() {

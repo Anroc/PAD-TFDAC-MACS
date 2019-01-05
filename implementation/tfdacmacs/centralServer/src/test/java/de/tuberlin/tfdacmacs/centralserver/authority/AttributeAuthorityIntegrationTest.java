@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.authority;
 
-import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AttributeAuthorityIntegrationTest extends IntegrationTestSuite {
+public class AttributeAuthorityRestTest extends RestTestSuite {
 
     private String aid = "aa.tu-berlin.de";
     private KeyPair keyPair = new StringAsymmetricCryptEngine().generateKeyPair();
