@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.user;
+package de.tuberlin.tfdacmacs.attributeauthority.user;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

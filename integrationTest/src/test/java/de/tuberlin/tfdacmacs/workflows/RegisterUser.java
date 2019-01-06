@@ -3,6 +3,8 @@ package de.tuberlin.tfdacmacs.workflows;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.IntegrationTestSuite;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.dto.attributeauthority.attribute.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.dto.attributeauthority.attribute.AttributeType;
@@ -12,6 +14,10 @@ import de.tuberlin.tfdacmacs.dto.attributeauthority.user.CreateUserRequest;
 import de.tuberlin.tfdacmacs.dto.attributeauthority.user.UserResponse;
 import de.tuberlin.tfdacmacs.dto.centralauthority.certificate.CaCertificateResponse;
 import de.tuberlin.tfdacmacs.dto.centralauthority.certificate.CertificateRequest;
+import de.tuberlin.tfdacmacs.dto.centralauthority.gpp.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.dto.centralauthority.user.DeviceResponse;
+import de.tuberlin.tfdacmacs.dto.centralauthority.user.EncryptedAttributeValueKeyDTO;
+import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.api.Java6Assertions;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -23,19 +29,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RegisterUser extends IntegrationTestSuite {
 
     private String attributeId;
-    private String userId;
-    private File p12ClientCert;
+    private File clientKeyStore;
+    private String deviceId;
+    private GlobalPublicParameter gpp;
+    private Element attributeSecretKey;
 
     @Before
     public void cleanup() {
@@ -81,7 +94,7 @@ public class RegisterUser extends IntegrationTestSuite {
 
     public void createUser() {
         attributeId = createAttribute();
-        userId = createUser(attributeId);
+        createUser(attributeId);
     }
 
     private File certificateRequest() {
@@ -174,10 +187,10 @@ public class RegisterUser extends IntegrationTestSuite {
     public void registerDevice() {
         createUser();
 
-        p12ClientCert = certificateRequest();
+        clientKeyStore = certificateRequest();
     }
 
-    private void getUser() {
+    private String getUser() {
         RestTemplate restTemplate = plainRestTemplate(AA_URL);
 
         ResponseEntity<UserResponse> exchange = restTemplate.exchange(
@@ -190,13 +203,14 @@ public class RegisterUser extends IntegrationTestSuite {
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(exchange.getBody().getDevices().isEmpty());
         assertThat(exchange.getBody().getUnapprovedDevices()).hasSize(1);
+        return exchange.getBody().getUnapprovedDevices().get(0).getId();
     }
 
     private void approveDevice() {
         RestTemplate restTemplate = plainRestTemplate(AA_URL);
 
         ResponseEntity<UserResponse> exchange = restTemplate.exchange(
-                "/users/" + email,
+                "/users/" + email + "/approve/" + deviceId,
                 HttpMethod.PUT,
                 HttpEntity.EMPTY,
                 UserResponse.class
@@ -207,13 +221,76 @@ public class RegisterUser extends IntegrationTestSuite {
         assertThat(exchange.getBody().getDevices()).hasSize(1);
     }
 
-    @Test
     public void adminApproval() {
         registerDevice();
-        getUser();
+        deviceId = getUser();
         approveDevice();
     }
 
+    private void getGPP() {
+        RestTemplate restTemplate = mutalAuthenticationRestTemplate(CA_URL, clientKeyStore.toPath().toString());
 
+        ResponseEntity<GlobalPublicParameterDTO> exchange = restTemplate.exchange(
+                "/gpp",
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                GlobalPublicParameterDTO.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        gpp = exchange.getBody().toGlobalPublicParameter(pairingGenerator);
+    }
+
+    private void getRawAttributeKeys() {
+        RestTemplate restTemplate = plainRestTemplate(AA_URL);
+
+        ResponseEntity<UserResponse> exchange = restTemplate.exchange(
+                "/users/" + email,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                UserResponse.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        attributeSecretKey = ElementConverter
+                .convert(extractFromSet(exchange.getBody().getAttributes()).getKey(), gpp.getPairing().getG1());
+    }
+
+    private void getAttributeKeys() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        RestTemplate restTemplate = mutalAuthenticationRestTemplate(CA_URL, clientKeyStore.toPath().toString());
+
+        ResponseEntity<DeviceResponse> exchange = restTemplate.exchange(
+                String.format("/users/%s/devices/%s", email, deviceId),
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                DeviceResponse.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+
+        DeviceResponse body = exchange.getBody();
+        EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = extractFromSet(body.getEncryptedAttributeValueKeys());
+
+        String encryptedKey = body.getEncryptedKey();
+        Key key = symmetricCryptEngine.createKeyFromBytes(asymmetricCryptEngine.decryptRaw(encryptedKey, clientKeyPair.getPrivate()));
+        byte[] rawElement = symmetricCryptEngine.decryptRaw(encryptedAttributeValueKeyDTO.getEncryptedKey(), key);
+        byte[] originalBytes = attributeSecretKey.toBytes();
+
+        assertSameElements(rawElement, originalBytes);
+    }
+
+
+    private <T> T extractFromSet(Set<T> set) {
+        return set.stream().findFirst().get();
+    }
+
+    @Test
+    public void retrieveAttributeKeys() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        adminApproval();
+        getGPP();
+
+        getRawAttributeKeys();
+        getAttributeKeys();
+    }
 
 }

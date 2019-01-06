@@ -1,6 +1,8 @@
 package de.tuberlin.tfdacmacs;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -23,19 +25,22 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import java.security.KeyPair;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DummySpringBootApplication.class,
         webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public abstract class IntegrationTestSuite {
 
-    protected static final String CLIENT_KEYSTORE = "classpath:ca-client-keystore.jks";
-    protected static final String AUTHORITY_KEYSTORE = "classpath:ca-authority-keystore.jks";
-
     @Autowired
-    protected StringAsymmetricCryptEngine cryptEngine;
+    protected StringAsymmetricCryptEngine asymmetricCryptEngine;
+    @Autowired
+    protected StringSymmetricCryptEngine symmetricCryptEngine;
     @Autowired
     protected CertificateRequestFactory certificateRequestFactory;
+    @Autowired
+    protected PairingGenerator pairingGenerator;
 
     protected CertificateUtils certificateUtils = new CertificateUtils();
 
@@ -50,7 +55,7 @@ public abstract class IntegrationTestSuite {
 
     @PostConstruct
     public void init() {
-        clientKeyPair = cryptEngine.generateKeyPair();
+        clientKeyPair = asymmetricCryptEngine.generateKeyPair();
     }
 
     protected RestTemplate plainRestTemplate(String rootURL) {
@@ -74,7 +79,7 @@ public abstract class IntegrationTestSuite {
         }
     }
 
-    protected void mutalAuthenticationRestTemplate(String rootURL, String keystore) {
+    protected RestTemplate mutalAuthenticationRestTemplate(String rootURL, String keystore) {
         try {
             SSLContext sslContext = SSLContexts
                     .custom()
@@ -88,6 +93,7 @@ public abstract class IntegrationTestSuite {
             HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
             RestTemplate restTemplate = plainRestTemplate(rootURL);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
+            return restTemplate;
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -102,5 +108,12 @@ public abstract class IntegrationTestSuite {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64Creds);
         return headers;
+    }
+
+    public void assertSameElements(byte[] actual, byte[] expected) {
+        assertThat(actual.length).isEqualTo(expected.length);
+        for(int i = 0; i<actual.length; i ++) {
+            assertThat(actual[i]).isSameAs(expected[i]);
+        }
     }
 }
