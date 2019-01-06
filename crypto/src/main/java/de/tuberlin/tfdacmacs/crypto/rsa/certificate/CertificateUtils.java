@@ -58,6 +58,8 @@ public class CertificateUtils {
         String hex = String.format("%2x", digest);
         if(hex.length() == 1) {
             hex = "0" + hex;
+        } else if (hex.toCharArray()[0] == ' ') {
+            hex = "0" + hex.toCharArray()[1];
         }
         return hex;
     }
