@@ -9,30 +9,6 @@ node {
     try {
         checkout scm
 
-        stage('gradle crypto:test') {
-            echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-            // sh('printenv')
-            dir (SOURCE_DIR) {
-                try {
-                    sh('./gradlew crypto:clean crypto:test')
-                } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
-                }
-            }
-        }
-
-        stage('gradle lib:test') {
-            echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-            // sh('printenv')
-            dir (SOURCE_DIR) {
-                try {
-                    sh('./gradlew lib:clean lib:test')
-                } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'lib/build/test-results/test/*.xml'])
-                }
-            }
-        }
-
         parallel documentation: {
             stage('pdflatex & bibtex') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
@@ -43,8 +19,22 @@ node {
             stage('artifacts') {
                 archiveArtifacts artifacts: "**/" + DOCUMENT_NAME + ".pdf", fingerprint: true
             }
-        },
-        attributeAuthority: {
+        }, testClasses: {
+        	stage('gradle testClasses') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew clean assemble testClasses')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
+                    }
+                }
+            }
+        }
+
+
+        parallel restTest: {
             stage('gradle attributeAuthority:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
@@ -67,9 +57,7 @@ node {
                     }
                 }
             }
-            
-        },
-        centralServer: {
+
             stage('gradle centralServer:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
@@ -93,6 +81,32 @@ node {
                 }
             }
             
+        },
+        crypto: {
+            stage('gradle crypto:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew crypto:clean crypto:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
+                    }
+                }
+            }
+        },
+        lib: {
+            stage('gradle lib:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew lib:clean lib:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'lib/build/test-results/test/*.xml'])
+                    }
+                }
+            }
         }
 
         stage('deploy') {
