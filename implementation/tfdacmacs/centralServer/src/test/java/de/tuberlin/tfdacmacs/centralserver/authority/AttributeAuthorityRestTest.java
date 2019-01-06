@@ -38,7 +38,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
         Optional<Certificate> certificateOptional = certificateDB.findEntity(body.getCertificateId());
         assertThat(certificateOptional).isPresent();
 
-        certificateRequestTestFactory.printPEMFormat(keyPair.getPrivate());
-        certificateRequestTestFactory.printPEMFormat(certificateOptional.get().getCertificate());
+        System.out.println(certificateUtils.pemFormat(keyPair.getPrivate()));
+        System.out.println(certificateUtils.pemFormat(certificateOptional.get().getCertificate()));
     }
 }

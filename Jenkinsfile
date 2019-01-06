@@ -21,12 +21,12 @@ node {
             }
         },
         java: {
-            stage('gradle test') {
+            stage('gradle attributeAuthority:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew clean test')
+                        sh('./gradlew attributeAuthority:test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
                     }
@@ -37,13 +37,64 @@ node {
                 // echo pwd()
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew bootjar')
+                        sh('./gradlew attributeAuthority:bootjar')
                     } finally {
                         archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
                     }
                 }
             }
             
+        },
+        java: {
+            stage('gradle centralServer:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew centralServer:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                    }
+                }
+            }
+            stage('gralde bootjar') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // echo pwd()
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew centralServer:bootjar')
+                    } finally {
+                        archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
+                    }
+                }
+            }
+            
+        },
+        java: {
+            stage('gradle crypto:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew crypto:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                    }
+                }
+            }
+        },
+        java: {
+            stage('gradle lib:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew lib:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                    }
+                }
+            }
         }
 
         stage('deploy') {

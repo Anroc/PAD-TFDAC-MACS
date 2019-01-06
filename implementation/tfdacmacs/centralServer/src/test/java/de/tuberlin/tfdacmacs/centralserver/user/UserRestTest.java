@@ -50,6 +50,22 @@ public class UserRestTest extends RestTestSuite {
     }
 
     @Test
+    public void findUser() {
+        mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
+
+        String userId = UUID.randomUUID().toString();
+        User user = new User(userId, aid);
+        userDB.insert(user);
+
+        ResponseEntity<UserResponse> response = sslRestTemplate
+                .exchange("/users/" + userId, HttpMethod.GET, HttpEntity.EMPTY, UserResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        UserResponse body = response.getBody();
+        assertThat(body.getId()).isEqualTo(userId);
+    }
+
+    @Test
     public void findUsers() {
         mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
 

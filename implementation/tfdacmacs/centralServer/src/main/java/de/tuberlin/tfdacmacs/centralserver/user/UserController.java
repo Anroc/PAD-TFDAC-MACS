@@ -57,6 +57,17 @@ public class UserController {
         return users.stream().map(this::toUserResponse).collect(Collectors.toList());
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    public UserResponse getUser(@PathVariable("id") String userId) {
+        String authorityId = authenticationFacade.getId();
+        User user = userService.findUserByIdAndAuthorityId(userId, authorityId)
+                .orElseThrow(
+                        () -> new NotFoundException(userId)
+                );
+        return toUserResponse(user);
+    }
+
     @GetMapping("/{userId}/devices/{deviceId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public DeviceResponse getDevice(

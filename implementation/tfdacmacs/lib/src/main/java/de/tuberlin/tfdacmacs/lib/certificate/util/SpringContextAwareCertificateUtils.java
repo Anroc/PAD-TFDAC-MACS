@@ -38,4 +38,8 @@ public class SpringContextAwareCertificateUtils {
     public String fingerprint(@NonNull X509Certificate x509Certificate) {
         return certificateUtils.fingerprint(x509Certificate);
     }
+
+    public String pemFormat(@NonNull Object o) {
+        return certificateUtils.pemFormat(o);
+    }
 }

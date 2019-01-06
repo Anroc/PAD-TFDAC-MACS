@@ -25,6 +25,7 @@ public class CouchbaseElementConverters {
 
     @WritingConverter
     @Component
+    @Slf4j
     public static class Write implements Converter<Element, String> {
 
         @Override
@@ -43,6 +44,10 @@ public class CouchbaseElementConverters {
                 }
             } else if (value instanceof ZrElement) {
                 fieldType = PBCFieldType.ZR;
+            }
+
+            if(fieldType == PBCFieldType.UNKNOWN) {
+                log.warn("Field could not be assigned: [{}]", value.getField().getClass().getCanonicalName());
             }
 
             return new StringBuilder(ElementConverter.convert(value))

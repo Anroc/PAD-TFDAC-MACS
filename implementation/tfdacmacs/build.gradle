@@ -45,3 +45,10 @@ project(':lib') {
         testCompile project(':crypto').sourceSets.test.output
     }
 }
+
+project('integrationTest') {
+    dependencies {
+        implementation project(':crypto')
+        testCompile project(':crypto').sourceSets.test.output
+    }
+}
