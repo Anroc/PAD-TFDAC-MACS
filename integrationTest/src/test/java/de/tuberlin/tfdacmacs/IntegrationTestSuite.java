@@ -50,8 +50,8 @@ public abstract class IntegrationTestSuite {
     protected String email = "test@tu-berlin.de";
     protected String aid = "aa.tu-berlin.de";
 
-    public static final String CA_URL = "https://server.vpn:9001/";
-    public static final String AA_URL = "http://server.vpn:9002/";
+    public static final String CA_URL = "https://localhost:9001/";
+    public static final String AA_URL = "http://localhost:9002/";
 
     @PostConstruct
     public void init() {
