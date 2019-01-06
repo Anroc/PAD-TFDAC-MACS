@@ -20,7 +20,7 @@ node {
                 archiveArtifacts artifacts: "**/" + DOCUMENT_NAME + ".pdf", fingerprint: true
             }
         },
-        java: {
+        attributeAuthority: {
             stage('gradle attributeAuthority:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
@@ -45,7 +45,7 @@ node {
             }
             
         },
-        java: {
+        centralServer: {
             stage('gradle centralServer:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
@@ -70,7 +70,7 @@ node {
             }
             
         },
-        java: {
+        crypto: {
             stage('gradle crypto:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
@@ -83,7 +83,7 @@ node {
                 }
             }
         },
-        java: {
+        lib: {
             stage('gradle lib:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
