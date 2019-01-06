@@ -7,13 +7,13 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
+import org.bouncycastle.util.io.pem.PemObjectGenerator;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -105,6 +105,19 @@ public class CertificateUtils {
             builder.build(params);
         } catch(Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public String pemFormat(Object o) throws UncheckedIOException {
+        try {
+            StringWriter sw = new StringWriter();
+            try (PemWriter pw = new PemWriter(sw)) {
+                PemObjectGenerator gen = new JcaMiscPEMGenerator(o);
+                pw.writeObject(gen);
+            }
+            return sw.toString();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

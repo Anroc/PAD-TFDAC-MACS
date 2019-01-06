@@ -1,8 +1,10 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate.factory;
 
+import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
+import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
+import de.tuberlin.tfdacmacs.lib.certificate.util.SpringContextAwareCertificateUtils;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -20,22 +22,14 @@ import java.security.KeyPair;
 public class CertificateRequestTestFactory {
 
     private final CertificateRequestFactory certificateRequestFactory;
+    private final SpringContextAwareCertificateUtils certificateUtils;
 
     public CertificateRequest create(String id, KeyPair keyPair) throws IOException, OperatorCreationException {
         PKCS10CertificationRequest request = certificateRequestFactory.create(id, keyPair);
-        printPEMFormat(request);
+        System.out.println(certificateUtils.pemFormat(request));
 
         return new CertificateRequest(
                 KeyConverter.from(request.getEncoded()).toBase64()
         );
-    }
-
-    public void printPEMFormat(Object o) throws IOException {
-        StringWriter sw = new StringWriter();
-        try (PemWriter pw = new PemWriter(sw)) {
-            PemObjectGenerator gen = new JcaMiscPEMGenerator(o);
-            pw.writeObject(gen);
-        }
-        System.out.println(sw.toString());
     }
 }

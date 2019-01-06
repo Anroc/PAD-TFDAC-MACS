@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserDB extends CouchbaseDB<User> {
@@ -18,5 +19,9 @@ public class UserDB extends CouchbaseDB<User> {
 
     public List<User> findUsersByAuthorityId(@NonNull String authorityId) {
         return repository.findUsersByAuthorityId(authorityId);
+    }
+
+    public Optional<User> findByIdAndAuthorityId(@NonNull String userId, @NonNull String authorityId) {
+        return repository.findByIdAndAuthorityId(userId, authorityId);
     }
 }

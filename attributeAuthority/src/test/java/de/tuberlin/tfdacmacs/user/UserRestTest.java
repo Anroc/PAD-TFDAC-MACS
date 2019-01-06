@@ -38,7 +38,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class UserRestTest extends RestTestSuite {
 
@@ -148,13 +147,11 @@ public class UserRestTest extends RestTestSuite {
     }
 
     @Test
-    public void getAttributeKeys() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+    public void getAttributeKeys() {
         // setup
-        String sign = gppTestFactory.getCryptEngine().sign(email);
         createUser_passes_nonNonExistingAttributeValue();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, sign);
         HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<UserResponse> exchange = restTemplate
                 .exchange("/users/" + email, HttpMethod.GET, httpEntity, UserResponse.class);

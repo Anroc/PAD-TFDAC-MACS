@@ -1,17 +1,14 @@
 package de.tuberlin.tfdacmacs.centralserver.certificate;
 
 import de.tuberlin.tfdacmacs.RestTestSuite;
-import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import org.bouncycastle.jce.X509Principal;
-import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -20,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.security.KeyPair;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
@@ -86,12 +82,7 @@ public class CertificateRestTest extends RestTestSuite {
         printPEMFormat(clientKeys.getPrivate());
     }
 
-    private void printPEMFormat(Object o) throws IOException {
-        StringWriter sw = new StringWriter();
-        try (PemWriter pw = new PemWriter(sw)) {
-            PemObjectGenerator gen = new JcaMiscPEMGenerator(o);
-            pw.writeObject(gen);
-        }
-        System.out.println(sw.toString());
+    private void printPEMFormat(Object o) {
+        System.out.println(certificateUtils.pemFormat(o));
     }
 }
