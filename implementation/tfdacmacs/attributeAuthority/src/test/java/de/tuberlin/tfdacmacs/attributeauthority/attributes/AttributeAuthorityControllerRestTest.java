@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributes;
+package de.tuberlin.tfdacmacs.attributeauthority.attributes;
 
 import com.google.common.collect.Lists;
 import de.tuberlin.tfdacmacs.RestTestSuite;
