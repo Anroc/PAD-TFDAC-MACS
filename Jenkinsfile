@@ -26,9 +26,9 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew attributeAuthority:test')
+                        sh('./gradlew attributeAuthority:clean attributeAuthority:test')
                     } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        step([$class: 'JUnitResultArchiver', testResults: 'attributeAuthority/build/test-results/test/*.xml'])
                     }
                 }
             }
@@ -51,9 +51,9 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew centralServer:test')
+                        sh('./gradlew centralServer:clean centralServer:test')
                     } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        step([$class: 'JUnitResultArchiver', testResults: 'centralServer/build/test-results/test/*.xml'])
                     }
                 }
             }
@@ -76,9 +76,9 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew crypto:test')
+                        sh('./gradlew crypto:clean crypto:test')
                     } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
                     }
                 }
             }
@@ -89,16 +89,16 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew lib:test')
+                        sh('./gradlew lib:clean lib:test')
                     } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: '**/test-results/test/*.xml'])
+                        step([$class: 'JUnitResultArchiver', testResults: 'lib/build/test-results/test/*.xml'])
                     }
                 }
             }
         }
 
         stage('deploy') {
-            if("${env.BRANCH_NAME}" == "master") {
+            if("${env.BRANCH_NAME}" == "feature/integration-test") {
                 copyArtifacts(
                     projectName: "${env.JOB_NAME}", 
                     selector: specific("${BUILD_NUMBER}"),
