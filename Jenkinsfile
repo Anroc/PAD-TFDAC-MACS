@@ -24,11 +24,7 @@ node {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
-                    try {
-                        sh('./gradlew clean assemble testClasses')
-                    } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
-                    }
+                    sh('./gradlew clean assemble testClasses')
                 }
             }
         }
@@ -40,7 +36,7 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew attributeAuthority:clean attributeAuthority:test')
+                        sh('./gradlew attributeAuthority:test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: 'attributeAuthority/build/test-results/test/*.xml'])
                     }
@@ -63,7 +59,7 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew centralServer:clean centralServer:test')
+                        sh('./gradlew centralServer:test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: 'centralServer/build/test-results/test/*.xml'])
                     }
@@ -88,7 +84,7 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew crypto:clean crypto:test')
+                        sh('./gradlew crypto:test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
                     }
@@ -101,7 +97,7 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
-                        sh('./gradlew lib:clean lib:test')
+                        sh('./gradlew lib:test')
                     } finally {
                         step([$class: 'JUnitResultArchiver', testResults: 'lib/build/test-results/test/*.xml'])
                     }
