@@ -106,30 +106,28 @@ node {
         }
 
         stage('integrationTest') {
-            if("${env.BRANCH_NAME}" == "feature/integration-test") {
-                copyArtifacts(
-                    projectName: "${env.JOB_NAME}", 
-                    selector: specific("${BUILD_NUMBER}"),
-                    target: '/var/lib/jenkins/deploy/',
-                    flatten: true, 
-                    filter: '**/*.jar');
+            copyArtifacts(
+                projectName: "${env.JOB_NAME}", 
+                selector: specific("${BUILD_NUMBER}"),
+                target: '/var/lib/jenkins/deploy/',
+                flatten: true, 
+                filter: '**/*.jar');
 
 
-                echo "Deploy artifacts."
-                sh('/var/lib/jenkins/deploy/cb-integration-test.sh')
-                echo "Dropped database"
-                sh('/var/lib/jenkins/deploy/deploy.sh')
-                echo "Redeployed"
+            echo "Deploy artifacts."
+            sh('/var/lib/jenkins/deploy/cb-integration-test.sh')
+            echo "Dropped database"
+            sh('/var/lib/jenkins/deploy/deploy.sh')
+            echo "Redeployed"
 
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                // sh('printenv')
-                dir (SOURCE_DIR) {
-                    try {
-                        sh('./gradlew integrationTest:test')
-                    } finally {
-                        step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
-                        archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
-                    }
+            echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+            // sh('printenv')
+            dir (SOURCE_DIR) {
+                try {
+                    sh('./gradlew integrationTest:test')
+                } finally {
+                    step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
+                    archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
                 }
             }
         }
