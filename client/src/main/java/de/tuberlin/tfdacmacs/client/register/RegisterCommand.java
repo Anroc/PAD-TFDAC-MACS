@@ -21,4 +21,9 @@ public class RegisterCommand {
         attributeService.retrieveAttributes(email, certificate.getId());
         System.out.println(String.format("Successfully registered as user [%s]", email));
     }
+
+    @ShellMethod("Login from the given files")
+    public void login(String email) {
+        // TODO: implement
+    }
 }

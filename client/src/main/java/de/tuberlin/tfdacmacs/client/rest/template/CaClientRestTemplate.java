@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -23,35 +24,51 @@ public class CaClientRestTemplate implements CaClient {
     private final RestTemplate restTemplate;
 
     private <T> T request(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+        HttpStatus responseStatus = null;
         ResponseEntity<T> response = null;
+
         do {
-            if(response != null) {
+            if(responseStatus != null) {
                 log.info("Waiting 10s until the next retry...");
+                waitSeconds(10);
             }
 
             log.info("Asking CA for [{}:{}]", httpMethod, url);
 
-            response = restTemplate.exchange(
-                    url,
-                    httpMethod,
-                    body != null ? new HttpEntity<>(body) : HttpEntity.EMPTY,
-                    responseType
-            );
+            try {
+                response = restTemplate.exchange(
+                        url,
+                        httpMethod,
+                        body != null ? new HttpEntity<>(body) : HttpEntity.EMPTY,
+                        responseType
+                );
+                responseStatus = response.getStatusCode();
+            } catch(HttpClientErrorException e) {
+                responseStatus = e.getStatusCode();
+                handleClientErrorException(url, httpMethod, e);
+            }
 
-            log.info("Asking CA for [{}:{}]: {}", httpMethod, url, response.getStatusCode());
-        } while (shouldRetry(response));
+            log.info("Asking CA for [{}:{}]: {}", httpMethod, url, responseStatus);
+        } while (shouldRetry(responseStatus));
 
-        postProcessResponse(response, url, httpMethod);
         return response.getBody();
     }
 
-    private boolean shouldRetry(ResponseEntity<?> response) {
-        return response.getStatusCode() == HttpStatus.PRECONDITION_FAILED;
+    private void waitSeconds(int timeInSeconds) {
+        try {
+            Thread.sleep(timeInSeconds * 1000);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted.", e);
+        }
     }
 
-    private void postProcessResponse(ResponseEntity<?> response, String url, HttpMethod httpMethod) {
-        if (response.getStatusCodeValue() < 200 || response.getStatusCodeValue() >= 300) {
-            throw new InterServiceCallError(httpMethod, url, response.getStatusCode());
+    private boolean shouldRetry(HttpStatus httpStatus) {
+        return httpStatus == HttpStatus.PRECONDITION_FAILED;
+    }
+
+    private void handleClientErrorException(String url, HttpMethod httpMethod, HttpClientErrorException e) {
+        if(! shouldRetry(e.getStatusCode())) {
+            throw new InterServiceCallError(httpMethod, url, e.getStatusCode(), e);
         }
     }
 
