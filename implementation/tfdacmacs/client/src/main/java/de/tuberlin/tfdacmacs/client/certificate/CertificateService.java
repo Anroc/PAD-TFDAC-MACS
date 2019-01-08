@@ -72,6 +72,7 @@ public class CertificateService {
 
     private File generateP12KeyStore(Path key, Path cert, String email) {
         CertificateKeyStoreConfig p12Certificate = clientConfig.getP12Certificate();
+        deleteIfExist(clientConfig.getP12Certificate().getLocation());
 
         cmdExec("openssl pkcs12 -export -clcerts -in " + cert.toString() + " -inkey " + key.toString() +" -out ./" + email + ".p12 -password pass:foobar");
         cmdExec("keytool -importkeystore -destkeystore " + p12Certificate.getLocation() + " -srckeystore ./" + email + ".p12 -srcstorepass foobar -srcstoretype PKCS12 -storepass " + p12Certificate.getKeyStorePassword() + "  -keypass " + p12Certificate.getKeyPassword());

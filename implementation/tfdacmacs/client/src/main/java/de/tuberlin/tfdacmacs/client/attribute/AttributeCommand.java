@@ -19,9 +19,13 @@ public class AttributeCommand {
         if (attributes == null) {
             System.out.println("No attributes registered.");
         } else {
-            attributes.forEach(
-                    attribute -> System.out.println(String.format("%s:\t\t%s", attribute.getId(), attribute.getKey().toBigInteger()))
-            );
+            attributes.stream()
+                    .map(Attribute::getId)
+                    .sorted()
+                    .map(id -> id.split(":"))
+                    .forEach(
+                        attribute -> System.out.println(String.format("%s\t%s", attribute[0], attribute[1]))
+                    );
         }
     }
 }
