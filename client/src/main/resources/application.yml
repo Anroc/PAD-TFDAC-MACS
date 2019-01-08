@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Client
+
+client:
+  ca-root-url: https://server.vpn:9001/
+  private-key:
+    location: classpath:keystore.jks
+    key-alias: key
+    key-store-password: foobar
+    key-password: foobar
+  p12-certificate:
+    location: classpath:keystore.jks
+    key-store-password: foobar
+    key-password: foobar
+  trust-store: classpath:ca-truststore.jks
+  trust-store-password: foobar
