@@ -10,7 +10,7 @@ client:
     key-store-password: foobar
     key-password: foobar
   p12-certificate:
-    location: classpath:keystore.jks
+    location: ./test-keystore.jks
     key-store-password: foobar
     key-password: foobar
   trust-store: classpath:ca-truststore.jks
