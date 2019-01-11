@@ -1,4 +1,4 @@
-\section{Implementation}
+\chapter{Implementation}
 As evaluated in the last section we will proceed to implement TF-DAC-MACS with small adaptions for a practical secure cloud storage system. To do so we need to implement five entities into our distributed system:  
 
 \begin{itemize}
@@ -12,7 +12,7 @@ Further, the Central Server functions as a Certificate Authority. It issues a ce
 
 In the following sections, the different phases setup, encrypt, decrypt, attribute revocation and authentication key revocation are shortly explained. Please note that for any scheme details we referrer to the TF-DAC-MACS \cite{li2017two} paper .
 
-\subsection{Setup}
+\section{Setup}
 \begin{figure}[!ht]
 \centering
     \includegraphics[width=\linewidth]{img/TF-DAC-MACS-overview-setup.png}
@@ -35,10 +35,10 @@ If Bob wants to get an authentication key from Alice he sends an authentication 
 
 The previous steps are summarized in the figure \ref{fig:tfdacmacs-setup}.
 
-\subsection{Encryption}
+\section{Encryption}
 \begin{figure}[!t]
 \centering
-    \includegraphics[width=\linewidth]{img/TF-DAC-MACS-overview-encrypt.png}
+    \includegraphics[width=0.7\linewidth]{img/TF-DAC-MACS-overview-encrypt.png}
     \caption{Encryption phase}
     \label{fig:tfdacmacs-encrypt}
 \end{figure}
@@ -49,10 +49,10 @@ To upload a file encrypted under an access policy, Alice first encrypts the file
 
 The file key, on the other hand, will be encrypted with an access policy defined by Alice. In addition she is also able to encrypt the ciphertext with the authentication key she issued to Bob. This encrypted file key will be uploaded to server where it is stored securely. 
 
-\subsection{Decryption}
+\section{Decryption}
 \begin{figure}[!t]
 \centering
-    \includegraphics[width=\linewidth]{img/TF-DAC-MACS-overview-decrypt.png}
+    \includegraphics[width=0.7\linewidth]{img/TF-DAC-MACS-overview-decrypt.png}
     \caption{Decryption phase}
     \label{fig:tfdacmacs-decryption}
 \end{figure}
@@ -61,17 +61,17 @@ On decryption first the encrypted file key will be downloaded from the server. I
 
 Next, he downloads the file chunks from the CSP, assembles them back together and decrypts them with the recovered file key.
 
-\subsection{Revoke attribute}
+\section{Revoke attribute}
 \begin{figure}[!t]
 \centering
-    \includegraphics[width=\linewidth]{img/TF-DAC-MACS-overview-revoce-attr.png}
+    \includegraphics[width=0.7\linewidth]{img/TF-DAC-MACS-overview-revoce-attr.png}
     \caption{Attribute revocation}
     \label{fig:tfdacmacs-attr-revocation}
 \end{figure}
 
 As displayed in figure \ref{fig:tfdacmacs-attr-revocation}, a revocation of an attribute key is always triggered by the AA that administers this attribute. It first creates a new secret key for the revoked attribute and calculates for each user owning the old attribute a delta. This delta is send to each non revoked user respectively. In addition, the AA calculates a cipher text update key. This is send to the server which then in turn starts updating all the cipher text for the new attribute secret key. This operation will not affect the plain text message in any kind. 
 
-\subsection{Revoke two-factor key}
+\section{Revoke two-factor key}
 \begin{figure}[!t]
 \centering
     \includegraphics[width=0.6\linewidth]{img/TF-DAC-MACS-overview-revoce-user-key.png}
@@ -81,10 +81,10 @@ As displayed in figure \ref{fig:tfdacmacs-attr-revocation}, a revocation of an a
 
 In a similar way as it is done for attribute revocation, Alice now starts to calculate a new two-factor key. She computes the delta to all old two-factor keys she issued and distributes them to all non-revoked users. Finally, she calculates the ciphertext update key and sends it to the server. The server updates all relevant cipher texts.
 
-\subsection{Adaptions and Improvements}
+\section{Adaptions and Improvements}
 While TF-DAC-MACS satisfy all the requirements it fits not perfect. To make the scheme more usable, the fix contain that each cipher text need to be secured by a two-factor authentication was removed. In addition, the key generation of the attribute is made more dynamic. Now the attributes do not need to be known in the setup phase but can be created dynamically when an AA admin registers a user. Further, we propose a simple technique to break up TF-DAC-MACS n-of-n threshold policy with the trade-off for performance. And finally, we a technique proposed in \cite{bethencourt2007ciphertext} to implement numerical values and comparisons in Boolean access formula. 
 
-\subsubsection{Removing the fix two-factor contain}
+\subsection{Removing the fix two-factor contain}
 To make \ac{TF-DAC-MACS} more piratically applicable we removed the fixed two-factor constrain from the encryption, decryption, and cipher update phase. The two factor identifier $\alpha$ is used by the data owner to restrict the access to the content for certain users. 
 
 This leads to the fact that the underlying \ac{ABE} schemes looses some of it expressiveness. The zero knowledge of the data owner on which individual is able to decrypt the cipher text is broken with the two factor part. Here each user that wants to decrypt the encrypted content need to make an \textit{authentication request} to the data owner to receive the corresponding decryption key. To restore the possibility to let an unknown user group decrypt the cipher text, we removed the two factor part. To do so we adapted encryption, decryption and cipher text update. The authentication key update will be ignored since it makes no sense to apply it on a non existing authentication key. 
@@ -158,15 +158,15 @@ It can be shown that $C'_3$ computes to the message $m$ in the same way as shown
 Nothing need to change since cipher text do not contain authentication components. 
 \end{itemize}
 
-\subsubsection{Dynamic secret key generation}
+\subsection{Dynamic secret key generation}
 Another small tweak in the \ac{TF-DAC-MACS} scheme was that the attributes for each \ac{AA} do not have to be known on AA initialization. They can as well be created on each users key gen. This reduces the universe of possible attribute values to thous who are actually needed.
 
-\subsection{Extension to m-of-n threshold policy}
+\section{Extension to m-of-n threshold policy}
 One big advantage of TF-DAC-MACS is its constant size cipher text. It archives this by only allowing n-of-n threshold policy. This means that a data owner is only allowed to create \textit{AND} policies to encrypt his content. However, extending this scheme to n-of-m threshold policy is not trivial. To not break any security constrains we decided to just upload multiple versions of the same cipher text encrypted under different policies. Now, an user only needs to decipher one version of the cipher text to recover the encrypted content. 
 
 Using this approach we enable access policies in disjunctive normal form (DNF) for the traide-off of linear cipher text overhead and linear overhead on cipher text updates (both scaling with the number of disjunctions).
 
-\subsection{Numerical Boolean comparisons}
+\section{Numerical Boolean comparisons}
 As described in \cite{bethencourt2007ciphertext} we could display numeric values in binary. Each number $x$ is composed of $\lceil log_2(x) \rceil$ attributes. Each of this attributes relate to either a $1$ or $0$ in one position in the binary number representation of $x$. So for example the number $5$ in binary would be displayed as $0101$ and its attribute would be: $x:0***$, $x:*1**$, $x:**0*$ and $x:***1$. 
 
 If a user now wants to create a policy where he challenges a number $x$ to be greater or equal to $3$ he creates a policy: "$(x:1*** or (x:*1** or (x:**1* and x:***1))$". Analogous the policy for $x$ smaller than $4$: "$(x:0*** and (x:*0** or (x:*1** and x:**0* and x:***0))$".
@@ -174,7 +174,7 @@ If a user now wants to create a policy where he challenges a number $x$ to be gr
 Disadvantage of this representation is of cause that it is limited in space. To display a 32-bit number we must issue 64 attribute values and maintain 64 attribute value keys. 
 
 
-\subsection{Technologies}
+\section{Technologies}
 To develop the first prototype of the system defined previously we will use the following technology stack:
 
 \begin{itemize}
@@ -185,9 +185,9 @@ To develop the first prototype of the system defined previously we will use the 
 \end{itemize}
 \todo{write me}
 
-\subsection{Problems}
+\section{Problems}
 
-\subsubsection{En- and decrypting arbitrary data}
+\subsection{En- and decrypting arbitrary data}
 TF-DAC-MACS takes as an input for encryption a message $M \in GT$. Since there is not easy way to reconstruct a message from an element in $GT$, we have to combine some encryption techniques to encrypt arbitrary data. 
 
 The algorithm first chooses a random $M \in GT$ and outputs $M$ together with the constructed cipher text. $M$ is then hashed into a byte buffer using \ac{SHA}-256. In the next step we will encrypt our arbitrary data using \ac{AES} and as a key the hash previous computed. 
