@@ -151,6 +151,7 @@ node {
                 } finally {
                     step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
                     archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
+                    archiveArtifacts artifacts: "/var/lib/jenkins/deploy/*.log", fingerprint: true
                 }
             }
         }
