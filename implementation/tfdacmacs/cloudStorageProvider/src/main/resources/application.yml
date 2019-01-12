@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: CloudStorageProvider
+  couchbase:
+    env:
+      timeouts:
+        connect: 10000
+        query: 75000
+        view: 75000
+        socket-connect: 10000
+    bootstrap-hosts: localhost
+    bucket:
+      name: csp
+      password: foobar
+server:
+  port: 9003
+  ssl:
+    key-store: classpath:csp.1@system.abe.jks
+    key-store-password: foobar
+    key-alias: 1
+    ca-alias: ca
+    key-password: foobar
+    enabled: true
+    client-auth: need
+    trust-store: classpath:csp-truststore.jks
+    trust-store-password: foobar
+
+csp:
+  files:
+    data-dir: ./data
+  caRootUrl: "https://localhost:9001/"
+
+---
+spring:
+  profiles: test
+  couchbase:
+    bootstrap-hosts: localhost
+    bucket:
+      name: csp-test
+      password: password
+
+csp.request-ca-on-init: false

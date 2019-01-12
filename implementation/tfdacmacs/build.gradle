@@ -39,6 +39,15 @@ project(':attributeAuthority') {
     }
 }
 
+project(':cloudStorageProvider') {
+    dependencies {
+        implementation project(':lib')
+        implementation project(':crypto')
+        testCompile project(':lib').sourceSets.test.output
+        testCompile project(':crypto').sourceSets.test.output
+    }
+}
+
 project(':lib') {
     dependencies {
         implementation project(':crypto')
