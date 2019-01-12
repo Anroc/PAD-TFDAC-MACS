@@ -1,0 +1,94 @@
+\section{An introduction to the field of Attribute-Based Encryption}
+A key requirement in security of distributed systems is authenticity. It describes the principle of associating individuals with their digital representation. A so called \textit{public key infrastructure} (\ac{PKI}) uses certificates the validate the public key bound to an identity.
+
+Identity-based encryption (\ac{IBE}) tries to circumvent this standard by binding identities to unique strings already associated with this identity, such as an email address. If we could encrypt directly with this identifier, we would not need a certificate check to validate the identity of the recipient. 
+
+\subsection{Identity Based Encryption}
+The idea of using universal identifier instead of public keys to identify individuals goes back until 1984. Shamir proposed the first \textit{Identity-Based Encryption} (\ac{IBE}) \cite{shamir1984identity} to use a central authority to create for each newly registered user a unique universal identifier (e.g. the email address) that can be used for encryption as we use to do with a public key. However, the difference to \ac{RSA} is that, since the universal identity is the public key, the use of a \ac{PKI} becomes nugatory. The main point was constructed around the idea of sending an email to a yet unknown coworker. Since the sender has to know the email address of the recipient he can derivative public key component from it, encrypt the email with this key and can be sure that only the identity owning this email can decipher the content. 
+
+A central authority was introduced since the users private key are derived from a random seed only known to this authority. If this seed was publicly known each user could simply compute the private key from any public identifier and so confidentiality would be broken. 
+
+Since this scheme could neither be shown to be practical applicable, nor to proven secure, it was not until 2001 when Boneh and Franklin proposed in \cite{boneh2001identity} a new approach to identity-based encryption. The use of the \textit{Weil pairing} revolutionized the field of identity-based encryption.\footnote{Curious reader can readup on the weil pairing here \cite{Miller2004} \cite{galbraith2008pairings} or here \url{https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627}}
+
+\subsection{Bilinear Mappings}
+\label{sec:bilinearmappings}
+Bilinear mappings are a tool for \textit{cryptographic pairings} and define the relationship between two cyclic groups of the same order into a third one. A cyclic group $G$ is defined by an generator $g$ of that form that each $g^n \in G$ with $n \in \mathbb{Z}$ completely describes each element in the group $G$.
+
+A bilinear map function $e$, also called \textit{pairing} is now defined as the mapping between two groups of the same order $G_1$ and $G_2$ into $G_t$:
+
+\begin{gather*}
+ e : G_1 \times G_2 \rightarrow G_t \\
+\text{ such that for all } g_1 \in G_1, g_2 \in G_2, a, b \in \mathbb{Z} \\
+e(g_1^a, g_2^b) = e(g_1, g_2)^{ab} 
+\end{gather*}
+
+If $G_1$ and $G_2$ describe the same group the mapping is called symmetric. In fact the \textit{decisional bilinear Diffie-Hellman problem} becomes easily computable using bilinear mappings. \cite{bethencourt2015intro}
+
+This construct of pairings is used by many schemes to either distribute a secret or computing the secret without revealing it.
+
+\subsection{Attribute-Based encryption}
+Attribute-Based Encryption (\ac{ABE}) is ancestor of IBE. Instead assigning each user a unique identifier, the work of Sahai and Waters \cite{sahai2005fuzzy} describes the approach of assigning each user a descriptive set of attributes. A deeper dig into this topic revealed the well known setup from \ac{IBE}: a central \textit{attribute authority} (\ac{AA}) issues attributes on user registration, binds them to key pairs and serves as a central public-key directory. 
+
+The advantage is that the \ac{AA} doesn't have to be online all the time. Once the attributes are issued and distributed the data owner, without any further interactions with the \ac{AA}, can use those to share content to authorized members. Further, no server needed to check whether entities are authorized to access certain content. This follows due to the fact that if the entity was authorized to download the content, it will certainly also be able to decrypt it. 
+
+As we already know, content is encrypted under attributes, rather then users. This implies that the data owner encrypting the file does not really know or does not care which individual deciphers the ciphertext. Using Boolean formula and the given attribute universe, the data owner creates an access policy securing his ciphertext. Any entity owning a certain set of attributes is allowed to access the data. This feature comes in handy in specific domains such as the medical domain. Here any set of doctors satisfying certain attribute are able to read the medial record. The patient, as the data owner, does not care about the real identities of the doctors only if they satisfy a specific qualification goal. The same is applicable on file-sharing in the business domain. Here users often share content to roles or group of members and if an employee gets promoted he automatically gets access to the content addressed to his job level. 
+
+Further, user management systems always also need a procedure to revoke users and their attributes. 
+In general two steps need to be made to revoke an attribute from an user. All users, except the revoked user, need to receive a new private key for this attribute and in addition, each ciphertext encrypted under this revoked attribute need to be updated to ensure forward secrecy. 
+
+In summary ABE provides us a big advance for the rekeying problem: Since new members joining a group just receive the respective attribute keys no group key needs to be distributed. Users are automatically member of a group if they satisfy the access policy. With \ac{ABE} we are able to go beyond the natural limitation of Secure Group Communication schemes which had a lower bound of one key per newly joined member.  
+
+\subsection{Comparing Secure Group Communication to Attribute-Based encryption}
+Comparing \ac{SGC} to \ac{ABE} is non trivial. This is due to a different encryption technique used by \ac{ABE}: paring. Pairing scales more or less with the overhead of \ac{RSA} rather then \ac{ECC} or block ciphers as stated by \textit{Galbraith et. al.} \cite{galbraith2008pairings}. But to archive the same bit security, computations in pairing need to happen in a much bigger bit-field and thous rendering \ac{ABE} less performant in comparison to \ac{RSA}. But in specific scenarios \ac{ABE} uses less keys to setup the group communication. In the following thous scenarios will be described and analyzed to find out where this schemes differ and what use-cases \ac{ABE} schemes address.
+
+In a \ac{RSA} sharing scheme, each user has his own public key which needs to be transmitted to a third party to establish a secret connection. Creating a group under this scheme will implicitly force the data owner to retrieve all $n$ public keys of all $n$ group members. The central server needs to provide a \ac{PKI} together with the public keys of each registered user to proof their identity. Thus follows the constrain that the central server needs to be available all the time to provide public keys for new registered users. Each member in the group receives an encrypted copy of the group key. The number of keys in \ac{SGC} scales at least linearly with the number of members. 
+
+\ac{ABE} breaks the constrain that the central server has to be available at all time. This is done by using attribute keys on encryption rather then the users public keys. This reduces the number of keys that need to be maintained to the size of the attribute set describing the group. If an new user is registered in the system no new keys need to be downloaded from the view of the data owner. The registered users retrieves his attribute set and eventually can decrypt the shared files if his attributes satisfy the access policy of the group. Further notable is that the number of keys that are maintained in the group remains constant in $a$. With $a$ donating the number attributes used to describe the group. 
+
+Given this observation we can state that \ac{ABE} is adventitious in scenarios where users address an unknown group of individuals. This can be some departments (e.g. attribute: police department of New York), colloquiums (e.g. attribute: facility for Secure network communications), or general user groups (attribute issued to all employees working in the security research team).
+
+To better clarify the scalability advantage of \ac{ABE} we compare GKMP with ABE in general\footnote{Specifically the ciphertext-policy ABE scheme of \cite{bethencourt2007ciphertext} is used in the comparison.} to evaluate the performance of both encryption schemes.
+
+\begin{table*}[!ht]
+\centering
+\begin{tabular}{l 		| l 						| l 						| l }
+ 						& \textbf{Bdrive}			& \textbf{\ac{GKMP}} 			& \textbf{\ac{ABE}} 		\\
+\hline
+\textbf{inizial share} 																				\\
+keys 					& $O(nf)$ 					& $O(1)$	 				& $O(1)$			\\
+messages (unicast)		& $O(nf)$  					& $O(n)$					& $O(n)$			\\
+messages (multicast) 	& $O(nf)$ 					& $O(n)$ 					& $O(1)$			\\
+encryptions				& $O(nf)$ 					& $O(f + n)$				& $O(a)$ 			\\
+\hline
+\textbf{member join} 																				\\
+keys 					& $O(f)$   					& $O(1)$					& $O(1)$			\\
+messages (unicast)		& $O(f)$  					& $O(1)$  					& $O(1)$ 			\\
+messages (multicast) 	& $O(f)$ 	 				& $O(1)$					& $O(1)$ 			\\
+encryptions				& $O(f)$  					& $O(1)$					& $O(1)$ 			\\
+\hline
+\textbf{member leave}																				\\
+keys 					& $O(0)$					& $O(1)$					& $O(1)$			\\
+messages (unicast)		& $O(0)$					& $O(n)$  					& $O(N(a^{-1}))$	\\
+messages (multicast)	& $O(0)$					& $O(n)$					& $O(1)$ 			\\ 
+encryptions 			& $O(0)$					& $O(f + n)$ 				& $O(F(a^{-1}))$	\\
+\hline	
+\textbf{addition of filekey}																		\\
+keys 					& $O(n)$	 				& $O(0)$					& $O(0)$			\\
+messages (unicast)		& $O(n)$	 				& $O(0)$					& $O(0)$			\\
+messages (multicast)	& $O(n)$ 					& $O(0)$ 					& $O(0)$			\\
+encryptions				& $O(n)$ 					& $O(1)$					& $O(1)$			\\
+\hline
+\end{tabular}
+\caption{Comparison of Bdrive, \ac{GKMP} and \ac{ABE} scheme. $n$ donating the number of members, $N$ the number of all users in the system, $f$ the number of file keys in the group, $F$ the number of all filekeys, $a$ the number of attributes used for this group, $A$ all attributes }
+\label{tab:comparisonsOWFTtoABE}
+\end{table*}
+
+Note that we assume the distribution of $a < n < f$ (number of attributes in the system is smaller than the number of devices which is smaller than the number of file keys) with growing number of users. While this assumption does not necessarily hold true, on average this constrain will be satisfied. Under this assumption we can extract from table \ref{tab:comparisonsOWFTtoABE}, that \ac{ABE} indeed scales better then \ac{OWFT} and Bdrive on initialization and member join. ABEs disadvantage is located in the member leave operations. Most likely the member leave would describe a degradation or revokation of an attribute. \ac{ABE} suffers from additional overhead due to updating the attribute key for each user owning this old attribute ($N(a^{-1}$) and additionally updating all cipher text that were encrypted with the attribute ($F(a^{-1}$).
+
+On the meta level attribute-based encryption tackles the rekeying problem by focusing on attribute and groups rather then individuals. \ac{ABE} reduces the number of keys needed by reusing and combining existing keys. In contrast stands secure group communication schemes which need to create a new key per each group. Here \ac{ABE} exploits the fact that groups generally can be described by an unique attribute set. Implicitly it follows that if another group is described by the exact same set of attributes the same keys are used. So the total number of groups is limited to all possible combinations of attributes. 
+
+%Lets define an scenario adventagous to \ac{ABE}. Alice wants to share a file with all management members of the coffee company. Since she does not know the members in person, nor their email addresses, she simply creates a share with the group "management of coffee company". Alice only needs to retrieve the key of the management from the central server of the coffee company. This proceedure took Alice, one encryption and two tranmissions: one to retrieve the key and one to upload the encrypted text. 
+
+%If we apply the same scenario to \ac{SGC} we face a problem. How to know which public keys belong to the executive officers? Alice need to check on the webside which people are in charge of the coffee company, to download thier public keys, encrypt the group key with their public keys, and upload the file and the \ac{GK} for each manager. This took alice one lookup of the role to key mappings, $n$ downloads of public keys, $n$ encryptions of the \ac{GK} for each member and one encryption of plain text, and two uploads of the cipher text and the group key.         
+
+In conclusion is \ac{ABE} more suitable to make the rekeying process of Bdrive more scalable. We can clearly see that \ac{ABE} scales with the number of attributes which is assumed to be less than the number of clients. Further, \ac{ABE} does not only handle the encryption but also provides an authentication service. Users are bound to roles and attributes which are tightly interleaved with the encryption scheme. Bdrive target audience are business which by nature have some kind of attribute authority in the form of role management and authorization mechanism embedded. Here \ac{ABE} can enfold its true potential and outperform SGC schemes not only in efficiency but also in additional security features. 
