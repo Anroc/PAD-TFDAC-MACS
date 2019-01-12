@@ -76,6 +76,29 @@ node {
                     }
                 }
             }
+
+            stage('gradle cloudStorageProvider:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew cloudStorageProvider:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'cloudStorageProvider/build/test-results/test/*.xml'])
+                    }
+                }
+            }
+            stage('gralde bootjar') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // echo pwd()
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew cloudStorageProvider:bootjar')
+                    } finally {
+                        archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
+                    }
+                }
+            }
             
         },
         crypto: {
