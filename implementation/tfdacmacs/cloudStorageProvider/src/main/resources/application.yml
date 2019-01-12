@@ -21,7 +21,7 @@ server:
     ca-alias: ca
     key-password: foobar
     enabled: true
-    client-auth: need
+    client-auth: want
     trust-store: classpath:csp-truststore.jks
     trust-store-password: foobar
 
@@ -29,6 +29,7 @@ csp:
   files:
     data-dir: ./data
   caRootUrl: "https://localhost:9001/"
+
 
 ---
 spring:
