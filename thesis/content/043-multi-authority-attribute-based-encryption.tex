@@ -1,7 +1,7 @@
-\subsection{Multi-authority attribute based encryption}
+\section{Multi-authority attribute based encryption}
 In the following the different sub topics of Multi-Authority Attribute-Based Encryption (\ac{MA-ABE}) will be described, analyzed given all the requirements and finally evaluated based on their performance and scalability. 
 
-\subsubsection{Introduction into Multi-Authority Attribute-based Encryption}
+\subsection{Introduction into Multi-Authority Attribute-based Encryption}
 Chase 2007 \cite{chase2007multi} was the first known to introduce the first \ac{MA-ABE} schemes. In her paper she describes the process on how to derive a multi-authority attribute-based encryption scheme from the single authority schemes. While chase's scheme also used bilinear maps its main security is based on interpolation and the fact that no under defined linear equation system could definitely be solved\footnote{\ac{LSSS} matrix are based on the same assumption.}.  
 
 To ensure collusion resistance each user is given blinded attribute private keys so that when used on decryption the plain text is still blinded with the user specific identifier. Using pairings this identifier can be substituted and the plaintext gets revealed. 
@@ -14,12 +14,12 @@ The other disadvantage, that was still present in the updated scheme, was that n
 
 The lack of adding new attributes and the missing revocation scheme made chases scheme impractical for further evaluations but gives a good introduction the challenges of the \ac{MA-ABE} schemes.
 
-\subsubsection{Hierarchical \ac{ABE}}
+\subsection{Hierarchical \ac{ABE}}
 \label{sec:HABE}
 
 \begin{figure*}[!ht]
 \centering
-    \includegraphics[width=0.5\linewidth]{img/HABE.png}
+    \includegraphics[width=0.7\linewidth]{img/HABE.png}
     \caption{Structure of hierarchical attribute-based encryption systems}
     \label{fig:habe}
 \end{figure*}
@@ -30,7 +30,7 @@ As displayed in figure \ref{fig:habe}, which is based on the approach in \cite{w
 
 \cite{Wang:2010:HAE:1866307.1866414} formalized this approach using \ac{CP-ABE}, which was later extended in \cite{wang2011hierarchical}. While implementing a revocation scheme, they depend on an access policy present in disjunctive normal form (\ac{DNF}). Any Boolean formula can be transferred into DNF but sometimes this might enforce negation. \cite{wang2011hierarchical} does not provide any negation mechanism so this scheme restricts us to DNF formulas that will not use negation.  
 
-\subsubsection{Decentralized attribute-based encryption}
+\subsection{Decentralized attribute-based encryption}
 \label{sec:DABE}
 In contrast to HABE stands \textit{decentralized attribute based encryption} (\ac{DABE}) which is designed arround the idea of having a peer network work of authorities and user. No entity has a global view onto the system and is in charge of issuing authority keys. This ecosystem is self sustaining in the form that each entity can become an \ac{AA} if needed and start issuing new attributes to users. 
 
@@ -42,7 +42,7 @@ Cui and Deng showed in \cite{cui2016revocable} that such a system could exist. E
 
 The question remains if such a system would be practically applicable since each cipher text needs to be reuploaded in each time period. Further, direct revocation DABE still remains an open issue.
 
-\subsubsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
+\subsection{Efficient Data Access Control for Multi-Authority Cloud Storage}
 The most explored field in \ac{MA-ABE} is the Efficient Data Access Control for Multi-Authortity Cloud Storage (\ac{DAC-MACS}) family \cite{yang2013dac}). First introduced by Yang \textit{et. al.} 2013 it describes an efficient, revocable \ac{MA-ABE} scheme based on \ac{CP-ABE} which uses proxy encryption on decryption and reencryption to make the scheme more efficient. Further, this scheme features a large attribute universe, adding \ac{AA}s on the running system and deescalates the global decryption power of the \ac{CA}. In sort \ac{DAC-MACS} satisfy all the non-optional requirements.
 
 In contrast to Chases scheme, DACMACS eliminates the need for the global decryption power of the \ac{CA} by issuing $k$ ciphertexts: One per \ac{AA}. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new \ac{AA}s at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
@@ -71,7 +71,7 @@ For the comparison we will use the charm implementation of DAC-MACS \cite{yang20
 \ac{TF-DAC-MACS} counts as the most advanced \ac{DAC-MACS} scheme providing non global decryption power, secure revocation channels and both backward and forward secrecy. In addition \ac{TF-DAC-MACS} introduces the two factor authentication. Data owner can issue and revoke \textit{authentication keys} to and from other users. This adds an additional layer of security. In total \ac{TF-DAC-MACS} archives still better performance then the other \ac{DAC-MACS} schemes providing constant decryption and encryption overhead. 
 To compare the TF-DAC-MACS with the others we will implement TF-DAC-MACS from scratch. 
 
-\subsubsection{Comparison}
+\subsection{Comparison}
 \label{sec:ma-comparison}
 \begin{table*}[!ht]
 \centering
