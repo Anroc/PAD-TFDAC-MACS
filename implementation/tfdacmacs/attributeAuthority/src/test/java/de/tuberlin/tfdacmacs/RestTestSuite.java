@@ -6,7 +6,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.attributes.factory.AttributeTest
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
-import de.tuberlin.tfdacmacs.attributeauthority.factory.BasicsGPPTestFactory;
+import de.tuberlin.tfdacmacs.lib.attribute.factory.BasicsGPPTestFactory;
 import de.tuberlin.tfdacmacs.attributeauthority.init.certificate.events.RootCertificateRetrieved;
 import de.tuberlin.tfdacmacs.attributeauthority.user.db.UserDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
@@ -113,7 +113,7 @@ public abstract class RestTestSuite {
     }
 
     @Before
-    public void mockGPPRequest() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public void setupMocks() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         GlobalPublicParameterDTO globalPublicParameterDTO = gppTestFactory.createDTO();
         doReturn(globalPublicParameterDTO).when(caClient).getGPP();
         publisher.publishEvent(

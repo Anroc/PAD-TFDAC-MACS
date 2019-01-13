@@ -76,6 +76,29 @@ node {
                     }
                 }
             }
+
+            stage('gradle cloudStorageProvider:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew cloudStorageProvider:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'cloudStorageProvider/build/test-results/test/*.xml'])
+                    }
+                }
+            }
+            stage('gralde bootjar') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // echo pwd()
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew cloudStorageProvider:bootjar')
+                    } finally {
+                        archiveArtifacts artifacts: "**/build/libs/*.jar", fingerprint: true
+                    }
+                }
+            }
             
         },
         crypto: {
@@ -125,6 +148,9 @@ node {
             dir (SOURCE_DIR) {
                 try {
                     sh('./gradlew integrationTest:test')
+                } catch (e) {
+                    archiveArtifacts artifacts: "/var/lib/jenkins/deploy/*.log", fingerprint: true
+                    throw e
                 } finally {
                     step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
                     archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
