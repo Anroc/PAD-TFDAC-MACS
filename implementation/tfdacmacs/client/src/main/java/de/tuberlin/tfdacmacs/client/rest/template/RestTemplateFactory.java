@@ -39,9 +39,9 @@ public class RestTemplateFactory {
         return buildRestTemplate(null);
     }
 
-    public RestTemplate updateForMutalAuthentication(@NonNull RestTemplate restTemplate) {
+    public RestTemplate updateForMutalAuthentication(@NonNull RestTemplate restTemplate, @NonNull String email) {
         try {
-            HttpClient httpClient = buildHttpClient(clientConfig.getP12Certificate());
+            HttpClient httpClient = buildHttpClient(clientConfig.getP12Certificate(), email);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
             return restTemplate;
         } catch(Exception e) {
@@ -51,7 +51,7 @@ public class RestTemplateFactory {
 
     private RestTemplate buildRestTemplate(KeyStoreConfig p12Certificate) {
         try {
-            HttpClient httpClient = buildHttpClient(p12Certificate);
+            HttpClient httpClient = buildHttpClient(p12Certificate, null);
             RestTemplate restTemplate = plainRestTemplate(clientConfig.getCaRootUrl());
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
             return restTemplate;
@@ -60,7 +60,7 @@ public class RestTemplateFactory {
         }
     }
 
-    private HttpClient buildHttpClient(KeyStoreConfig p12Certificate)
+    private HttpClient buildHttpClient(KeyStoreConfig p12Certificate, String email)
             throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
             UnrecoverableKeyException, KeyManagementException {
         SSLContextBuilder sslContextBuilder = SSLContexts
@@ -71,7 +71,7 @@ public class RestTemplateFactory {
                 );
         if(p12Certificate != null) {
             sslContextBuilder.loadKeyMaterial(
-                    clientConfig.locateResource(p12Certificate.getLocation()),
+                    clientConfig.locateResource(p12Certificate.getLocation() + email + ".jks"),
                     p12Certificate.getKeyStorePassword().toCharArray(),
                     p12Certificate.getKeyPassword().toCharArray()
             );

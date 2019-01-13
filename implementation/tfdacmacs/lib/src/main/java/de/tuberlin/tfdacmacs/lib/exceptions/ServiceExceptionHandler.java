@@ -26,7 +26,11 @@ public class ServiceExceptionHandler {
     public void handleServiceException(ServiceException serviceException, HttpServletResponse response)
             throws IOException {
 
-        log.error(serviceException.getMessage(), serviceException);
+        if(serviceException.isPrintStackTrace()) {
+            log.error(serviceException.getMessage(), serviceException);
+        } else {
+            log.info(serviceException.getMessage());
+        }
         response.sendError(serviceException.getHttpStatus().value(), serviceException.getMessage());
     }
 

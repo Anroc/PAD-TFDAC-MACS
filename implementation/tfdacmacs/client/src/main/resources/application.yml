@@ -3,14 +3,16 @@ spring:
     name: Client
 
 client:
+  db:
+    data-dir: data-client
   ca-root-url: https://server.vpn:9001/
   private-key:
-    location: classpath:keystore.jks
+    location: ./
     key-alias: key
     key-store-password: foobar
     key-password: foobar
   p12-certificate:
-    location: ./test-keystore.jks
+    location: ./
     key-store-password: foobar
     key-password: foobar
   trust-store: classpath:ca-truststore.jks

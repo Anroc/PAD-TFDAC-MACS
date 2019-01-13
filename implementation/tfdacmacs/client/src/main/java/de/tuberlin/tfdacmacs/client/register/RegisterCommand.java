@@ -24,6 +24,6 @@ public class RegisterCommand {
 
     @ShellMethod("Login from the given files")
     public void login(String email) {
-        // TODO: implement
+        certificateService.login(email);
     }
 }

@@ -1,13 +1,21 @@
 package de.tuberlin.tfdacmacs.client.attribute.data;
 
 import it.unisa.dia.gas.jpbc.Element;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class Attribute {
 
-    private final String id;
-    private final Element key;
+    @NotBlank
+    private String id;
+    @NotNull
+    private Element key;
+
 }

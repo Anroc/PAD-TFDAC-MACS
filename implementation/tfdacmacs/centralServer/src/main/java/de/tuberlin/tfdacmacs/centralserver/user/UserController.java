@@ -86,7 +86,8 @@ public class UserController {
         );
 
         if(device.getDeviceState() != DeviceState.ACTIVE) {
-            throw new ServiceException("Device is not active.", HttpStatus.PRECONDITION_FAILED);
+            throw new ServiceException("Device is not active.", HttpStatus.PRECONDITION_FAILED)
+                    .andDoNotPrintStackTrace();
         }
 
         return toDeviceResponse(device);
