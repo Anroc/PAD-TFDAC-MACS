@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.lib.exceptions;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -13,6 +14,9 @@ public class ServiceException extends RuntimeException {
      * status code that will be returned to the client.
      */
     private final HttpStatus httpStatus;
+
+    @Getter
+    private boolean printStackTrace = true;
 
     public ServiceException(HttpStatus httpStatus) {
         super(httpStatus.name());
@@ -43,5 +47,10 @@ public class ServiceException extends RuntimeException {
 
     public HttpStatus getHttpStatus() {
         return httpStatus;
+    }
+
+    public ServiceException andDoNotPrintStackTrace() {
+        this.printStackTrace = false;
+        return this;
     }
 }

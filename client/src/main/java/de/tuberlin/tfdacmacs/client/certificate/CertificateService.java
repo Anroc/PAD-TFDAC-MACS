@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.client.certificate;
 
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
+import de.tuberlin.tfdacmacs.client.certificate.events.LoginEvent;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairFactory;
 import de.tuberlin.tfdacmacs.client.keypair.config.CertificateKeyStoreConfig;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,6 +39,17 @@ public class CertificateService {
 
     private final RestTemplateFactory restTemplateFactory;
     private final RestTemplate restTemplate;
+    private final ApplicationEventPublisher publisher;
+
+    public void login(@NonNull String email) {
+        File file = clientConfig.locateResource(clientConfig.getP12Certificate().getLocation() + email + ".jks");
+        if(file.exists()) {
+            restTemplateFactory.updateForMutalAuthentication(restTemplate, email);
+            publisher.publishEvent(new LoginEvent(email));
+        } else {
+            log.error("Could not login. No certificate exist ([{}])", file.getAbsolutePath());
+        }
+    }
 
     public Certificate certificateRequest(@NonNull String email) {
         try {
@@ -67,16 +80,16 @@ public class CertificateService {
 
         generateP12KeyStore(key, cert, email);
 
-        restTemplateFactory.updateForMutalAuthentication(restTemplate);
+        restTemplateFactory.updateForMutalAuthentication(restTemplate, email);
     }
 
     private File generateP12KeyStore(Path key, Path cert, String email) {
         CertificateKeyStoreConfig p12Certificate = clientConfig.getP12Certificate();
-        deleteIfExist(clientConfig.getP12Certificate().getLocation());
+        deleteIfExist(clientConfig.getP12Certificate().getLocation() + email + ".jks");
 
         cmdExec("openssl pkcs12 -export -clcerts -in " + cert.toString() + " -inkey " + key.toString() +" -out ./" + email + ".p12 -password pass:foobar");
-        cmdExec("keytool -importkeystore -destkeystore " + p12Certificate.getLocation() + " -srckeystore ./" + email + ".p12 -srcstorepass foobar -srcstoretype PKCS12 -storepass " + p12Certificate.getKeyStorePassword() + "  -keypass " + p12Certificate.getKeyPassword());
-        return clientConfig.locateResource(clientConfig.getP12Certificate().getLocation());
+        cmdExec("keytool -importkeystore -destkeystore " + p12Certificate.getLocation() + email + ".jks" + " -srckeystore ./" + email + ".p12 -srcstorepass foobar -srcstoretype PKCS12 -storepass " + p12Certificate.getKeyStorePassword() + "  -keypass " + p12Certificate.getKeyPassword());
+        return clientConfig.locateResource(clientConfig.getP12Certificate().getLocation() + email + ".jks");
     }
 
     private void cmdExec(String cmd) {
