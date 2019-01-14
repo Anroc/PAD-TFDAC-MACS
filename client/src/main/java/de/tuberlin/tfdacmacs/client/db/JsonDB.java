@@ -1,14 +1,15 @@
 package de.tuberlin.tfdacmacs.client.db;
 
+import com.fasterxml.jackson.databind.Module;
 import de.tuberlin.tfdacmacs.client.db.config.JsonDBConfiguration;
-import de.tuberlin.tfdacmacs.client.gpp.events.GPPReceivedEvent;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,16 +25,13 @@ public abstract class JsonDB<T> implements CRUDOperations<String, T> {
     private final Class<T> clazz;
     private final Map<String, T> memoryMap = new HashMap<>();
 
+    @Getter
     private FileEngine fileEngine;
 
     @PostConstruct
     public final void init() {
         fileEngine = new FileEngine(clazz, jsonDBConfiguration.getDataDir());
-    }
-
-    @EventListener(GPPReceivedEvent.class)
-    public void initElementSeralisation(GPPReceivedEvent gppReceivedEvent) {
-        fileEngine.configureObjectMapper(gppReceivedEvent.getGPP().getPairing().getG1());
+        registerModule();
     }
 
     @Override
@@ -79,5 +77,24 @@ public abstract class JsonDB<T> implements CRUDOperations<String, T> {
     public void delete(@NonNull String key) {
         fileEngine.delete(key);
         memoryMap.remove(key);
+    }
+
+    @Override
+    public void drop() {
+        fileEngine.drop();
+        memoryMap.clear();
+    }
+
+    /**
+     * Can be overwritten to register custom modules.
+     *
+     * @return array of modules. Default is Module[0]
+     */
+    public Module[] getCustomModule() {
+        return new Module[0];
+    }
+
+    private final void registerModule() {
+        Arrays.stream(getCustomModule()).forEach(fileEngine::registerModule);
     }
 }

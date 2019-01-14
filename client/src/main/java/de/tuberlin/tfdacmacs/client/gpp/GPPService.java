@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.gpp;
 
-import de.tuberlin.tfdacmacs.client.certificate.events.LoginEvent;
+import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;

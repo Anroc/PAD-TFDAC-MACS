@@ -1,13 +1,10 @@
 package de.tuberlin.tfdacmacs.client.db;
 
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.tuberlin.tfdacmacs.client.db.exception.EntityAlreadyExistException;
-import de.tuberlin.tfdacmacs.client.db.models.ElementDeserializer;
-import de.tuberlin.tfdacmacs.client.db.models.ElementSerializer;
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,10 +33,7 @@ public class FileEngine<T> implements CRUDOperations<String, T> {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void configureObjectMapper(Field field) {
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Element.class, new ElementDeserializer(field));
-        module.addSerializer(Element.class, new ElementSerializer());
+    public void registerModule(Module module) {
         objectMapper.registerModule(module);
     }
 
@@ -81,10 +75,20 @@ public class FileEngine<T> implements CRUDOperations<String, T> {
         }
     }
 
+    @Override
+    public void drop() {
+        try {
+            FileUtils.cleanDirectory(getPath().toFile());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     private void save(String key, T entity) throws FileAlreadyExistsException {
         try {
+            getPathFor(key).toFile().getParentFile().mkdirs();
             File file = Files.createFile(getPathFor(key)).toFile();
-            Files.write(file.toPath(), objectMapper.writeValueAsBytes(entity));
+            Files.write(file.toPath(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(entity));
         } catch (IOException e) {
             if(e instanceof FileAlreadyExistsException) {
                 throw (FileAlreadyExistsException) e;

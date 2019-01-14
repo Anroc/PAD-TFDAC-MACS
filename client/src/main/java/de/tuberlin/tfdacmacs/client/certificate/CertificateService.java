@@ -1,9 +1,9 @@
 package de.tuberlin.tfdacmacs.client.certificate;
 
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
-import de.tuberlin.tfdacmacs.client.certificate.events.LoginEvent;
+import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
-import de.tuberlin.tfdacmacs.client.keypair.KeyPairFactory;
+import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.config.CertificateKeyStoreConfig;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,30 +30,45 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class CertificateService {
 
-    private final KeyPairFactory keyPairFactory;
+    private final KeyPairService keyPairService;
     private final CertificateUtils certificateUtils;
     private final CaClient caClient;
     private final CertificateRequestFactory certificateRequestFactory;
     private final ClientConfig clientConfig;
+    private final CertificateDB certificateDB;
 
     private final RestTemplateFactory restTemplateFactory;
     private final RestTemplate restTemplate;
-    private final ApplicationEventPublisher publisher;
 
-    public void login(@NonNull String email) {
-        File file = clientConfig.locateResource(clientConfig.getP12Certificate().getLocation() + email + ".jks");
+    public Certificate login(@NonNull String email) {
+        File file = getP12KeyStore(email);
         if(file.exists()) {
             restTemplateFactory.updateForMutalAuthentication(restTemplate, email);
-            publisher.publishEvent(new LoginEvent(email));
+            return certificateDB.find(email).orElseThrow(
+                    () -> new IllegalStateException(
+                            String.format("P12 Certificate exist but certificate object in DB does not [%s]", email))
+            );
         } else {
-            log.error("Could not login. No certificate exist ([{}])", file.getAbsolutePath());
+            throw new IllegalStateException(
+                    String.format("Can not login. No state object is present.")
+            );
         }
+    }
+
+    private File getP12KeyStore(@NonNull String email) {
+        String location = clientConfig.getP12Certificate().getLocation();
+        if(! location.endsWith(File.separator)) {
+            location += File.separator;
+        }
+        File file = clientConfig.locateResource(location + email + ".jks");
+        file.mkdirs();
+        return file;
     }
 
     public Certificate certificateRequest(@NonNull String email) {
         try {
             PKCS10CertificationRequest pkcs10CertificationRequest = certificateRequestFactory
-                    .create(email, keyPairFactory.getKeyPair());
+                    .create(email, keyPairService.getKeyPair(email).toJavaKeyPair());
             CertificateRequest certificateRequest = new CertificateRequest(
                     KeyConverter.from(pkcs10CertificationRequest.getEncoded()).toBase64()
             );
@@ -62,20 +76,27 @@ public class CertificateService {
             CertificateResponse certificateResponse = caClient.postCertificateRequest(certificateRequest);
             log.info("received certificate with id [{}] for user [{}]", certificateResponse.getId(), email);
 
-            return new Certificate(
-                    certificateResponse.getId(),
-                    email,
-                    KeyConverter.from(certificateResponse.getCertificate()).toX509Certificate()
-            );
+            return createCertificate(email, certificateResponse);
         } catch (OperatorCreationException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private Certificate createCertificate(@NonNull String email, CertificateResponse certificateResponse) {
+        Certificate certificate = new Certificate(
+                certificateResponse.getId(),
+                email,
+                KeyConverter.from(certificateResponse.getCertificate()).toX509Certificate()
+        );
+
+        certificateDB.upsert(email, certificate);
+        return certificate;
+    }
+
     public void generateP12KeyStore(Certificate certificate) {
         String email = certificate.getEmail();
 
-        Path key = toFile("key", certificateUtils.pemFormat(keyPairFactory.getKeyPair().getPrivate()), email);
+        Path key = toFile("key", certificateUtils.pemFormat(keyPairService.getKeyPair(email).getPrivateKey()), email);
         Path cert = toFile("crt", certificateUtils.pemFormat(certificate.getCertificate()), email);
 
         generateP12KeyStore(key, cert, email);
@@ -85,11 +106,11 @@ public class CertificateService {
 
     private File generateP12KeyStore(Path key, Path cert, String email) {
         CertificateKeyStoreConfig p12Certificate = clientConfig.getP12Certificate();
-        deleteIfExist(clientConfig.getP12Certificate().getLocation() + email + ".jks");
+        deleteIfExist(getP12KeyStore(email));
 
         cmdExec("openssl pkcs12 -export -clcerts -in " + cert.toString() + " -inkey " + key.toString() +" -out ./" + email + ".p12 -password pass:foobar");
         cmdExec("keytool -importkeystore -destkeystore " + p12Certificate.getLocation() + email + ".jks" + " -srckeystore ./" + email + ".p12 -srcstorepass foobar -srcstoretype PKCS12 -storepass " + p12Certificate.getKeyStorePassword() + "  -keypass " + p12Certificate.getKeyPassword());
-        return clientConfig.locateResource(clientConfig.getP12Certificate().getLocation() + email + ".jks");
+        return getP12KeyStore(email);
     }
 
     private void cmdExec(String cmd) {
@@ -134,9 +155,13 @@ public class CertificateService {
 
     private Path deleteIfExist(String fileLocation) {
         Path path = Paths.get(fileLocation);
-        if (path.toFile().exists()) {
-            path.toFile().delete();
+        return deleteIfExist(path.toFile());
+    }
+
+    private Path deleteIfExist(File file) {
+        if(file.exists()) {
+            file.delete();
         }
-        return path;
+        return file.toPath();
     }
 }

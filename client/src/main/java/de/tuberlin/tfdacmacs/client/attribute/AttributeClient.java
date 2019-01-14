@@ -4,7 +4,7 @@ import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.EncryptedAttributeValueKeyDTO;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
-import de.tuberlin.tfdacmacs.client.keypair.KeyPairFactory;
+import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.rest.CaClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
@@ -17,6 +17,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.PrivateKey;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 public class AttributeClient {
 
     private final CaClient caClient;
-    private final KeyPairFactory keyPairFactory;
+    private final KeyPairService keyPairService;
     private final AsymmetricCryptEngine<?> asymmetricCryptEngine;
     private final SymmetricCryptEngine<?> symmetricCryptEngine;
 
@@ -37,13 +38,13 @@ public class AttributeClient {
         Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys = deviceResponse
                 .getEncryptedAttributeValueKeys();
 
-        return decrypt(encryptedKey, encryptedAttributeValueKeys);
+        return decrypt(keyPairService.getKeyPair(email).getPrivateKey(), encryptedKey, encryptedAttributeValueKeys);
     }
 
-    private Set<Attribute> decrypt(String encryptedKey, Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys) {
+    private Set<Attribute> decrypt(PrivateKey privateKey, String encryptedKey, Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys) {
         try {
             Key key = symmetricCryptEngine.createKeyFromBytes(
-                    asymmetricCryptEngine.decryptRaw(encryptedKey, keyPairFactory.getKeyPair().getPrivate()));
+                    asymmetricCryptEngine.decryptRaw(encryptedKey, privateKey));
 
             return encryptedAttributeValueKeys.stream()
                     .map(encryptedAttributeValueKeyDTO -> decrypt(key, encryptedAttributeValueKeyDTO))
