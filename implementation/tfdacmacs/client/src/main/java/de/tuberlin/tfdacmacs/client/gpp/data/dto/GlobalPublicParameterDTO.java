@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -12,6 +13,7 @@ import lombok.NonNull;
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class GlobalPublicParameterDTO  {
 

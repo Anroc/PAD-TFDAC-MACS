@@ -26,4 +26,6 @@ public interface CRUDOperations<K extends String, T> {
             insert(key, entity);
         }
     }
+
+    void drop();
 }
