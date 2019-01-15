@@ -34,9 +34,9 @@ public class ABECryptoTest extends UnitTestSuite {
         userSecretAttributeValueKey = attributeValueKeyGenerator
                 .generateUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys.getPrivateKey());
 
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
+        HashSet<AttributePolicyElement> attributePolicyElements = Sets.newHashSet();
+        attributePolicyElements.add(new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
+        andAccessPolicy = new AndAccessPolicy(attributePolicyElements);
     }
 
     @Test
@@ -60,8 +60,8 @@ public class ABECryptoTest extends UnitTestSuite {
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         // encrypt
@@ -118,8 +118,8 @@ public class ABECryptoTest extends UnitTestSuite {
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
         CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, null);
         assertThat(cipherText.isTwoFactorSecured()).isFalse();

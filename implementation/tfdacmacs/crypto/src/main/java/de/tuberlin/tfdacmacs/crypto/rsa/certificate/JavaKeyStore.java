@@ -55,6 +55,10 @@ public class JavaKeyStore {
         keyStore.load(ClassLoader.getSystemResourceAsStream(name), pwdArray);
     }
 
+    public void setEnty(String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
+        keyStore.setEntry(alias, entry, protectionParameter);
+    }
+
     public void setEntry(String alias, KeyStore.SecretKeyEntry secretKeyEntry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
         keyStore.setEntry(alias, secretKeyEntry, protectionParameter);
     }
@@ -62,6 +66,10 @@ public class JavaKeyStore {
     public KeyStore.Entry getEntry(String alias) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
         KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(keyStorePassword.toCharArray());
         return keyStore.getEntry(alias, protParam);
+    }
+
+    public KeyStore.Entry getEntry(String alias, KeyStore.ProtectionParameter protectionParameter) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
+        return keyStore.getEntry(alias, protectionParameter);
     }
 
     public void setKeyEntry(String alias, PrivateKey privateKey, String keyPassword, Certificate[] certificateChain) throws KeyStoreException {

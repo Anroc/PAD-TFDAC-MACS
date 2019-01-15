@@ -2,9 +2,12 @@ package de.tuberlin.tfdacmacs.client.attribute;
 
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,5 +31,10 @@ public class AttributeService {
         this.attributes = attributeClient.getAttributes(email, certificateId);
         this.attributes.forEach(attribute -> attributeDB.upsert(attribute.getId(), attribute));
         return this.attributes;
+    }
+
+    public Optional<AttributeValueKey.Public> findAttributeValuePublicKey(@NonNull String attributeValueId) {
+        // TODO: implement
+        return Optional.empty();
     }
 }
