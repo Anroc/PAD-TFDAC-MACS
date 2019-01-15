@@ -8,7 +8,7 @@ public class AccessPolicyParserTest {
 
     @Test
     public void parse() {
-        parser.parse("(a or b)");
+        parser.parse("a:0 or b:qwe");
 
     }
 }
