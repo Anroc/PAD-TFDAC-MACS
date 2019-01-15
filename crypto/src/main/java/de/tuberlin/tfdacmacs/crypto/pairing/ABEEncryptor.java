@@ -21,22 +21,22 @@ public class ABEEncryptor extends ABECrypto {
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull GlobalPublicParameter gpp,
             DataOwner dataOwner) {
-        if(andAccessPolicy.getAccessPolicyElements() == null || andAccessPolicy.getAccessPolicyElements().isEmpty()) {
+        if(andAccessPolicy.getAttributePolicyElements() == null || andAccessPolicy.getAttributePolicyElements().isEmpty()) {
             throw new IllegalArgumentException("No Attribute policy given.");
         }
 
-        Set<String> attributeValueIdentifier = andAccessPolicy.getAccessPolicyElements().stream()
-                .map(AccessPolicyElement::getAttributeValueId)
+        Set<String> attributeValueIdentifier = andAccessPolicy.getAttributePolicyElements().stream()
+                .map(AttributePolicyElement::getAttributeValueId)
                 .collect(Collectors.toSet());
 
         Element key = gpp.getPairing().getGT().newRandomElement().getImmutable();
         Element s = gpp.getPairing().getZr().newRandomElement().getImmutable();
 
-        Map<AuthorityKey.Public, Set<AccessPolicyElement>> policy = andAccessPolicy.groupByAttributeAuthority();
+        Map<AuthorityKey.Public, Set<AttributePolicyElement>> policy = andAccessPolicy.groupByAttributeAuthority();
 
         Element c1 = mulAuthorityPublicKeys(policy);
         Element c2 = gpp.getG().powZn(s).getImmutable();
-        Element c3 = mulAttributePublicValueKeys(andAccessPolicy.getAccessPolicyElements());
+        Element c3 = mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements());
 
         c1 = key.duplicate().mul(c1.duplicate().powZn(s)).getImmutable();
 
@@ -66,7 +66,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate().mul(cipherTextAttributeUpdateKey.getUpdateKey())
                 .mul(mulAttributePublicValueKeys(
-                        andAccessPolicy.getAccessPolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId())
+                        andAccessPolicy.getAttributePolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId())
                         .orElse(gpp.getPairing().getG1().newOneElement())
                         .powZn(r))
                 .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
@@ -109,7 +109,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate()
                 .mul(subSet2FaUpdateKeys.stream().reduce((a,b) -> a.duplicate().mul(b)).get())
-                .mul(mulAttributePublicValueKeys(andAccessPolicy.getAccessPolicyElements()).powZn(r));
+                .mul(mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements()).powZn(r));
         return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getEncryptedMessage());
     }
 
@@ -122,9 +122,9 @@ public class ABEEncryptor extends ABECrypto {
         return cipherText.getC2().duplicate().mul(gpp.getG().powZn(r));
     }
 
-    private Element mulAuthorityPublicKeys(Map<AsymmetricElementKey.Public, Set<AccessPolicyElement>> policy) {
+    private Element mulAuthorityPublicKeys(Map<AsymmetricElementKey.Public, Set<AttributePolicyElement>> policy) {
         Element c1 = null;
-        for(Map.Entry<AuthorityKey.Public, Set<AccessPolicyElement>> entry : policy.entrySet()) {
+        for(Map.Entry<AuthorityKey.Public, Set<AttributePolicyElement>> entry : policy.entrySet()) {
             Element authorityPublicKey = entry.getKey().getKey().duplicate();
             int n = entry.getValue().size();
 
@@ -133,15 +133,15 @@ public class ABEEncryptor extends ABECrypto {
         return c1;
     }
 
-    private Element mulAttributePublicValueKeys(@NonNull Set<AccessPolicyElement> accessPolicyElements) {
-        return mulAttributePublicValueKeys(accessPolicyElements, null).get();
+    private Element mulAttributePublicValueKeys(@NonNull Set<AttributePolicyElement> attributePolicyElements) {
+        return mulAttributePublicValueKeys(attributePolicyElements, null).get();
     }
 
     private Optional<Element> mulAttributePublicValueKeys(
-            @NonNull Set<AccessPolicyElement> policy, String excludedAttributeValueId) {
+            @NonNull Set<AttributePolicyElement> policy, String excludedAttributeValueId) {
         return policy.stream()
                 .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().equals(excludedAttributeValueId))
-                .map(AccessPolicyElement::getAttributePublicKey)
+                .map(AttributePolicyElement::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
                 .reduce((a, b) -> a.duplicate().mul(b))
                 .map(Element::duplicate);

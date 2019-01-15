@@ -41,9 +41,9 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         userSecretAttributeValueKey = attributeValueKeyGenerator
                 .generateUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys.getPrivateKey());
 
-        HashSet<AccessPolicyElement> accessPolicyElements = Sets.newHashSet();
-        accessPolicyElements.add(new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
-        andAccessPolicy = new AndAccessPolicy(accessPolicyElements);
+        HashSet<AttributePolicyElement> attributePolicyElements = Sets.newHashSet();
+        attributePolicyElements.add(new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
+        andAccessPolicy = new AndAccessPolicy(attributePolicyElements);
 
         twoFactoryKey = twoFactorKeyGenerator.generate(gpp, userId);
         dataOwner = new DataOwner(dataOwnerId, twoFactoryKey.getPrivateKey());
@@ -82,8 +82,8 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         UserAttributeValueKey userAttributeSecretValueKey2 = attributeValueKeyGenerator
                 .generateUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys2.getPrivateKey());
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         // encrypt
@@ -105,8 +105,8 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         String attrValueId = "aa.tu-berlin.de.role:student";
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         // encrypt
@@ -131,8 +131,8 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         UserAttributeValueKey userAttributeSecretValueKey2 = attributeValueKeyGenerator
                 .generateUserKey(gpp, userId, authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         // encrypt
@@ -155,8 +155,8 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
 
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         // encrypt
@@ -233,8 +233,8 @@ public class PairingCryptEngineTest extends UnitTestSuite {
                 .generateUserKey(gpp, "OtherId", authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
 
         // encrypt
-        andAccessPolicy.getAccessPolicyElements().add(
-                new AccessPolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+        andAccessPolicy.getAttributePolicyElements().add(
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
         CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);

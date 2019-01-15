@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.crypto.pairing.data;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.util.HashMap;
@@ -11,28 +12,34 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class AndAccessPolicy {
+public class AndAccessPolicy extends AccessPolicyElement {
 
-    private Set<AccessPolicyElement> accessPolicyElements;
+    private Set<AttributePolicyElement> attributePolicyElements = new HashSet<>();
 
-    public Map<AuthorityKey.Public, Set<AccessPolicyElement>> groupByAttributeAuthority() {
-        Map<AuthorityKey.Public, Set<AccessPolicyElement>> map = new HashMap<>();
+    public Map<AuthorityKey.Public, Set<AttributePolicyElement>> groupByAttributeAuthority() {
+        Map<AuthorityKey.Public, Set<AttributePolicyElement>> map = new HashMap<>();
 
-        for(AccessPolicyElement accessPolicyElement : accessPolicyElements) {
-            if(! map.containsKey(accessPolicyElement.getAuthorityPublicKey())) {
-                map.put(accessPolicyElement.getAuthorityPublicKey(), new HashSet<>());
+        for(AttributePolicyElement attributePolicyElement : attributePolicyElements) {
+            if(! map.containsKey(attributePolicyElement.getAuthorityPublicKey())) {
+                map.put(attributePolicyElement.getAuthorityPublicKey(), new HashSet<>());
             }
 
-            map.get(accessPolicyElement.getAuthorityPublicKey()).add(accessPolicyElement);
+            map.get(attributePolicyElement.getAuthorityPublicKey()).add(attributePolicyElement);
         }
 
         return map;
     }
 
     public boolean contains(@NonNull String attributeValueId) {
-        return accessPolicyElements.stream()
-                .map(AccessPolicyElement::getAttributeValueId)
+        return attributePolicyElements.stream()
+                .map(AttributePolicyElement::getAttributeValueId)
                 .anyMatch(attributeValueId::equals);
+    }
+
+    @Override
+    public void put(@NonNull AccessPolicyElement accessPolicyElement) {
+        this.attributePolicyElements.add((AttributePolicyElement) accessPolicyElement);
     }
 }

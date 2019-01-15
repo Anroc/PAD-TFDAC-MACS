@@ -68,8 +68,8 @@ public class TFDACMACSDemo {
     }
 
     private void addPolicyElement(AuthorityKey authorityKey, String aid, AttributeValueKey attributeValueKey,
-            Set<AccessPolicyElement> policy) {
-        policy.add(new AccessPolicyElement(authorityKey.getPublicKey(), attributeValueKey.getPublicKey(), aid));
+            Set<AttributePolicyElement> policy) {
+        policy.add(new AttributePolicyElement(authorityKey.getPublicKey(), attributeValueKey.getPublicKey(), aid));
     }
 
     private CipherText encrypt(GlobalPublicParameter gpp, AndAccessPolicy andAccessPolicy, byte[] message) {
@@ -108,7 +108,7 @@ public class TFDACMACSDemo {
 
         UserAttributeValueKey userAttributeValueKey = createUserAttributeKey(gpp, uid, authorityKey, attributeValueKey);
 
-        Set<AccessPolicyElement> policy = new HashSet<>();
+        Set<AttributePolicyElement> policy = new HashSet<>();
         addPolicyElement(authorityKey, aid, attributeValueKey, policy);
         AndAccessPolicy andAccessPolicy = new AndAccessPolicy(policy);
 
@@ -139,7 +139,7 @@ public class TFDACMACSDemo {
 
         UserAttributeValueKey userAttributeValueKey = createUserAttributeKey(gpp, uid, authorityKey, attributeValueKey);
 
-        Set<AccessPolicyElement> policy = new HashSet<>();
+        Set<AttributePolicyElement> policy = new HashSet<>();
         addPolicyElement(authorityKey, aid, attributeValueKey, policy);
         AndAccessPolicy andAccessPolicy = new AndAccessPolicy(policy);
 
