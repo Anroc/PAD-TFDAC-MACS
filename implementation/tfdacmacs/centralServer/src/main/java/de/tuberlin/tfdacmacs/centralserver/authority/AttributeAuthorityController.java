@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,7 +85,10 @@ public class AttributeAuthorityController {
         return new AttributeAuthorityResponse(
                 attributeAuthority.getId(),
                 attributeAuthority.getCertificateId(),
-                ElementConverter.convert(attributeAuthority.getPublicKey().getKey())
+                Optional.ofNullable(attributeAuthority.getPublicKey())
+                    .map(AuthorityKey.Public::getKey)
+                    .map(ElementConverter::convert)
+                    .orElse(null)
         );
     }
 }
