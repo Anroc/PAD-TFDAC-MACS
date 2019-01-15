@@ -14,16 +14,23 @@ public class AccessPolicyParser {
 
     public void parse(@NonNull String policy) {
         PolicyLexer policyLexer = new PolicyLexer(CharStreams.fromString(policy));
-        PolicyParser parser = new PolicyParser(new CommonTokenStream(policyLexer));
+        CommonTokenStream commonTokenStream = new CommonTokenStream(policyLexer);
+        PolicyParser parser = new PolicyParser(commonTokenStream);
         ParseTreeWalker parseTreeWalker = ParseTreeWalker.DEFAULT;
-        parser.setBuildParseTree(true);
         parseTreeWalker.walk(new ParserListener(), parser.policy());
     }
 
     public class ParserListener extends PolicyBaseListener {
 
-        @Override public void enterPolicy(PolicyParser.PolicyContext ctx) {
-            System.out.println(ctx.getText());
+        @Override
+        public void enterPolicy(PolicyParser.PolicyContext ctx) {
+            System.out.println(ctx.start.getType() + " " + ctx.getText());
+        }
+
+        @Override public void enterOr_expression(PolicyParser.Or_expressionContext ctx) {
+            System.out.println("-- OR --");
+            System.out.println(ctx.getChild(0).getText());
+            System.out.println(ctx.getChild(2).getText());
         }
     }
 }
