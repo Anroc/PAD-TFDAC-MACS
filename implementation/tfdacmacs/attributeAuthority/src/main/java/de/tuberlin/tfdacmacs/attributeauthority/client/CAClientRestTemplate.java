@@ -2,6 +2,8 @@ package de.tuberlin.tfdacmacs.attributeauthority.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
+import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
+import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
@@ -114,6 +116,11 @@ public class CAClientRestTemplate implements CAClient {
     @Override
     public DeviceResponse updateDevice(String userId, String deviceId, DeviceUpdateRequest deviceUpdateRequest) {
         return request(String.format("/users/%s/devices/%s", userId, deviceId), HttpMethod.PUT, DeviceResponse.class, deviceUpdateRequest);
+    }
+
+    @Override
+    public AttributeAuthorityResponse updateAuthorityPublicKey(String authorityId, AttributeAuthorityPublicKeyRequest attributeAuthorityPublicKeyRequest) {
+        return request(String.format("/authorities/%s/public-key", authorityId), HttpMethod.PUT, AttributeAuthorityResponse.class, attributeAuthorityPublicKeyRequest);
     }
 
     @Override
