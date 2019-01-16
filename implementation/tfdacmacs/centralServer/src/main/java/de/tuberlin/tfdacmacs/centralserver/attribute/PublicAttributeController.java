@@ -87,11 +87,11 @@ public class PublicAttributeController {
 
     @GetMapping("/{authorityId}/values/{valueId}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_AUTHORITY', 'ROLE_ADMIN')")
-    public PublicAttributeValueResponse getAttribute(@PathVariable("authorityId") String authorityId, @PathVariable("valueId") String valueId) {
-        return publicAttributeService.findEntity(authorityId)
+    public PublicAttributeValueResponse getAttribute(@PathVariable("authorityId") String attributeId, @PathVariable("valueId") String valueId) {
+        return publicAttributeService.findEntity(attributeId)
                 .map(PublicAttribute::getValues)
                 .map(Set::stream)
-                .orElseThrow(() -> new NotFoundException(authorityId))
+                .orElseThrow(() -> new NotFoundException(attributeId))
                 .filter(attributeValue -> attributeValue.getValue().toString().equals(valueId))
                 .findAny()
                 .map(PublicAttributeValueResponse::from)

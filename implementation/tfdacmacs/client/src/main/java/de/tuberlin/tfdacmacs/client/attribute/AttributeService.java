@@ -27,14 +27,13 @@ public class AttributeService {
         return this.attributes;
     }
 
-    public Set<Attribute> retrieveAttributes(String email, String certificateId) {
-        this.attributes = attributeClient.getAttributes(email, certificateId);
+    public Set<Attribute> retrieveAttributesForUser(String email, String certificateId) {
+        this.attributes = attributeClient.getAttributesForUser(email, certificateId);
         this.attributes.forEach(attribute -> attributeDB.upsert(attribute.getId(), attribute));
         return this.attributes;
     }
 
     public Optional<AttributeValueKey.Public> findAttributeValuePublicKey(@NonNull String attributeValueId) {
-        // TODO: implement
-        return Optional.empty();
+        return attributeClient.findAttributePublicKey(attributeValueId);
     }
 }
