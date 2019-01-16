@@ -207,7 +207,7 @@ public class UserRestTest extends RestTestSuite {
         String encryptedKey = deviceUpdateRequest.getEncryptedKey();
         Key key = symCryptEngine.createKeyFromBytes(asymCryptEngine.decryptRaw(encryptedKey, userKeyPair.getPrivate()));
         byte[] rawElement = symCryptEngine.decryptRaw(encryptedAttributeValueKeyDTO.getEncryptedKey(), key);
-        byte[] originalBytes = extractFromSet(user.getAttributes()).getKey().getSecretKey().toBytes();
+        byte[] originalBytes = extractFromSet(user.getAttributes()).getKey().getKey().toBytes();
 
         assertSameElements(rawElement, originalBytes);
     }

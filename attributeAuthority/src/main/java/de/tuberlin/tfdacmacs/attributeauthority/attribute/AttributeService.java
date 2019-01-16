@@ -30,11 +30,11 @@ public class AttributeService {
     private final GPPService gppService;
     private final AttributeAuthorityConfig config;
 
-    public Collection<Attribute> findAllAttributes() {
+    public Collection<Attribute<AttributeValue>> findAllAttributes() {
         return attributeDB.findAll();
     }
 
-    public Optional<Attribute> findAttribute(@NonNull String attributeId) {
+    public Optional<Attribute<AttributeValue>> findAttribute(@NonNull String attributeId) {
         return attributeDB.findEntity(attributeId);
     }
 
@@ -45,12 +45,12 @@ public class AttributeService {
                 .map(value -> generateAttributeKeys(value, AttributeValue.generateId(config.getId(), name, value), gpp))
                 .collect(Collectors.toSet());
 
-        Attribute attribute = new Attribute(config.getId(), name, attrValues, type);
+        Attribute attribute = Attribute.createAttribute(config.getId(), name, attrValues, type);
         attributeDB.insert(attribute);
         return attribute;
     }
 
-    public <T> AttributeValue<T> getOrCreateAttributeKey(@NonNull Attribute attribute, @NonNull T value, @NonNull GlobalPublicParameter gpp) {
+    public <T> AttributeValue<T> getOrCreateAttributeKey(@NonNull Attribute<AttributeValue> attribute, @NonNull T value, @NonNull GlobalPublicParameter gpp) {
         Optional<AttributeValue> res = attribute.getValues().stream()
                 .filter(attributeValue -> attributeValue.getValue().equals(value))
                 .findAny();

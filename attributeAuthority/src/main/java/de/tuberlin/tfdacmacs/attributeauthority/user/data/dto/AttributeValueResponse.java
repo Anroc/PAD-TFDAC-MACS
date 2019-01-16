@@ -26,7 +26,7 @@ public class AttributeValueResponse {
         return new AttributeValueResponse(
                 userAttributeKey.getAttributeId(),
                 userAttributeKey.getValue(),
-                ElementConverter.convert(userAttributeKey.getKey().getSecretKey())
+                ElementConverter.convert(userAttributeKey.getKey().getKey())
         );
     }
 }

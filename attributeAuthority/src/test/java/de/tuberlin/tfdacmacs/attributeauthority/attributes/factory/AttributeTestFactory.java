@@ -13,7 +13,7 @@ public class AttributeTestFactory {
     private final AttributeValueTestFactory attributeValueTestFactory;
 
     public Attribute create() {
-        return new Attribute("aa.tu-berlin.de", "testAttribute", Sets.newLinkedHashSet(
+        return Attribute.createAttribute("aa.tu-berlin.de", "testAttribute", Sets.newLinkedHashSet(
                 attributeValueTestFactory.createString()
         ), AttributeType.STRING);
     }

@@ -24,7 +24,7 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     }
 
     public TwoFactorKey.Private getPrivateKey() {
-        return new Private(getSecretKey());
+        return new Private(getKey());
     }
 
     public static class Private<T> extends AsymmetricElementKey.Private<TwoFactorKey> {

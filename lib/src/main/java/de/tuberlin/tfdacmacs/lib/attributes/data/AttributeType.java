@@ -15,4 +15,16 @@ public enum AttributeType {
     public boolean matchesType(Object value) {
         return value.getClass().isAssignableFrom(getClazz());
     }
+
+    public Object cast(String value) {
+        switch (this) {
+            case NUMBER:
+                return Integer.valueOf(value);
+            case STRING:
+                return value;
+            case BOOLEAN:
+                return Boolean.valueOf(value);
+        }
+        return null;
+    }
 }

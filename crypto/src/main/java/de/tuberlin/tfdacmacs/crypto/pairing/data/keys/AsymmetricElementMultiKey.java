@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
-public abstract class AsymmetricElementMultiKey<T> extends SymmetricElementKey {
+public abstract class AsymmetricElementMultiKey<T> extends ElementKey {
 
     @NotNull
     protected Map<T, Element> publicKeys;

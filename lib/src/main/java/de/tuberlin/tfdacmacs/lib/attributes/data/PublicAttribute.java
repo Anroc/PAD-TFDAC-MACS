@@ -7,10 +7,10 @@ import java.util.Set;
 
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Attribute extends AbstractAttribute<AttributeValue> {
+public class PublicAttribute extends AbstractAttribute<PublicAttributeValue> {
 
-    protected Attribute(String authorityDomain, String name,
-            Set<AttributeValue> values, AttributeType type) {
+    protected PublicAttribute(String authorityDomain, String name,
+            Set<PublicAttributeValue> values, AttributeType type) {
         super(authorityDomain, name, values, type);
     }
 }
