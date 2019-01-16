@@ -107,7 +107,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
     public void addAttributeValue() {
         publicAttributeDB.insert(publicAttribute);
 
-        Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement()
+        Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
         String value = "otherTest";
 
         AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
