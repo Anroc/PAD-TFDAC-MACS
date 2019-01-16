@@ -127,7 +127,7 @@ node {
                 }
             }
         }
-        lib: {
+        client: {
             stage('gradle client:test') {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
