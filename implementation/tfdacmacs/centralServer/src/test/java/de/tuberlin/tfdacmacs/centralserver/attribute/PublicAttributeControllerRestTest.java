@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.centralserver.attribute;
 
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.RestTestSuite;
+import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AbstractAttribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
@@ -10,6 +11,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.PublicAttributeValue;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueResponse;
 import it.unisa.dia.gas.jpbc.Element;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,13 +39,15 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
                 "test"
         );
         this.publicAttribute = AbstractAttribute.createPublicAttribute(
-                "aa.tu-berlin.de",
+                aid,
                 "this-is-a",
                 Sets.newHashSet(this.publicAttributeValue),
                 AttributeType.STRING
         );
 
         this.serializedPublicKey = ElementConverter.convert(publicAttributeValue.getKey());
+
+        attributeAuthorityDB.insert(new AttributeAuthority(aid, "someCertId"));
     }
 
     @Test
@@ -105,30 +109,49 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
 
     @Test
     public void addAttributeValue() {
+        mutalAuthenticationRestTemplate(RestTestSuite.AUTHORITY_KEYSTORE);
+
+
         publicAttributeDB.insert(publicAttribute);
 
         Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
         String value = "otherTest";
 
         AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
-            ElementConverter.convert(originalPublicKey), value
+            value, ElementConverter.convert(originalPublicKey)
         );
-        ResponseEntity<PublicAttributeResponse> exchange =
+        ResponseEntity<PublicAttributeValueResponse> exchange =
                 sslRestTemplate.exchange(
                         "/attributes/" + publicAttribute.getId(),
                         HttpMethod.POST,
                         new HttpEntity<>(attributeValueCreationRequest),
-                        PublicAttributeResponse.class
+                        PublicAttributeValueResponse.class
+                );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+
+        PublicAttributeValueResponse body = exchange.getBody();
+        assertThat(body.getValue()).isEqualTo(value);
+        assertThat(body.getPublicKey()).isEqualTo(ElementConverter.convert(originalPublicKey));
+    }
+
+    @Test
+    public void getAttributeValue() {
+        publicAttributeDB.insert(publicAttribute);
+
+        ResponseEntity<PublicAttributeValueResponse> exchange =
+                sslRestTemplate.exchange(
+                        "/attributes/" + publicAttribute.getId() + "/values/" + publicAttributeValue.getValue(),
+                        HttpMethod.GET,
+                        HttpEntity.EMPTY,
+                        PublicAttributeValueResponse.class
                 );
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
 
-        PublicAttributeResponse body = exchange.getBody();
-        assertThat(body.getId()).isEqualTo(publicAttribute.getId());
-        assertThat(body.getAuthorityDomain()).isEqualTo(publicAttribute.getAuthorityDomain());
-        assertThat(body.getType()).isEqualByComparingTo(publicAttribute.getType());
-        assertThat(body.getValues().get(1).getValue()).isEqualTo(value);
-        assertThat(body.getValues().get(1).getPublicKey()).isEqualTo(ElementConverter.convert(originalPublicKey));
+        PublicAttributeValueResponse body = exchange.getBody();
+        assertThat(body.getValue()).isEqualTo(publicAttributeValue.getValue());
+        assertThat(body.getPublicKey()).isEqualTo(serializedPublicKey);
     }
 
     public void assertPublicAttributeResponse(PublicAttributeResponse body) {

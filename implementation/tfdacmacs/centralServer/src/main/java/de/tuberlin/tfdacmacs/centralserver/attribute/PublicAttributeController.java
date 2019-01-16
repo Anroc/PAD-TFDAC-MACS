@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.PublicAttributeValue;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,7 +66,7 @@ public class PublicAttributeController {
     @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
-    public PublicAttributeResponse createAttribute(@PathVariable("id") String id, @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
+    public PublicAttributeValueResponse addAttributeValue(@PathVariable("id") String id, @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
         PublicAttribute publicAttribute = publicAttributeService.findEntity(id)
                 .orElseThrow(() -> new NotFoundException(id));
 
@@ -76,11 +78,24 @@ public class PublicAttributeController {
         );
 
         try {
-            publicAttribute = publicAttributeService.addValue(publicAttribute, publicAttributeValue);
-            return PublicAttributeResponse.from(publicAttribute);
+            publicAttributeService.addValue(publicAttribute, publicAttributeValue);
+            return PublicAttributeValueResponse.from(publicAttributeValue);
         } catch(IllegalArgumentException e) {
             throw new ServiceException(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    @GetMapping("/{authorityId}/values/{valueId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_AUTHORITY', 'ROLE_ADMIN')")
+    public PublicAttributeValueResponse getAttribute(@PathVariable("authorityId") String authorityId, @PathVariable("valueId") String valueId) {
+        return publicAttributeService.findEntity(authorityId)
+                .map(PublicAttribute::getValues)
+                .map(Set::stream)
+                .orElseThrow(() -> new NotFoundException(authorityId))
+                .filter(attributeValue -> attributeValue.getValue().toString().equals(valueId))
+                .findAny()
+                .map(PublicAttributeValueResponse::from)
+                .orElseThrow(() -> new NotFoundException(valueId));
     }
 
     public Field getG1() {
