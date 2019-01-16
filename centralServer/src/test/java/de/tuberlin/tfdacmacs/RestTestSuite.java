@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs;
 
+import de.tuberlin.tfdacmacs.centralserver.attribute.db.PublicAttributeDB;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
@@ -64,6 +65,8 @@ public abstract class RestTestSuite {
     protected GlobalPublicParameterDTODB globalPublicParameterDTODB;
     @Autowired
     protected GlobalPublicParameterDB globalPublicParameterDB;
+    @Autowired
+    protected PublicAttributeDB publicAttributeDB;
 
     // utils
     @Autowired
@@ -91,6 +94,7 @@ public abstract class RestTestSuite {
         userDB.drop();
         globalPublicParameterDTODB.drop();
         attributeAuthorityDB.drop();
+        publicAttributeDB.drop();
     }
 
     @PostConstruct

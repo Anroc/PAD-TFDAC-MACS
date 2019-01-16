@@ -75,9 +75,12 @@ public class PublicAttributeController {
                 publicAttribute.getType()
         );
 
-        publicAttribute = publicAttributeService.addValue(publicAttribute, publicAttributeValue);
-
-        return PublicAttributeResponse.from(publicAttribute);
+        try {
+            publicAttribute = publicAttributeService.addValue(publicAttribute, publicAttributeValue);
+            return PublicAttributeResponse.from(publicAttribute);
+        } catch(IllegalArgumentException e) {
+            throw new ServiceException(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
     }
 
     public Field getG1() {
