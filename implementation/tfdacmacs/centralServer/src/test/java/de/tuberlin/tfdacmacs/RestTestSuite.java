@@ -31,6 +31,7 @@ import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
+import java.util.Collection;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CentralServerApplication.class,
@@ -144,5 +145,9 @@ public abstract class RestTestSuite {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64Creds);
         return headers;
+    }
+
+    public static <T> T findFirst(Collection<T> collection) {
+        return collection.stream().findFirst().get();
     }
 }

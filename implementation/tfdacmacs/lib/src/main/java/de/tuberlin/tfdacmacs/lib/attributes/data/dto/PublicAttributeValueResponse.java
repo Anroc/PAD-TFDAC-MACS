@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.lib.attributes.data.dto;
 
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValueComponent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,10 +20,10 @@ public class PublicAttributeValueResponse {
     @NotNull
     private Object value;
 
-    public static PublicAttributeValueResponse from(AttributeValue attributeValue) {
+    public static PublicAttributeValueResponse from(AttributeValueComponent attributeValue) {
         PublicAttributeValueResponse publicAttributeValueResponse = new PublicAttributeValueResponse();
         publicAttributeValueResponse.setValue(attributeValue.getValue());
-        publicAttributeValueResponse.setPublicKey(ElementConverter.convert(attributeValue.getPublicKey().getKey()));
+        publicAttributeValueResponse.setPublicKey(ElementConverter.convert(attributeValue.getPublicKeyComponent()));
         return publicAttributeValueResponse;
     }
 }

@@ -82,7 +82,7 @@ public class UserEventListener {
                         attribute -> attribute.getAttributeValueId(),
                         attribute -> {
                             try {
-                                return symmetricCryptEngine.encryptRaw(attribute.getKey().getSecretKey().toBytes(), key);
+                                return symmetricCryptEngine.encryptRaw(attribute.getKey().getKey().toBytes(), key);
                             } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
                                 throw new RuntimeException(e);
                             }

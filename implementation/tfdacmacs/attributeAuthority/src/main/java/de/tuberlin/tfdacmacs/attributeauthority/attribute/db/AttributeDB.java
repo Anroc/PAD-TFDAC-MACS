@@ -23,4 +23,6 @@ public class AttributeDB extends CouchbaseDB<Attribute> {
     public Collection<Attribute> findAll() {
         return repository.findAllByClass().collect(Collectors.toList());
     }
+
+
 }

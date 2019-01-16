@@ -6,8 +6,8 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 public abstract class AsymmetricElementKey<T> {
 
     private @NotNull @NonNull Private<T> privateKey;
@@ -16,8 +16,7 @@ public abstract class AsymmetricElementKey<T> {
     public AsymmetricElementKey(
             @NonNull Element privateKey,
             @NonNull Element publicKey) {
-        this.privateKey = new Private(privateKey);
-        this.publicKey = new Public(publicKey);
+        this(new Private(privateKey), new Public(publicKey));
     }
 
     @SuppressWarnings("unused")
@@ -42,5 +41,9 @@ public abstract class AsymmetricElementKey<T> {
         public Element getKey() {
             return this.key.getImmutable();
         }
+    }
+
+    public enum AsymmetricElementKeyType {
+        KEY_PAIR, PUBLIC_KEY
     }
 }

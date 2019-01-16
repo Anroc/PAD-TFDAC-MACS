@@ -2,6 +2,10 @@ package de.tuberlin.tfdacmacs.attributeauthority.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueUpdateRequest;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
@@ -132,4 +136,21 @@ public class CAClientRestTemplate implements CAClient {
     public CertificateResponse getCertificate(String id) {
         return request(String.format("/certificates/%s", id), HttpMethod.GET, CertificateResponse.class, null);
     }
+
+    @Override
+    public PublicAttributeResponse createAttribute(AttributeCreationRequest attributeCreationRequest) {
+        return request("/attributes", HttpMethod.POST, PublicAttributeResponse.class, attributeCreationRequest);
+    }
+
+    @Override
+    public PublicAttributeResponse createAttributeValue(String attributeId, AttributeValueCreationRequest attributeValueCreationRequest) {
+        return request(String.format("/attributes/%s/values", attributeId), HttpMethod.POST, PublicAttributeResponse.class, attributeValueCreationRequest);
+    }
+
+    @Override
+    public PublicAttributeResponse updateAttributeValue(String attributeId, String attributeValueId,
+            AttributeValueUpdateRequest attributeUpdateRequest) {
+        return request(String.format("/attributes/%s/values/%s", attributeId, attributeValueId), HttpMethod.PUT, PublicAttributeResponse.class, attributeUpdateRequest);
+    }
+
 }

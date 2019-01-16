@@ -127,6 +127,19 @@ node {
                 }
             }
         }
+        lib: {
+            stage('gradle client:test') {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                    try {
+                        sh('./gradlew client:test')
+                    } finally {
+                        step([$class: 'JUnitResultArchiver', testResults: 'client/build/test-results/test/*.xml'])
+                    }
+                }
+            }
+        }
 
         stage('integrationTest') {
             copyArtifacts(

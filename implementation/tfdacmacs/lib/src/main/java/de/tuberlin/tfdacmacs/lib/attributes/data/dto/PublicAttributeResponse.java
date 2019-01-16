@@ -1,7 +1,8 @@
 package de.tuberlin.tfdacmacs.lib.attributes.data.dto;
 
-import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AbstractAttribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValueComponent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ public class PublicAttributeResponse {
     @NotBlank
     private String id;
 
-    public static PublicAttributeResponse from(@NonNull Attribute attribute) {
+    public static PublicAttributeResponse from(@NonNull AbstractAttribute<? extends AttributeValueComponent> attribute) {
         PublicAttributeResponse publicAttributeResponse = new PublicAttributeResponse();
         publicAttributeResponse.setAuthorityDomain(attribute.getAuthorityDomain());
         publicAttributeResponse.setName(attribute.getName());

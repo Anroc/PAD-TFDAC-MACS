@@ -30,7 +30,7 @@ public class ABEDecryptor extends ABECrypto {
 
         Element sk = secrets.stream()
                 .map(UserAttributeSecretComponents::getUserSecretAttributeKey)
-                .map(UserAttributeValueKey::getSecretKey)
+                .map(UserAttributeValueKey::getKey)
                 .reduce((a,b) -> a.duplicate().mul(b))
                 .orElseThrow(() -> new IllegalArgumentException("Given secrets where empty."));
 
