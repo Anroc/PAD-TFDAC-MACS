@@ -22,7 +22,7 @@ import static org.mockito.Mockito.doReturn;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ClientApplication.class)
 @ActiveProfiles("test")
-public class CommandTestSuite {
+public abstract class CommandTestSuite {
 
     @MockBean
     protected CaClient caClient;

@@ -34,6 +34,6 @@ public class AttributeCommand {
 
     @ShellMethod(value = "update attributes", key = "attributes update")
     public void update() {
-        attributeService.retrieveAttributes(session.getEmail(), session.getCertificate().getId());
+        attributeService.retrieveAttributesForUser(session.getEmail(), session.getCertificate().getId());
     }
 }
