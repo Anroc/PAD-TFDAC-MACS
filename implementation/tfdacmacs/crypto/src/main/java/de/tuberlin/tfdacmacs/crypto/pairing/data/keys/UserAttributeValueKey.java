@@ -4,8 +4,8 @@ import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 
 public class UserAttributeValueKey extends ElementKey {
-    public UserAttributeValueKey(@NonNull Element secretKey) {
-        super(secretKey);
+    public UserAttributeValueKey(@NonNull Element key) {
+        super(key);
     }
 
     public UserAttributeValueKey update(@NonNull UserAttributeValueUpdateKey userAttributeValueUpdateKey) {
