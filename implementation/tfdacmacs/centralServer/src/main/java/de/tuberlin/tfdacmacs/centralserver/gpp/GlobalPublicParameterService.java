@@ -1,14 +1,17 @@
 package de.tuberlin.tfdacmacs.centralserver.gpp;
 
+import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
+import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Data
@@ -19,6 +22,11 @@ public class GlobalPublicParameterService {
 
     private final PairingGenerator pairingGenerator;
     private final GlobalPublicParameterDB globalPublicParameterDB;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public GlobalPublicParameterChangedEvent initGPP() {
+        return new GlobalPublicParameterChangedEvent(getGlobalPublicParameter());
+    }
 
     public GlobalPublicParameter getGlobalPublicParameter() {
         if(globalPublicParameterDB.gppExist()) {
