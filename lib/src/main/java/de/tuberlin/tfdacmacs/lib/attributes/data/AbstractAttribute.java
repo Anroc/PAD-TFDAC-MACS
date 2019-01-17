@@ -62,7 +62,7 @@ public abstract class AbstractAttribute<T extends AttributeValueComponent> exten
     }
 
     private final AbstractAttribute addValues(@NonNull Set<T> values) {
-        values.forEach(this::addValue);
+        values.forEach(this::doAddValue);
         return this;
     }
 
