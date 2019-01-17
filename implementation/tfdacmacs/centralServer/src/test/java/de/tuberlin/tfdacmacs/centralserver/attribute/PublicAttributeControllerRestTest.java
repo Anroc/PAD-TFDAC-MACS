@@ -122,7 +122,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         );
         ResponseEntity<PublicAttributeValueResponse> exchange =
                 sslRestTemplate.exchange(
-                        "/attributes/" + publicAttribute.getId(),
+                        "/attributes/" + publicAttribute.getId() + "/values",
                         HttpMethod.POST,
                         new HttpEntity<>(attributeValueCreationRequest),
                         PublicAttributeValueResponse.class
