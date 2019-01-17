@@ -36,27 +36,7 @@ generateGrammarSource {
     outputDirectory = new File("${project.rootDir}/client/build/generated-src/antlr/main/de/tuberlin/tfdacmacs/client/antlr".toString())
 }
 
-//sourceSets {
-//    main {
-//        java {
-//            srcDirs 'generated-src/antlr/main/'
-//        }
-//    }
-//}
-
-//idea {
-//    module {
-//        sourceDirs += file("generated-src/antlr/main")
-//    }
-//}
-
 compileJava.dependsOn generateGrammarSource
-//compileJava.source sourceSets.generated.java, sourceSets.main.java
-
-//clean{
-//    delete "generated-src"
-//}
-
 
 dependencies {
     antlr("org.antlr:antlr4:4.7.1")

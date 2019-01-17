@@ -63,7 +63,7 @@ public class PublicAttributeController {
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/values")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
     public PublicAttributeValueResponse addAttributeValue(@PathVariable("id") String id, @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
