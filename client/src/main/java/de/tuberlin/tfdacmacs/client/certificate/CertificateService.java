@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -38,12 +37,11 @@ public class CertificateService {
     private final CertificateDB certificateDB;
 
     private final RestTemplateFactory restTemplateFactory;
-    private final RestTemplate restTemplate;
 
     public Certificate login(@NonNull String email) {
         File file = getP12KeyStore(email);
         if(file.exists()) {
-            restTemplateFactory.updateForMutualAuthentication(restTemplate, email);
+            restTemplateFactory.updateForMutualAuthentication(email);
             return certificateDB.find(email).orElseThrow(
                     () -> new IllegalStateException(
                             String.format("P12 Certificate exist but certificate object in DB does not [%s]", email))
@@ -101,7 +99,7 @@ public class CertificateService {
 
         generateP12KeyStore(key, cert, email);
 
-        restTemplateFactory.updateForMutualAuthentication(restTemplate, email);
+        restTemplateFactory.updateForMutualAuthentication(email);
     }
 
     private File generateP12KeyStore(Path key, Path cert, String email) {
