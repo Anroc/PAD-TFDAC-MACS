@@ -20,7 +20,7 @@ public class AESEncryptor extends AESCryptoMapper {
         super(hashGenerator, symmetricCryptEngine);
     }
 
-    public String encrypt(byte[] data, Element key) {
+    public byte[] encrypt(byte[] data, Element key) {
         Key symmetricKey = generateAesKey(key);
         try {
             return symmetricCryptEngine.encryptRaw(data, symmetricKey);

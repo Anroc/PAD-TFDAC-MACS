@@ -4,14 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.Charset;
 import java.security.*;
 
 @Slf4j
@@ -81,17 +79,14 @@ public abstract class SymmetricCryptEngine<T> extends CypherProcessor {
      *
      * @param data the data that shell be encrypted
      * @param key  the key that will be used (either public or private)
-     * @return the base64 encoded encrypted string.
+     * @return the encrypted content.
      * @throws BadPaddingException       on padding mismatch
      * @throws InvalidKeyException       on wrong cipher instance
      * @throws IllegalBlockSizeException on wrong alignment
      */
-    public String encryptRaw(byte[] data, Key key) throws BadPaddingException, InvalidKeyException,
+    public byte[] encryptRaw(byte[] data, Key key) throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException {
-        return new String(
-                Base64.encode(process(data, key, Cipher.ENCRYPT_MODE)),
-                Charset.forName(CHAR_ENCODING)
-        );
+        return process(data, key, Cipher.ENCRYPT_MODE);
     }
 
     /**
@@ -118,10 +113,10 @@ public abstract class SymmetricCryptEngine<T> extends CypherProcessor {
      * @throws InvalidKeyException       on wrong cipher instance
      * @throws IllegalBlockSizeException on wrong alignment
      */
-    public byte[] decryptRaw(String data, Key key)
+    public byte[] decryptRaw(byte[] data, Key key)
             throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException {
-        return process(Base64.decode(data), key, Cipher.DECRYPT_MODE);
+        return process(data, key, Cipher.DECRYPT_MODE);
     }
 
     @Override

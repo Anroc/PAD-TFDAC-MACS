@@ -59,7 +59,7 @@ public class StringSymmetricCryptEngine extends SymmetricCryptEngine<String> {
     public String decrypt(String data, Key key)
             throws BadPaddingException, InvalidKeyException,
             IllegalBlockSizeException {
-        return new String(decryptRaw(data, key), Charset.forName(CHAR_ENCODING));
+        return new String(decryptRaw(Base64.decode(data), key), Charset.forName(CHAR_ENCODING));
     }
 
 }

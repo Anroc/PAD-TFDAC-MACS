@@ -7,13 +7,12 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
+import org.assertj.core.util.Lists;
 import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -52,31 +51,30 @@ public class PairingCryptEngineTest extends UnitTestSuite {
     @Test
     public void encrypt_decrypt_passes_without_2FA() {
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
-        assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
-        assertThat(cipherText.isTwoFactorSecured()).isFalse();
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
 
-        // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
-
-        assertSameElements(output, message);
+        UserAttributeSecretComponent userAttributeSecretComponent = new UserAttributeSecretComponent(
+                userSecretAttributeValueKey, attributeKeys.getPublicKey(),
+                attributeValueIdentifier);
+        assertSuccessfulDecryption(cipherText, andCipherText.getFile(), userAttributeSecretComponent);
     }
 
     @Test
     public void encrypt_decrypt_passes_without_2FA_sameEncryptionDoesNotResolveInSameCipherText() {
         // encrypt
-        CipherText cipherText1 = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
-        CipherText cipherText2 = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
-        assertThat(cipherText1.getEncryptedMessage()).isNotEqualTo(cipherText2.getEncryptedMessage());
+        AndCipherText andCipherText1 = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText1 = andCipherText1.getCipherText();
+        AndCipherText andCipherText2 = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText2 = andCipherText2.getCipherText();
+        assertNotSameElements(andCipherText1.getFile().getData(), andCipherText2.getFile().getData());
         assertThat(cipherText1.getC1()).isNotEqualTo(cipherText2.getC1());
         assertThat(cipherText1.getC2()).isNotEqualTo(cipherText2.getC2());
         assertThat(cipherText1.getC3()).isNotEqualTo(cipherText2.getC3());
     }
 
     @Test
-    public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_sameAuthority() {
+    public void encrypt_decrypt_passes_without_2FA_with_multipleAttributes_sameAuthority() {
         String attrValueId = "aa.tu-berlin.de.role:student";
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
         UserAttributeValueKey userAttributeSecretValueKey2 = attributeValueKeyGenerator
@@ -87,17 +85,18 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         );
 
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new UserAttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
-
-        assertSameElements(output, message);
+        assertSuccessfulDecryption(
+                cipherText,
+                andCipherText.getFile(),
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponent(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId)
+        );
     }
 
     @Test
@@ -110,20 +109,21 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         );
 
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
-                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null)
+                () -> pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null)
         );
     }
 
     @Test
-    public void encrypt_decrypt_fails_without_2FA_with_multipleAttributes_otherAuthorities() {
+    public void encrypt_decrypt_passes_without_2FA_with_multipleAttributes_otherAuthorities() {
         String attrValueId = "aa.hpi.de.role:student";
         AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
@@ -136,17 +136,18 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         );
 
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new UserAttributeSecretComponents(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
-
-        assertSameElements(output, message);
+        assertSuccessfulDecryption(
+                cipherText,
+                andCipherText.getFile(),
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponent(userAttributeSecretValueKey2, attributeKeys.getPublicKey(), attrValueId)
+        );
     }
 
     @Test
@@ -160,15 +161,16 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         );
 
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
         assertThatExceptionOfType(AccessPolicyNotSatisfiedException.class).isThrownBy(
-                () -> pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null)
+                () -> pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null)
         );
     }
 
@@ -181,30 +183,32 @@ public class PairingCryptEngineTest extends UnitTestSuite {
                 .generateUserKey(gpp, userId, authorityAuthorityKey2.getPrivateKey(), attributeKeys2.getPrivateKey());
 
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
-
-        assertSameElements(output, message);
+        assertSuccessfulDecryption(
+                cipherText,
+                andCipherText.getFile(),
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponent(userSecretAttributeValueKey2, attributeKeys.getPublicKey(), attrValueId)
+        );
     }
 
     @Test
     public void encrypt_decrypt_passes_wit_FA() {
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrProperties();
         assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, twoFactoryKey.getPublicKeyOfUser(userId));
+        LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        byte[] output = pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, twoFactoryKey.getPublicKeyOfUser(userId));
 
         assertSameElements(output, message);
     }
@@ -212,14 +216,15 @@ public class PairingCryptEngineTest extends UnitTestSuite {
     @Test
     public void encrypt_decrypt_passes_with_FA_butUserHasNo2FAKey() {
         // encrypt
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, dataOwner);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrProperties();
         assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
+        byte[] output = pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertNotSameElements(output, message);
     }
@@ -237,16 +242,70 @@ public class PairingCryptEngineTest extends UnitTestSuite {
                 new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
         );
 
-        CipherText cipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        AndCipherText andCipherText = pairingCryptEngine.encrypt(message, andAccessPolicy, gpp, null);
+        CipherText cipherText = andCipherText.getCipherText();
         assertThat(cipherText).hasNoNullFieldsOrPropertiesExcept("ownerId");
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
 
         // decrypt
-        LinkedHashSet<UserAttributeSecretComponents> userAttributeSecretComponents = Sets.newLinkedHashSet(
-                new UserAttributeSecretComponents(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
-                new UserAttributeSecretComponents(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
-        byte[] output = pairingCryptEngine.decrypt(cipherText, gpp, userId, userAttributeSecretComponents, null);
+        LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
+                new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
+                new UserAttributeSecretComponent(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId));
+        byte[] output = pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null);
 
         assertNotSameElements(output, message);
+    }
+
+    @Test
+    public void encrypt_decrypt_passes_withDNFAccessPolicy() {
+        String attrValueId = "aa.tu-berlin.de.role:student";
+        AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
+        UserAttributeValueKey userAttributeSecretValueKey2 = attributeValueKeyGenerator
+                .generateUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys2.getPrivateKey());
+
+        AndAccessPolicy andAccessPolicy2 = new AndAccessPolicy(
+                Sets.newLinkedHashSet(new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId))
+        );
+        DNFAccessPolicy dnfAccessPolicy = new DNFAccessPolicy(
+                Lists.newArrayList(andAccessPolicy, andAccessPolicy2)
+        );
+
+
+        // encrypt
+        DNFCipherText dnfCipherText = pairingCryptEngine.encrypt(message, dnfAccessPolicy, gpp, null);
+        List<CipherText> cipherTexts = dnfCipherText.getCipherTexts();
+        assertThat(cipherTexts).hasSize(2);
+
+        // assert frist ciphertext
+        CipherText cipherText1 = cipherTexts.get(0);
+        UserAttributeSecretComponent userAttributeSecretComponent = new UserAttributeSecretComponent(
+                userSecretAttributeValueKey, attributeKeys.getPublicKey(),
+                attributeValueIdentifier);
+        assertSuccessfulDecryption(cipherText1, dnfCipherText.getFile(), userAttributeSecretComponent);
+
+        CipherText cipherText2 = cipherTexts.get(1);
+        UserAttributeSecretComponent userAttributeSecretComponent2 = new UserAttributeSecretComponent(
+                userAttributeSecretValueKey2, attributeKeys2.getPublicKey(),
+                attrValueId);
+        assertSuccessfulDecryption(cipherText2, dnfCipherText.getFile(), userAttributeSecretComponent2);
+    }
+
+    private void assertSuccessfulDecryption(CipherText cipherText1, File file, UserAttributeSecretComponent component, UserAttributeSecretComponent... components) {
+        assertThat(cipherText1).hasNoNullFieldsOrPropertiesExcept("ownerId");
+        assertThat(cipherText1.isTwoFactorSecured()).isFalse();
+
+        // decrypt
+        Set<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(components);
+        userAttributeSecretComponents.add(component);
+        byte[] output = pairingCryptEngine.decrypt(
+                file.getData(),
+                cipherText1,
+                gpp,
+                userId,
+                userAttributeSecretComponents,
+                null
+        );
+
+        assertSameElements(output, message);
     }
 }

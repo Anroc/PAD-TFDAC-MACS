@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.client.authority.AuthorityService;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.policy.AccessPolicyParser;
 import it.unisa.dia.gas.jpbc.Element;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Before;

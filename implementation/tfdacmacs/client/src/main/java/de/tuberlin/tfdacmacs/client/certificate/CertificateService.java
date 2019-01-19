@@ -43,7 +43,7 @@ public class CertificateService {
     public Certificate login(@NonNull String email) {
         File file = getP12KeyStore(email);
         if(file.exists()) {
-            restTemplateFactory.updateForMutalAuthentication(restTemplate, email);
+            restTemplateFactory.updateForMutualAuthentication(restTemplate, email);
             return certificateDB.find(email).orElseThrow(
                     () -> new IllegalStateException(
                             String.format("P12 Certificate exist but certificate object in DB does not [%s]", email))
@@ -101,7 +101,7 @@ public class CertificateService {
 
         generateP12KeyStore(key, cert, email);
 
-        restTemplateFactory.updateForMutalAuthentication(restTemplate, email);
+        restTemplateFactory.updateForMutualAuthentication(restTemplate, email);
     }
 
     private File generateP12KeyStore(Path key, Path cert, String email) {

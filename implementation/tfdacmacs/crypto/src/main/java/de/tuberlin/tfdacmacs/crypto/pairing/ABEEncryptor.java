@@ -20,7 +20,8 @@ public class ABEEncryptor extends ABECrypto {
     public CipherTextDescription encrypt(
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull GlobalPublicParameter gpp,
-            DataOwner dataOwner) {
+            DataOwner dataOwner,
+            Element key) {
         if(andAccessPolicy.getAttributePolicyElements() == null || andAccessPolicy.getAttributePolicyElements().isEmpty()) {
             throw new IllegalArgumentException("No Attribute policy given.");
         }
@@ -29,7 +30,7 @@ public class ABEEncryptor extends ABECrypto {
                 .map(AttributePolicyElement::getAttributeValueId)
                 .collect(Collectors.toSet());
 
-        Element key = gpp.getPairing().getGT().newRandomElement().getImmutable();
+        key = (key != null)? key : gpp.getPairing().getGT().newRandomElement().getImmutable();
         Element s = gpp.getPairing().getZr().newRandomElement().getImmutable();
 
         Map<AuthorityKey.Public, Set<AttributePolicyElement>> policy = andAccessPolicy.groupByAttributeAuthority();
@@ -45,7 +46,7 @@ public class ABEEncryptor extends ABECrypto {
             return new CipherTextDescription(c1, c2, c3, attributeValueIdentifier, null, key);
         } else {
             c3 = c3.powZn(s.duplicate().add(dataOwner.getTwoFactorPrivateKey().getKey())).getImmutable();
-            return new CipherTextDescription(c1, c2, c3, attributeValueIdentifier, dataOwner.getId(), null, key);
+            return new CipherTextDescription(c1, c2, c3, attributeValueIdentifier, dataOwner.getId(), key);
         }
     }
 
@@ -71,7 +72,7 @@ public class ABEEncryptor extends ABECrypto {
                         .powZn(r))
                 .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
 
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getEncryptedMessage());
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId());
     }
 
     public CipherText update(
@@ -110,7 +111,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC3 = cipherText.getC3().duplicate()
                 .mul(subSet2FaUpdateKeys.stream().reduce((a,b) -> a.duplicate().mul(b)).get())
                 .mul(mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements()).powZn(r));
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getEncryptedMessage());
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId());
     }
 
     private Element updateC1(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy, Element r) {

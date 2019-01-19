@@ -16,14 +16,14 @@ import java.util.Set;
 public class CipherTextEntity extends Entity {
 
     public CipherTextEntity(@NonNull String id, Element c1, Element c2, Element c3,
-            Set<String> accessPolicy, String ownerId, String encryptedMessage) {
+            Set<String> accessPolicy, String ownerId, String fileId) {
         super(id);
         this.c1 = c1;
         this.c2 = c2;
         this.c3 = c3;
         this.accessPolicy = accessPolicy;
         this.ownerId = ownerId;
-        this.encryptedMessage = encryptedMessage;
+        this.fileId = fileId;
     }
 
     @NotNull
@@ -39,5 +39,5 @@ public class CipherTextEntity extends Entity {
     private String ownerId;
 
     @NotBlank
-    private String encryptedMessage;
+    private String fileId;
 }

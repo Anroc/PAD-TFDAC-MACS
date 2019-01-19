@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -21,8 +21,8 @@ public class FileService {
     private final FileInformationDB fileInformationDB;
     private final FileConfiguration fileConfiguration;
 
-    public FileInformation saveFile(@NonNull String originalFilename, byte[] bytes) throws IOException {
-        FileInformation fileInformation = createNewFile(originalFilename);
+    public FileInformation saveFile(@NonNull String id, @NonNull String originalFilename, byte[] bytes) throws IOException {
+        FileInformation fileInformation = createNewFile(id, originalFilename);
         log.info("Creating new file '{}' [{}]", fileInformation.getOriginalName(), fileInformation.getPath());
         File file = Files.createFile(Paths.get(fileInformation.getPath())).toFile();
         Files.write(file.toPath(), bytes);
@@ -32,8 +32,7 @@ public class FileService {
         return fileInformation;
     }
 
-    private FileInformation createNewFile(String originalFilename) {
-        String id = UUID.randomUUID().toString();
+    private FileInformation createNewFile(String id, String originalFilename) {
         return new FileInformation(id, buildNewFilePath(id), originalFilename);
     }
 

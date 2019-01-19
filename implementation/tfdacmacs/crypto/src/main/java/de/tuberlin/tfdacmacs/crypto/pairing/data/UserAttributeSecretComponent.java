@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class UserAttributeSecretComponents {
+public class UserAttributeSecretComponent {
 
     private final UserAttributeValueKey userSecretAttributeKey;
     private final AttributeValueKey.Public attributePublicKey;

@@ -22,10 +22,10 @@ public class AESDecryptor extends AESCryptoMapper {
         super(hashGenerator, symmetricCryptEngine);
     }
 
-    public byte[] decrypt(String encryptedMessage, Element key) {
+    public byte[] decrypt(byte[] encryptedContent, Element key) {
         Key symmetricKey = generateAesKey(key);
         try {
-            return symmetricCryptEngine.decryptRaw(encryptedMessage, symmetricKey);
+            return symmetricCryptEngine.decryptRaw(encryptedContent, symmetricKey);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
             log.error("Decryption failed. Maybe wrong key is used.", e);
             return new byte[0];
