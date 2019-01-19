@@ -1,19 +1,15 @@
-package de.tuberlin.tfdacmacs.client.policy;
+package de.tuberlin.tfdacmacs.crypto.pairing.policy;
 
-import de.tuberlin.tfdacmacs.client.antlr.PolicyBaseListener;
-import de.tuberlin.tfdacmacs.client.antlr.PolicyLexer;
-import de.tuberlin.tfdacmacs.client.antlr.PolicyParser;
-import de.tuberlin.tfdacmacs.client.attribute.AttributeService;
-import de.tuberlin.tfdacmacs.client.attribute.exceptions.InvalidAttributeValueIdentifierException;
-import de.tuberlin.tfdacmacs.client.authority.AuthorityService;
-import de.tuberlin.tfdacmacs.client.authority.exception.InvalidAuthorityIdentifier;
-import de.tuberlin.tfdacmacs.client.policy.exception.ThrowingErrorListener;
+import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyBaseListener;
+import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyLexer;
+import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyParser;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.AccessPolicyElement;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.AndAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.AttributePolicyElement;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.policy.exception.ThrowingErrorListener;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
@@ -27,8 +23,8 @@ import java.util.Stack;
 @RequiredArgsConstructor
 public class AccessPolicyParser {
 
-    private final AttributeService attributeService;
-    private final AuthorityService authorityService;
+    private final AttributeValueKeyProvider attributeValueKeyProvider;
+    private final AuthorityKeyProvider authorityKeyProvider;
 
     public DNFAccessPolicy parse(@NonNull String policy) {
         PolicyLexer policyLexer = new PolicyLexer(CharStreams.fromString(policy));
@@ -40,7 +36,7 @@ public class AccessPolicyParser {
         policyParser.removeErrorListeners();
         policyParser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
-        ParserListener parserListener = new ParserListener(authorityService, attributeService);
+        ParserListener parserListener = new ParserListener();
         ParseTreeWalker parseTreeWalker = ParseTreeWalker.DEFAULT;
         parseTreeWalker.walk(parserListener, policyParser.policy());
 
@@ -51,8 +47,6 @@ public class AccessPolicyParser {
     public class ParserListener extends PolicyBaseListener {
 
         private final Stack<AccessPolicyElement> accessPolicyElement = new Stack<>();
-        private final AuthorityService authorityService;
-        private final AttributeService attributeService;
 
         @Override
         public void enterPolicy(PolicyParser.PolicyContext ctx) {
@@ -83,15 +77,8 @@ public class AccessPolicyParser {
             String authorityId = ctx.authorityId.getText();
             String attributeValueId = ctx.getText();
 
-            AuthorityKey.Public authorityPublicKey = authorityService.findAuthorityPublicKey(authorityId)
-                    .orElseThrow(
-                            () -> new InvalidAuthorityIdentifier(authorityId)
-                    );
-
-            AttributeValueKey.Public attributeValuePublicKey = attributeService.findAttributeValuePublicKey(attributeValueId)
-                    .orElseThrow(
-                            () -> new InvalidAttributeValueIdentifierException(attributeValueId)
-                    );
+            AuthorityKey.Public authorityPublicKey = authorityKeyProvider.getAuthorityPublicKey(authorityId);
+            AttributeValueKey.Public attributeValuePublicKey = attributeValueKeyProvider.getAttributeValuePublicKey(attributeValueId);
 
             current().put(new AttributePolicyElement(
                     authorityPublicKey,

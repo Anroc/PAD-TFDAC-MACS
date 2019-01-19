@@ -11,7 +11,7 @@ import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
@@ -35,7 +35,7 @@ public class AttributeClient {
     private final CaClient caClient;
     private final KeyPairService keyPairService;
     private final AsymmetricCryptEngine<?> asymmetricCryptEngine;
-    private final SymmetricCryptEngine<?> symmetricCryptEngine;
+    private final StringSymmetricCryptEngine symmetricCryptEngine;
 
     private final GPPService gppService;
 
@@ -63,8 +63,8 @@ public class AttributeClient {
 
     private Attribute decrypt(Key symmetricKey, EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO) {
         try {
-            byte[] rawElement = symmetricCryptEngine.decryptRaw(encryptedAttributeValueKeyDTO.getEncryptedKey(), symmetricKey);
-            Element element = ElementConverter.convert(rawElement, getG1());
+            String base64Element = symmetricCryptEngine.decrypt(encryptedAttributeValueKeyDTO.getEncryptedKey(), symmetricKey);
+            Element element = ElementConverter.convert(base64Element, getG1());
 
             return new Attribute(encryptedAttributeValueKeyDTO.getAttributeValueId(), element);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {

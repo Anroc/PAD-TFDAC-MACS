@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -23,26 +25,55 @@ public class PairingCryptEngine {
     private final ABEEncryptor abeEncrypt;
     private final ABEDecryptor abeDecryptor;
 
+    public DNFCipherText encrypt(
+            byte[] data,
+            @NonNull DNFAccessPolicy dnfAccessPolicy,
+            @NonNull GlobalPublicParameter gpp,
+            DataOwner dataOwner) {
+        AndAccessPolicy andAccessPolicy = dnfAccessPolicy.getAndAccessPolicies().get(0);
+        CipherTextDescription cipherTextDescription = abeEncrypt.encrypt(andAccessPolicy, gpp, dataOwner, null);
+        byte[] encryptedContent = aesEncryptor.encrypt(data, cipherTextDescription.getKey());
+        File file = new File(encryptedContent);
 
-    public CipherText encrypt(
+        List<CipherText> cipherTexts = new ArrayList<>();
+        cipherTexts.add(cipherTextDescription.bindTo(file));
+
+        for(int i = 1; i< dnfAccessPolicy.getAndAccessPolicies().size(); i++) {
+            andAccessPolicy = dnfAccessPolicy.getAndAccessPolicies().get(i);
+            CipherTextDescription additionalCTDescription = abeEncrypt.encrypt(
+                    andAccessPolicy,
+                    gpp,
+                    dataOwner,
+                    cipherTextDescription.getKey());
+
+            cipherTexts.add(additionalCTDescription.bindTo(file));
+        }
+
+        return new DNFCipherText(cipherTexts, file);
+    }
+
+
+    public AndCipherText encrypt(
             byte[] data,
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull GlobalPublicParameter gpp,
             DataOwner dataOwner) {
-        CipherTextDescription cipherTextDescription = abeEncrypt.encrypt(andAccessPolicy, gpp, dataOwner);
-        String encryptedMessage = aesEncryptor.encrypt(data, cipherTextDescription.getKey());
-        return cipherTextDescription.toCipherText(encryptedMessage);
+        CipherTextDescription cipherTextDescription = abeEncrypt.encrypt(andAccessPolicy, gpp, dataOwner, null);
+        byte[] encryptedContent = aesEncryptor.encrypt(data, cipherTextDescription.getKey());
+        File file = new File(encryptedContent);
+        return new AndCipherText(cipherTextDescription.bindTo(file), file);
     }
 
     public byte[] decrypt(
+            byte[] encryptedContent,
             @NonNull CipherText cipherText,
             @NonNull GlobalPublicParameter gpp,
             @NonNull String userId,
-            @NonNull Set<UserAttributeSecretComponents> secrets,
+            @NonNull Set<UserAttributeSecretComponent> secrets,
             TwoFactorKey.Public twoFactorPublicKey) {
 
         Element key = abeDecryptor.decrypt(cipherText, gpp, userId, secrets, twoFactorPublicKey);
-        return aesDecryptor.decrypt(cipherText.getEncryptedMessage(), key);
+        return aesDecryptor.decrypt(encryptedContent, key);
     }
 
     public CipherText update(

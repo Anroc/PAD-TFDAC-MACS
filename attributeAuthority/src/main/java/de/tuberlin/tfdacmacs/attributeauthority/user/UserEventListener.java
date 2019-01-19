@@ -12,6 +12,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.encoders.Base64;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -82,7 +83,7 @@ public class UserEventListener {
                         attribute -> attribute.getAttributeValueId(),
                         attribute -> {
                             try {
-                                return symmetricCryptEngine.encryptRaw(attribute.getKey().getKey().toBytes(), key);
+                                return Base64.toBase64String(symmetricCryptEngine.encryptRaw(attribute.getKey().getKey().toBytes(), key));
                             } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
                                 throw new RuntimeException(e);
                             }

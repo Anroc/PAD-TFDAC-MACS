@@ -21,6 +21,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.api.Java6Assertions;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -273,7 +274,7 @@ public class RegisterUser extends IntegrationTestSuite {
 
         String encryptedKey = body.getEncryptedKey();
         Key key = symmetricCryptEngine.createKeyFromBytes(asymmetricCryptEngine.decryptRaw(encryptedKey, clientKeyPair.getPrivate()));
-        byte[] rawElement = symmetricCryptEngine.decryptRaw(encryptedAttributeValueKeyDTO.getEncryptedKey(), key);
+        byte[] rawElement = symmetricCryptEngine.decryptRaw(Base64.decode(encryptedAttributeValueKeyDTO.getEncryptedKey()), key);
         byte[] originalBytes = attributeSecretKey.toBytes();
 
         assertSameElements(rawElement, originalBytes);

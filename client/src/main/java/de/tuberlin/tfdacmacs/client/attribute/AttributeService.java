@@ -2,7 +2,9 @@ package de.tuberlin.tfdacmacs.client.attribute;
 
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
+import de.tuberlin.tfdacmacs.client.attribute.exceptions.InvalidAttributeValueIdentifierException;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AttributeService {
+public class AttributeService implements AttributeValueKeyProvider {
 
     private final AttributeClient attributeClient;
     private final AttributeDB attributeDB;
@@ -35,5 +37,12 @@ public class AttributeService {
 
     public Optional<AttributeValueKey.Public> findAttributeValuePublicKey(@NonNull String attributeValueId) {
         return attributeClient.findAttributePublicKey(attributeValueId);
+    }
+
+    @Override
+    public AttributeValueKey.Public getAttributeValuePublicKey(@NonNull String attributeValueId) {
+        return findAttributeValuePublicKey(attributeValueId).orElseThrow(
+                () -> new InvalidAttributeValueIdentifierException(attributeValueId)
+        );
     }
 }

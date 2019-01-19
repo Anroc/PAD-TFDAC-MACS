@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.policy.exception;
+package de.tuberlin.tfdacmacs.crypto.pairing.policy.exception;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;

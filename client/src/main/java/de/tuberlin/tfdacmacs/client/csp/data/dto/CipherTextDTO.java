@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.csp.ciphertext.data.dto;
+package de.tuberlin.tfdacmacs.client.csp.data.dto;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
-import de.tuberlin.tfdacmacs.csp.ciphertext.data.CipherTextEntity;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,8 +37,8 @@ public class CipherTextDTO {
     @NotBlank
     private String fileId;
 
-    public CipherTextEntity toCipherTextEntity(@NonNull Field field) {
-        return new CipherTextEntity(
+    public CipherText toCipherText(@NonNull Field field) {
+        return new CipherText(
                 id,
                 ElementConverter.convert(c1, field),
                 ElementConverter.convert(c2, field),
@@ -49,15 +49,16 @@ public class CipherTextDTO {
         );
     }
 
-    public static CipherTextDTO from(@NonNull CipherTextEntity cipherTextEntity) {
+    public static CipherTextDTO from(@NonNull CipherText cipherText) {
         return new CipherTextDTO(
-                cipherTextEntity.getId(),
-                ElementConverter.convert(cipherTextEntity.getC1()),
-                ElementConverter.convert(cipherTextEntity.getC2()),
-                ElementConverter.convert(cipherTextEntity.getC3()),
-                cipherTextEntity.getAccessPolicy(),
-                cipherTextEntity.getOwnerId(),
-                cipherTextEntity.getFileId()
+                cipherText.getId(),
+                ElementConverter.convert(cipherText.getC1()),
+                ElementConverter.convert(cipherText.getC2()),
+                ElementConverter.convert(cipherText.getC3()),
+                cipherText.getAccessPolicy(),
+                cipherText.getOwnerId(),
+                cipherText.getFileId()
         );
     }
+
 }

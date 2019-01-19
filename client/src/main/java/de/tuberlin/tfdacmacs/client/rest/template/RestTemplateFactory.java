@@ -10,6 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -27,19 +28,38 @@ import java.security.cert.CertificateException;
 @RequiredArgsConstructor
 public class RestTemplateFactory {
 
+    public static final String CA_REST_TEMPLATE_BEAN_NAME = "caRestTemplate";
+    public static final String CSP_REST_TEMPLATE_BEAN_NAME = "cspRestTemplate";
+
     private final ClientConfig clientConfig;
+    private final ApplicationContext applicationContext;
 
     protected RestTemplate plainRestTemplate(@NonNull String rootURL) {
         RestTemplate restTemplate = new RestTemplateBuilder().rootUri(rootURL).build();
         return restTemplate;
     }
 
-    @Bean
-    protected RestTemplate sslRestTemplate() {
-        return buildRestTemplate(null);
+    @Bean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME)
+    protected RestTemplate sslCARestTemplate() {
+        return buildRestTemplate(clientConfig.getCaRootUrl(), null);
     }
 
-    public RestTemplate updateForMutalAuthentication(@NonNull RestTemplate restTemplate, @NonNull String email) {
+    @Bean(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME)
+    protected RestTemplate sslCSPRestTemplate() {
+        return buildRestTemplate(clientConfig.getCaRootUrl(), null);
+    }
+
+    public void updateForMutualAuthentication(@NonNull String email) {
+        RestTemplate caRestTemplate = applicationContext
+                .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
+        RestTemplate cspRestTemplate = applicationContext
+                .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
+
+        updateRestTemplate(email, caRestTemplate);
+        updateRestTemplate(email, cspRestTemplate);
+    }
+
+    private RestTemplate updateRestTemplate(@NonNull String email, RestTemplate restTemplate) {
         try {
             HttpClient httpClient = buildHttpClient(clientConfig.getP12Certificate(), email);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
@@ -49,10 +69,10 @@ public class RestTemplateFactory {
         }
     }
 
-    private RestTemplate buildRestTemplate(KeyStoreConfig p12Certificate) {
+    private RestTemplate buildRestTemplate(String rootUrl, KeyStoreConfig p12Certificate) {
         try {
             HttpClient httpClient = buildHttpClient(p12Certificate, null);
-            RestTemplate restTemplate = plainRestTemplate(clientConfig.getCaRootUrl());
+            RestTemplate restTemplate = plainRestTemplate(rootUrl);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
             return restTemplate;
         } catch(Exception e) {

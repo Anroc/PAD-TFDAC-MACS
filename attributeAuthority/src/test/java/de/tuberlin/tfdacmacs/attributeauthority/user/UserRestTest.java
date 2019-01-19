@@ -20,6 +20,7 @@ import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -206,7 +207,7 @@ public class UserRestTest extends RestTestSuite {
 
         String encryptedKey = deviceUpdateRequest.getEncryptedKey();
         Key key = symCryptEngine.createKeyFromBytes(asymCryptEngine.decryptRaw(encryptedKey, userKeyPair.getPrivate()));
-        byte[] rawElement = symCryptEngine.decryptRaw(encryptedAttributeValueKeyDTO.getEncryptedKey(), key);
+        byte[] rawElement = symCryptEngine.decryptRaw(Base64.decode(encryptedAttributeValueKeyDTO.getEncryptedKey()), key);
         byte[] originalBytes = extractFromSet(user.getAttributes()).getKey().getKey().toBytes();
 
         assertSameElements(rawElement, originalBytes);

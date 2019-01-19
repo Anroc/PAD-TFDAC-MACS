@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/files")
@@ -20,16 +21,20 @@ public class FileController {
 
     private final FileService fileService;
 
-    @PostMapping
+    @PostMapping(params = "id")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public FileInformationResponse uploadImage(@RequestParam("file") MultipartFile file) {
+    public FileInformationResponse createFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "id", required = false) String id) {
+
         if (file.isEmpty()) {
             throw new ServiceException("Given file was empty.", HttpStatus.BAD_REQUEST);
         }
 
         try {
-            FileInformation fileInformation = fileService.saveFile(file.getOriginalFilename(), file.getBytes());
+            id = (id == null)? UUID.randomUUID().toString() : id;
+            FileInformation fileInformation = fileService.saveFile(id, file.getOriginalFilename(), file.getBytes());
             return FileInformationResponse.from(fileInformation);
         } catch (IOException e) {
             throw new ServiceException("Could not save file.", e);

@@ -6,6 +6,7 @@ client:
   db:
     data-dir: data-client
   ca-root-url: https://server.vpn:9001/
+  csp-root-url: https://server.vpn:9003/
   private-key:
     location: ./
     key-alias: key

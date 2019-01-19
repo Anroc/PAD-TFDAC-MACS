@@ -10,7 +10,6 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
 apply plugin: 'antlr'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
@@ -30,17 +29,7 @@ publishing {
     }
 }
 
-generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ['-package', 'de.tuberlin.tfdacmacs.client.antlr']
-    outputDirectory = new File("${project.rootDir}/client/build/generated-src/antlr/main/de/tuberlin/tfdacmacs/client/antlr".toString())
-}
-
-compileJava.dependsOn generateGrammarSource
-
 dependencies {
-    antlr("org.antlr:antlr4:4.7.1")
-    compile("org.antlr:antlr4-runtime:4.7.1")
     compile('net.java.dev.jna:jna:5.1.0')
     compile('it.unisa.dia.gas:jpbc-pbc:2.0.0')
     compile('org.bouncycastle:bcprov-jdk15on:1.60')
