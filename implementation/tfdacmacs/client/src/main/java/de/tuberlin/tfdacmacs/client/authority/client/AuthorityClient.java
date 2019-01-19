@@ -25,7 +25,7 @@ public class AuthorityClient {
                     new AuthorityKey.Public<>(
                         ElementConverter.convert(
                             caClient.getAuthority(authorityId).getPublicKey(),
-                            gppService.getGPP().getPairing().getG1())));
+                            gppService.getGPP().getPairing().getGT())));
         } catch(InterServiceCallError e) {
             if(e.getResponseStatus() == HttpStatus.NOT_FOUND) {
                 return Optional.empty();
