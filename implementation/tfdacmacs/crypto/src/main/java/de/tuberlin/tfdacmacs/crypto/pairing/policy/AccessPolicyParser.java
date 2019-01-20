@@ -15,11 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.springframework.stereotype.Component;
 
 import java.util.Stack;
 
-@Component
 @RequiredArgsConstructor
 public class AccessPolicyParser {
 
