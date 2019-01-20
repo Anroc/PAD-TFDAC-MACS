@@ -21,19 +21,19 @@ public class FileController {
 
     private final FileService fileService;
 
-    @PostMapping(params = "id")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_USER')")
     public FileInformationResponse createFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "id", required = false) String id) {
+            @RequestParam(value = "id", defaultValue = "") String id) {
 
         if (file.isEmpty()) {
             throw new ServiceException("Given file was empty.", HttpStatus.BAD_REQUEST);
         }
 
         try {
-            id = (id == null)? UUID.randomUUID().toString() : id;
+            id = (id.isEmpty())? UUID.randomUUID().toString() : id;
             FileInformation fileInformation = fileService.saveFile(id, file.getOriginalFilename(), file.getBytes());
             return FileInformationResponse.from(fileInformation);
         } catch (IOException e) {
