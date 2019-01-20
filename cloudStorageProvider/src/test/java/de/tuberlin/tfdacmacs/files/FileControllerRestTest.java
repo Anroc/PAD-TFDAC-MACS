@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,6 +86,39 @@ public class FileControllerRestTest extends RestTestSuite {
 
         FileInformation fileInformation = fileInformationDB.findEntity(id).get();
         assertThat(fileInformation.getId()).isEqualTo(id);
+        assertThat(fileInformation.getOriginalName()).isEqualTo(fileName);
+        String path = fileInformation.getPath();
+        assertThat(path).isNotBlank();
+
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        assertSameElements(bytes, content);
+    }
+
+    @Test
+    public void createFile_usingCustomId() throws Exception {
+        String fileName = "obvious_p0rn";
+        byte[] content = "only over 18!!!".getBytes();
+        String id = UUID.randomUUID().toString();
+
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
+        MockMultipartFile firstFile = new MockMultipartFile("file", fileName, ContentType.APPLICATION_OCTET_STREAM.toString(), content);
+        MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
+                .multipart(sslRestTemplate.getRootUri() + "/files?id=" + id)
+                .file(firstFile);
+        MvcResult mvcResult = mockMvc.perform(file)
+                .andExpect(status().is(201))
+                .andReturn();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        FileInformationResponse fileInformationResponse = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsString(), FileInformationResponse.class);
+
+        String receivedId = fileInformationResponse.getId();
+        assertThat(receivedId).isNotBlank().isEqualTo(id);
+
+        FileInformation fileInformation = fileInformationDB.findEntity(receivedId).get();
+        assertThat(fileInformation.getId()).isEqualTo(receivedId);
         assertThat(fileInformation.getOriginalName()).isEqualTo(fileName);
         String path = fileInformation.getPath();
         assertThat(path).isNotBlank();
