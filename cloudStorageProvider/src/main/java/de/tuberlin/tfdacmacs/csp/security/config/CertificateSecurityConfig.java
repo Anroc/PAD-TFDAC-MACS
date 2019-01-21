@@ -25,7 +25,6 @@ public class CertificateSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
                     .antMatchers(HttpMethod.GET,"/v2/api-docs").permitAll()
                     // device registration
-                    .antMatchers("/certificates/**").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .x509()
@@ -37,8 +36,7 @@ public class CertificateSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**")
-                .and().ignoring().antMatchers("/certificates/**");
+        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**");
     }
 
     @Bean

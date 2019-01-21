@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,9 +22,14 @@ public class FileService {
     private final FileInformationDB fileInformationDB;
     private final FileConfiguration fileConfiguration;
 
+    @PostConstruct
+    public void init() {
+        Paths.get(fileConfiguration.getDataDir()).toFile().mkdirs();
+    }
+
     public FileInformation saveFile(@NonNull String id, @NonNull String originalFilename, byte[] bytes) throws IOException {
         FileInformation fileInformation = createNewFile(id, originalFilename);
-        log.info("Creating new file '{}' [{}]", fileInformation.getOriginalName(), fileInformation.getPath());
+        log.info("Creating new file '{}' [{}]", fileInformation.getOriginalName(), Paths.get(fileInformation.getPath()).toFile().getAbsolutePath());
         File file = Files.createFile(Paths.get(fileInformation.getPath())).toFile();
         Files.write(file.toPath(), bytes);
 
