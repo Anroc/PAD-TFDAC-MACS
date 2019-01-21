@@ -29,7 +29,7 @@ node {
             }
         }, stopServices: {
             stage('stopping services') {
-              sh('/var/lib/jenkins/deploy/stopAll.sh')
+              sh('/var/lib/jenkins/deploy/stopAll.sh || true')
             }
         }
 
