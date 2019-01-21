@@ -46,14 +46,14 @@ public class RestTemplateFactory {
 
     @Bean(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME)
     protected RestTemplate sslCSPRestTemplate() {
-        return buildRestTemplate(clientConfig.getCaRootUrl(), null);
+        return buildRestTemplate(clientConfig.getCspRootUrl(), null);
     }
 
     public void updateForMutualAuthentication(@NonNull String email) {
         RestTemplate caRestTemplate = applicationContext
                 .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
         RestTemplate cspRestTemplate = applicationContext
-                .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
+                .getBean(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
 
         updateRestTemplate(email, caRestTemplate);
         updateRestTemplate(email, cspRestTemplate);

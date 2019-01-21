@@ -20,7 +20,7 @@ public class CaClientRestTemplate extends ClientRestTemplate implements CaClient
 
     @Autowired
     public CaClientRestTemplate(@Qualifier(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME) RestTemplate restTemplate) {
-        super(restTemplate);
+        super(restTemplate, "CA");
     }
 
     @Override

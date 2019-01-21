@@ -16,6 +16,7 @@ import java.util.Map;
 public abstract class ClientRestTemplate {
 
     private final RestTemplate restTemplate;
+    private final String serviceName;
     private volatile Map<Long, HttpHeaders> httpHeaders = new HashMap<>();
 
 
@@ -29,7 +30,7 @@ public abstract class ClientRestTemplate {
                 waitSeconds(10);
             }
 
-            log.info("Asking CA for [{}:{}]", httpMethod, url);
+            log.info("Asking {} for [{}:{}]", serviceName, httpMethod, url);
 
             try {
                 response = restTemplate.exchange(

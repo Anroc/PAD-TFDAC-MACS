@@ -1,5 +1,5 @@
 \chapter{Implementation}
-As evaluated in the last sections we will proceed to implement TF-DAC-MACS with small adaptions for a practical secure cloud storage system. To do so five entities need to implemented into our distributed system:  
+As evaluated in the last sections we will proceed to implement TF-DAC-MACS with small adaptions for a practical secure cloud storage system. To do so the role of the four entities present in the system will be shortly summarized:
 
 \begin{itemize}
   \item \textbf{Central Server} does the initial setup of the global public parameter used in the later process. It publishes this information on a public bulletin board. Further, the CA is the central entry point to trigger and permit AA creations. It audits the \textit{Authority Identifier} (\ac{AID}) provided by the AA and which should be unique in this system. 
@@ -7,7 +7,7 @@ As evaluated in the last sections we will proceed to implement TF-DAC-MACS with 
 Further, the CA functions as a \textit{Certificate Authority}. It issues a certificate for the GID and RSA public keys of the user. This certificate can be revoked so that the user is not able to obtain new secret keys from the AA or other data owners.
 The CA is also the central service that provides all necessary information to the client. Such as public attribute keys, encrypted user private attribute keys and certificates.
  The Central Server is honest-but-curious.
-  \item \textbf{Attribute Authority (\ac{AA})} creates the secret keys for its attributes. Attributes are prefixed with the \ac{AID} to ensure uniqueness among the attribute universe. AAs are also untrusted but never collude with users. They have decryption power in their domain. 
+  \item \textbf{Attribute Authority (\ac{AA})} creates the secret keys for its attributes. Attributes are prefixed with the \ac{AID} to ensure uniqueness among the attribute universe. They have decryption power in their domain. Further, they are in charge of revoking attributes. 
   \item \textbf{Cloud Storage Provider (\ac{CSP})} The cloud storage provider provides storage to save the encrypted files. If an cipher text update is needed the CSP updates the cipher text accordingly. 
   \item \textbf{Users} download and decipher ciphertext. They receive attribute secret keys from the AA, GID and certificates from the server and two factor keys from the data owners. The CSP is honest-but-curious as well.
   \item \textbf{Data owner} are specifications of users who can issue two-factor keys to other users. The so called \textit{Two-Factor Key} (\ac{2FA}-Key), adds an additional security layer to the cipher text. It restricts the access to the encrypted plain text to a even smaller select user group.  
@@ -16,23 +16,55 @@ The CA is also the central service that provides all necessary information to th
 In the following sections, the different phases setup, encrypt, decrypt, attribute revocation and authentication key revocation are shortly explained. Please note that for any scheme details we referrer to the TF-DAC-MACS \cite{li2017two} paper .
 
 \section{Setup}
-\begin{figure}[!ht]
-\centering
-    \includegraphics[width=\linewidth]{img/TF-DAC-MACS-overview-setup.png}
-    \caption{Setup phase}
-    \label{fig:tfdacmacs-setup}
-\end{figure}
-
 The setup summarizes the steps described in \cite{li2017two} such as: Setup, user registration, data owner registration, authority setup, key generation and authentication requests. 
 
-The first step is to create the global public parameters on the server. Thous parameter are exposed on a public bulletin board and available for each entity in the system. Since they are required in every step it is assumed that the entity downloaded this information in advance. 
+% GPP init
+\subsection{Generate Global Public Paramter}
+The very first step is to create the global public parameters on the central server. Thous parameter are exposed on a public bulletin board and available for each entity in the system. Since they are required in every step it is assumed that the entity downloaded this information in advance. 
 
-On AA setup the server first generates a new AID. This AID will be mapped to the domain name of this entity. So for example the TU-Berlin will have as its ID: "aa.tu-berlin.de". In this way it is ensured that no AID can double. Further, it would be verifiable via the certificate chain of TLS/SSL that this AID indeed belongs to the TU-Berlin. To do so the certificate coupled with this domain can be verified and then a query to "aa.tu-berlin.de" would lead to the corresponding AA of the TU-Berlin.
+% AA setup
+\subsection{Setup Attribute Authority}
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=\linewidth]{img/aa_setup.png}
+    \caption{Attribute Authority Setup}
+    \label{fig:aa-setup}
+\end{figure}
+An AA is registered, as shown in figure \ref{fig:aa-setup}, with the help of a central server administrator (CS-Admin) and a attribute authority administrator (AA-Admin). As a prerequisite the AA-Admin already created a RSA key pair and send the public component to the CS-Admin together with the desired authority identifier (AID). The AID should be globally unique among this ecosystem so that authority domains can be clearly differentiated. Now the CS-Admin creates a new certificate request embedding the RSA public key of the new AA (1.). The central server checks that the given AID is unique and signs the certificate request (2.). The resulting certificate is passed back to the AA (3.) where it, together with the RSA private key, can be used for mutual certificate authentication. 
 
-The AA is free to generate attribute keys. Attributes also have identifier and values assigned to them. Values and attribute identifier can be any valid string as long as it does not contain any special characters such as ":" or ".". The attribute will have the form of "<AID>.attr.<Attribute\_name>:<Attribute\_value>". For example the major computer science would be displayed as "aa.tu-berlin.de.attr.major:computer\_sience". Each attribute-value pair gets a secret key assigned. The public component for this attribute will be saved in the AA and published on the public bulletin board of the Central Server. 
+The AA-Admin uploads the received certificate and the private key to the AA service (4.) so that it can communicate confident and authenticated with the central server. For each ABE related key generation the GPP are needed, which can now be retrieved over a secured channel, from the CS (5. and 6.). To create attribute keys first an ABE authority key needs to be created (7.) . Now the AA-Admin specifies the attributes by providing the attribute name and values to the service (8.). Internally, the attribute value keys are generated (9.). For each attribute value a ABE key-pair is generated. And to ensure uniques of the attribute identifier it is composed using the following syntax: "<AID>.attr.<Attribute\_name>:<Attribute\_value>". For example the major computer science would be displayed as "aa.tu-berlin.de.attr.major:computer\_sience". In the final step, a signed version of the public attribute value keys and authority public key and the attribute identifier are uploaded to the central service (10.).
 
-In the next step, users are registered to the server. They receive the GID and a certificate for this GID. They can use the certificate later on to register to the AA or to authenticate them self to other users. The GID will be the email of the user. After the certificate is approved by the AA, it encrypts the user specific attribute value keys with the public key embedded in the presented certificate and pushes the encrypted attribute value keys to the central server. The user downloads and decrypts this keys. \todo{include registration flow graphic and describe this flow more deeply}
+\subsection{Register a user}
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=\linewidth]{img/user_register.png}
+    \caption{Register a user}
+    \label{fig:user-register}
+\end{figure}
+Figure \ref{fig:user-register} shows the user registration flow. Users are registered by the AA-Admin. He chooses a user identifier (UID) and attributes for the new user (1.).  The AA now checks if all attribute values are already known or if a new attribute value key pair needs to be created (2.). If new attribute values would have been created their public component would also be signed and published to the central server. The user specific attribute secret keys needs to be created (3.). They have the hash of the UID embedded so that on colluding with other users this hash would mesh and no successful decryption would be possible. Finally, the central server is notified for this new user. It just saves the user object for future reference.
 
+\subsection{Register a device}
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=\linewidth]{img/device_register.png}
+    \caption{Register a device for a user}
+    \label{fig:device-register}
+\end{figure}
+
+A device is the first end-system that is able to encrypt and decrypt files in the system. Figure \ref{fig:register-device} shows the rather complex flow for registering a new device. We start off by first creating a new RSA key pair on this device. These are used for later communication and securing the transmission of the private attribute keys to the client. 
+
+The device creates a new certificate request embedding its public key as the subject. This certificate request is posted as a pending request under a user object (1.). The central server processes the certificate request, validates that the user with the desired UID exist and returns a certificate for this request to the device (2.). In addition the central service notifies the AA of the user that a new device was initialized by passing the new certificate (3.). The AA-Admin gets notified for this new device and its certificate (4.). He then manually contacts the addressed user and asks him if he registered a new device (5.). They compare fingerprints of the public key of the certificate and the public key of the user’s device (6.). If they match the AA-Admin approves the device (7.). The AA encrypts the attribute secret keys of the user with the public key embedded in the certificate, signs the content and pushes this information to the central server (8.). 
+
+The double check between AA-Admin and user is imported because the central service (since it might try to provide wrong information) might have generated a new RSA key pair, self-signed the certificate request for them and secretly added it as a fake device to a user. If the AA would just send the attribute private keys along without double checking with the user, the central server would retrieve the attribute private keys for this user. 
+
+Now the device gets notified that it has been approved and receives the encrypted and signed attribute secret keys (9.). To validate the identity of this secret keys, the device needs to retrieve the certificate of his administrating authority (10.). The device is expected to have the AA address set somewhere in its settings. \footnote{The device can not ask the central server for the certificate or AA address since it retrieves untrustable information.} So the device requests the AA certificate and the trusted AA IDs (11.). The device will only trust attribute private and public keys coming from a trusted AA ID. If it gets attributes of one of thous trusted AAs, it will request again the certificate of the AA to validate the authenticity of the public and private attribute keys. 
+
+This is due to the fact that the central server just might overwrite the public attribute keys so that the device encrypts using the tampered keys. Now the central server would only have to use his generated attribute private keys to decipher the encrypted content. 
+
+In the final step, the device decrypts the attribute secret keys using its private key and validating the signature using the certificate it retrieved (12.). Some might have noticed that the device would just retrieve its attribute secret keys directly from the AA. However, form the view of designing a practical system it makes sense to only have one entry point to retrieve attributes from instead of crawling all trusted AAs periodically. 
+
+\subsection{Two-Factor Keys}
+\todo{todo}
 In the final setup, users can issue each other two factor keys so called \textit{authentication keys}. This authentication keys introduce a new layer of security where users can decide who exactly can decipher their plain text. In some cases this may be needed since access policies in ABE describe always a group of user and the exact members of this group remains hidden from the data owner.
  
 An example flow to receive the 2FA-Key would look like this: If Bob wants to get an authentication key from Alice he sends an authentication request to the CA addressing Alice and containing his certificate. Alice gets notified about the request, checks the validity of the certificate and creates the authentication key for Bob. She  uses the public key embedded in Bobs certificate to encrypt the private authentication key and uploads it to the CA. Bob downloads the encrypted key and decrypts it. In the later manner, Bob can use this authentication key to authenticate against the cipher text created by Alice. 

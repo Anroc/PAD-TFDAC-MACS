@@ -21,7 +21,7 @@ public class CspClientRestTemplate extends ClientRestTemplate implements CSPClie
 
     @Autowired
     public CspClientRestTemplate(@Qualifier(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME) RestTemplate restTemplate) {
-        super(restTemplate);
+        super(restTemplate, "CSP");
     }
 
     @Override
@@ -35,7 +35,7 @@ public class CspClientRestTemplate extends ClientRestTemplate implements CSPClie
 
     @Override
     public void createFile(String id, MultiValueMap<String, Object> file) {
-        request("/files",
+        request(String.format("/files?id=%s", id),
                 HttpMethod.POST,
                 Void.class,
                 file

@@ -27,6 +27,10 @@ node {
                     sh('./gradlew clean assemble testClasses')
                 }
             }
+        }, stopServices: {
+            stage('stopping services') {
+              sh('/var/lib/jenkins/deploy/stopAll.sh')
+            }
         }
 
 

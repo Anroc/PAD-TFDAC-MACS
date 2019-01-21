@@ -42,7 +42,6 @@ public class FileKeyClient {
             }
         };
         map.add("file", contentsAsResource);
-
         cspClient.withHeaders(httpHeaders).createFile(file.getId(), map);
     }
 }

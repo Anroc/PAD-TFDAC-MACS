@@ -8,6 +8,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFCipherText;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EncryptionService {
@@ -31,6 +33,7 @@ public class EncryptionService {
 
             List<CipherText> cipherTexts = dnfCipherText.getCipherTexts();
             cspService.createCipherTexts(cipherTexts);
+            log.info("FileId: {} for file: {}", dnfCipherText.getFile().getId(), plainText.toFile().getName());
             cspService.uploadFile(EncryptedFile.from(dnfCipherText.getFile(), plainText.toFile().getName()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
