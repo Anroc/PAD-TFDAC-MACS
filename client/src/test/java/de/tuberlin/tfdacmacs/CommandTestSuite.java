@@ -34,6 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -129,6 +130,10 @@ public abstract class CommandTestSuite {
     public void cleanUp() throws IOException {
         applicationContext.getBeansOfType(CRUDOperations.class).values()
                 .forEach(CRUDOperations::drop);
-        FileUtils.cleanDirectory(Paths.get(clientConfig.getP12Certificate().getLocation()).toFile());
+
+        File p12Dir = Paths.get(clientConfig.getP12Certificate().getLocation()).toFile();
+        if(p12Dir.exists()) {
+            FileUtils.cleanDirectory(p12Dir);
+        }
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -51,7 +52,10 @@ public class RegisterCommand {
     @ShellMethod("Resets this client")
     public void reset() throws IOException {
         context.getBeansOfType(CRUDOperations.class).values().forEach(CRUDOperations::drop);
-        FileUtils.cleanDirectory(Paths.get(clientConfig.getP12Certificate().getLocation()).toFile());
+        File p12Dir = Paths.get(clientConfig.getP12Certificate().getLocation()).toFile();
+        if(p12Dir.exists()) {
+            FileUtils.cleanDirectory(p12Dir);
+        }
         publisher.publishEvent(new LogoutEvent("Reset was called."));
     }
 
