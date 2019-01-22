@@ -17,4 +17,7 @@ public interface UserRepository extends CouchbaseRepository<User, String> {
 
     @Query("#{#n1ql.selectEntity} USE KEYS $1 WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.user.data.User' and authorityId = $2")
     Optional<User> findByIdAndAuthorityId(String userId, String authorityId);
+
+    @Query("#{#n1ql.selectEntity} USE KEYS $1 WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.user.data.User'")
+    Optional<User> findUserById(String userId);
 }

@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.client.attribute.AttributeService;
 import de.tuberlin.tfdacmacs.client.certificate.CertificateService;
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
+import de.tuberlin.tfdacmacs.client.config.StandardStreams;
 import de.tuberlin.tfdacmacs.client.db.CRUDOperations;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
@@ -30,6 +31,7 @@ public class RegisterCommand {
 
     private final ApplicationContext context;
     private final ClientConfig clientConfig;
+    private final StandardStreams standardStreams;
 
     @ShellMethod("Register this client")
     public void register(String email) {
@@ -37,7 +39,7 @@ public class RegisterCommand {
         certificateService.generateP12KeyStore(certificate);
         attributeService.retrieveAttributesForUser(email, certificate.getId());
         publisher.publishEvent(new RegisteredEvent(email, certificate, keyPairService.getKeyPair(email)));
-        System.out.println(String.format("Successfully registered as user [%s]", email));
+        standardStreams.out(String.format("Successfully registered as user [%s]", email));
     }
 
     @ShellMethod("Login from the given files")
@@ -51,5 +53,10 @@ public class RegisterCommand {
         context.getBeansOfType(CRUDOperations.class).values().forEach(CRUDOperations::drop);
         FileUtils.cleanDirectory(Paths.get(clientConfig.getP12Certificate().getLocation()).toFile());
         publisher.publishEvent(new LogoutEvent("Reset was called."));
+    }
+
+    @ShellMethod("Log this client out")
+    public void logout() {
+        publisher.publishEvent(new LogoutEvent("Logout was called."));
     }
 }

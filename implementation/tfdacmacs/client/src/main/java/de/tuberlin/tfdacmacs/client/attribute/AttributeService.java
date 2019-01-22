@@ -3,10 +3,12 @@ package de.tuberlin.tfdacmacs.client.attribute;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.client.attribute.exceptions.InvalidAttributeValueIdentifierException;
+import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,6 +29,11 @@ public class AttributeService implements AttributeValueKeyProvider {
             this.attributes = attributeDB.findAll().collect(Collectors.toSet());
         }
         return this.attributes;
+    }
+
+    @EventListener(LogoutEvent.class)
+    public void cleanState() {
+        this.attributes = null;
     }
 
     public Set<Attribute> retrieveAttributesForUser(String email, String certificateId) {

@@ -17,6 +17,11 @@ public class UserDB extends CouchbaseDB<User> {
         this.repository = repository;
     }
 
+    @Override
+    public Optional<User> findEntity(@NonNull String userId) {
+        return repository.findUserById(userId);
+    }
+
     public List<User> findUsersByAuthorityId(@NonNull String authorityId) {
         return repository.findUsersByAuthorityId(authorityId);
     }
