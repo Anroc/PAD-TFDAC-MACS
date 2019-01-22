@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.client.gpp;
 
 import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
+import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -21,5 +22,10 @@ public class GPPService {
         }
 
         return this.gpp;
+    }
+
+    @EventListener(LogoutEvent.class)
+    public void cleanState() {
+        this.gpp = null;
     }
 }

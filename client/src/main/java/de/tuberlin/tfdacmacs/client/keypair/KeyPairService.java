@@ -1,12 +1,12 @@
 package de.tuberlin.tfdacmacs.client.keypair;
 
+import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 import java.util.Optional;
 
 @Component

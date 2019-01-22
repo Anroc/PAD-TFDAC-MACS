@@ -16,6 +16,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.util.encoders.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -50,8 +51,7 @@ public class AttributeClient {
 
     private Set<Attribute> decrypt(PrivateKey privateKey, String encryptedKey, Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys) {
         try {
-            Key key = symmetricCryptEngine.createKeyFromBytes(
-                    asymmetricCryptEngine.decryptRaw(encryptedKey, privateKey));
+            Key key = symmetricCryptEngine.createKeyFromBytes(asymmetricCryptEngine.decryptRaw(encryptedKey, privateKey));
 
             return encryptedAttributeValueKeys.stream()
                     .map(encryptedAttributeValueKeyDTO -> decrypt(key, encryptedAttributeValueKeyDTO))
@@ -63,8 +63,8 @@ public class AttributeClient {
 
     private Attribute decrypt(Key symmetricKey, EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO) {
         try {
-            String base64Element = symmetricCryptEngine.decrypt(encryptedAttributeValueKeyDTO.getEncryptedKey(), symmetricKey);
-            Element element = ElementConverter.convert(base64Element, getG1());
+            byte[] byteElement = symmetricCryptEngine.decryptRaw(Base64.decode(encryptedAttributeValueKeyDTO.getEncryptedKey()), symmetricKey);
+            Element element = ElementConverter.convert(byteElement, getG1());
 
             return new Attribute(encryptedAttributeValueKeyDTO.getAttributeValueId(), element);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
