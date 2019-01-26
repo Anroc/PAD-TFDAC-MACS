@@ -7,7 +7,7 @@ import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
 
-public interface CaClient {
+public interface CAClient {
 
     CertificateResponse postCertificateRequest(CertificateRequest certificateRequest);
 

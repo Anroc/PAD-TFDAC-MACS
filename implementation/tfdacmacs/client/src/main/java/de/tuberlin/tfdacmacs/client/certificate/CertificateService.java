@@ -7,7 +7,7 @@ import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.config.CertificateKeyStoreConfig;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.client.rest.CaClient;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
@@ -31,7 +31,7 @@ public class CertificateService {
 
     private final KeyPairService keyPairService;
     private final CertificateUtils certificateUtils;
-    private final CaClient caClient;
+    private final CAClient caClient;
     private final CertificateRequestFactory certificateRequestFactory;
     private final ClientConfig clientConfig;
     private final CertificateDB certificateDB;

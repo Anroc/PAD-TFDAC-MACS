@@ -10,7 +10,8 @@ import de.tuberlin.tfdacmacs.client.gpp.factory.GPPDTOTestFactory;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
 import de.tuberlin.tfdacmacs.client.register.Session;
-import de.tuberlin.tfdacmacs.client.rest.CaClient;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
+import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
@@ -54,7 +55,9 @@ import static org.mockito.Mockito.doReturn;
 public abstract class CommandTestSuite {
 
     @MockBean
-    protected CaClient caClient;
+    protected CAClient caClient;
+    @MockBean
+    protected CSPClient cspClient;
 
     @SpyBean
     protected RestTemplateFactory restTemplateFactory;
@@ -134,6 +137,14 @@ public abstract class CommandTestSuite {
         File p12Dir = Paths.get(clientConfig.getP12Certificate().getLocation()).toFile();
         if(p12Dir.exists()) {
             FileUtils.cleanDirectory(p12Dir);
+        }
+    }
+
+    public void evaluate(String command) {
+        Object ret = shell.evaluate(() -> command);
+
+        if(ret instanceof Exception) {
+            throw new RuntimeException((Exception) ret);
         }
     }
 }

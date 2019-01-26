@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.client.authority.client;
 
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
-import de.tuberlin.tfdacmacs.client.rest.CaClient;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthorityClient {
 
-    private final CaClient caClient;
+    private final CAClient caClient;
     private final GPPService gppService;
 
     public Optional<AuthorityKey.Public> findAuthorityKey(@NonNull String authorityId) {
