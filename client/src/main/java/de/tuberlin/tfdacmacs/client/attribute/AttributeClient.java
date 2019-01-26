@@ -6,7 +6,7 @@ import de.tuberlin.tfdacmacs.client.attribute.data.dto.EncryptedAttributeValueKe
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
-import de.tuberlin.tfdacmacs.client.rest.CaClient;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AttributeClient {
 
-    private final CaClient caClient;
+    private final CAClient caClient;
     private final KeyPairService keyPairService;
     private final AsymmetricCryptEngine<?> asymmetricCryptEngine;
     private final StringSymmetricCryptEngine symmetricCryptEngine;

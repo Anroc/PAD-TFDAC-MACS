@@ -6,7 +6,7 @@ import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityRespons
 import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.client.rest.CaClient;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,10 +16,10 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
-public class CaClientRestTemplate extends ClientRestTemplate implements CaClient {
+public class CAClientRestTemplate extends ClientRestTemplate implements CAClient {
 
     @Autowired
-    public CaClientRestTemplate(@Qualifier(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME) RestTemplate restTemplate) {
+    public CAClientRestTemplate(@Qualifier(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME) RestTemplate restTemplate) {
         super(restTemplate, "CA");
     }
 
