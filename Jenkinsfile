@@ -145,7 +145,7 @@ node {
             }
         }
 
-        stage('integrationTest:services') {
+        stage('integration:services') {
             copyArtifacts(
                 projectName: "${env.JOB_NAME}", 
                 selector: specific("${BUILD_NUMBER}"),
@@ -176,7 +176,7 @@ node {
         }
 
 
-        stage('integrationTest:client') {
+        stage('integration:client') {
             dir (SOURCE_DIR) {
                 try {
                     sh('./gradlew client:integrationTest')
