@@ -92,7 +92,7 @@ public class IntegrationTest extends CommandTestSuite {
         RestTemplate restTemplate = sslRestTemplate(clientConfig.getAaRootUrl());
 
         ResponseEntity<Object> exchange = restTemplate.exchange(
-                String.format("/users/" + email + "/approve/" + deviceId, ),
+                "/users/" + email + "/approve/" + deviceId,
                 HttpMethod.PUT,
                 new HttpEntity<>(httpHeaders),
                 Object.class
