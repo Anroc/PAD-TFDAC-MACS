@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.gpp;
+package de.tuberlin.tfdacmacs.attributeauthority.gpp;
 
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client.GPPClient;
+import de.tuberlin.tfdacmacs.attributeauthority.gpp.client.GPPClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GPPService {
+public class GPPProvider {
 
     private final GPPClient gppClient;
     private final AttributeAuthorityConfig config;

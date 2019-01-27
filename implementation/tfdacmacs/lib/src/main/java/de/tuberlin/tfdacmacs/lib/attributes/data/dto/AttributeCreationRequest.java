@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.lib.attributes.data.dto;
 
+import de.tuberlin.tfdacmacs.lib.attributes.AttributeValueSigner;
 import de.tuberlin.tfdacmacs.lib.attributes.data.*;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.AllArgsConstructor;
@@ -31,14 +32,16 @@ public class AttributeCreationRequest {
     @NotEmpty
     private List<AttributeValueCreationRequest> values;
 
-    public static AttributeCreationRequest from(@NonNull AbstractAttribute<? extends AttributeValueComponent> attribute) {
+    public static AttributeCreationRequest from(
+            @NonNull AbstractAttribute<? extends AttributeValueComponent> attribute,
+            @NonNull AttributeValueSigner attributeValueSigner) {
         return new AttributeCreationRequest(
                 attribute.getId(),
                 attribute.getName(),
                 attribute.getAuthorityDomain(),
                 attribute.getType(),
                 attribute.getValues().stream()
-                        .map(AttributeValueCreationRequest::from)
+                        .map(value -> AttributeValueCreationRequest.from(value, attributeValueSigner.sign(value)))
                         .collect(Collectors.toList())
         );
     }

@@ -71,18 +71,19 @@ public class StringAsymmetricCryptEngine extends AsymmetricCryptEngine<String> {
      * hash of the given message. Then this hash will be digitally signed with the private key.
      *
      * @param data the plain string that shell be singed
+     * @param key the private key that shell be used for signature
      * @return the base64 encoded MAC
      * @throws BadPaddingException       on padding mismatch
      * @throws InvalidKeyException       on wrong cipher instance
      * @throws IllegalBlockSizeException on wrong alignment
      */
     @Override
-    public String sign(String data)
+    public String sign(String data, PrivateKey key)
             throws IllegalBlockSizeException, BadPaddingException,
             InvalidKeyException {
         String hash = getSHA256Hash(data);
 
-        return encrypt(hash, getPrivateKey());
+        return encrypt(hash, key);
     }
 
     /**

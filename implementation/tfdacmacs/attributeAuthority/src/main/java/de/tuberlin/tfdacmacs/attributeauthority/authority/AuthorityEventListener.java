@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.authority;
+package de.tuberlin.tfdacmacs.attributeauthority.authority;
 
-import de.tuberlin.tfdacmacs.attributeauthority.init.authority.client.AuthorityClient;
-import de.tuberlin.tfdacmacs.attributeauthority.init.authority.events.AuthorityKeyCreatedEvent;
+import de.tuberlin.tfdacmacs.attributeauthority.authority.client.AuthorityClient;
+import de.tuberlin.tfdacmacs.attributeauthority.authority.events.AuthorityKeyCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

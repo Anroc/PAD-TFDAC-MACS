@@ -33,17 +33,12 @@ public class UserClient {
         UserResponse userResponse = caClient.getUser(user.getId());
 
         getMissingCertificateIds(user, userResponse)
-            .stream()
-            .map(id -> certificateClient.getCertificate(id, user.getId()))
-                .forEach(certificate -> {
-
-            if( getDevice(userResponse, certificate.getId()).getDeviceState() == DeviceState.ACTIVE) {
-                        user.getDevices().add(certificate);
-                    } else {
-                        user.getUnapprovedDevices().add(certificate);
-                }
-            });
-
+                .stream()
+                .map(id -> certificateClient.getCertificate(id, user.getId()))
+                // we can only relay on our data base for active devices. So that the CA can not just
+                // add a active device in its database.
+                // for that reason we add each unknow device directly into unapproved devices
+                .forEach(certificate -> user.getUnapprovedDevices().add(certificate));
         return user;
     }
 
@@ -58,13 +53,6 @@ public class UserClient {
                 deviceId,
                 new DeviceUpdateRequest(DeviceState.ACTIVE, encryptedKey, encryptedAttributeValueKeyDTOs)
         );
-    }
-
-    private DeviceResponse getDevice(UserResponse userResponse, String deviceId) {
-        return userResponse.getDevices().stream()
-                .filter(device -> device.getCertificateId().equals(deviceId))
-                .findAny()
-                .get();
     }
 
     private Set<String> getMissingCertificateIds(@NonNull User user, @NonNull UserResponse userResponse) {

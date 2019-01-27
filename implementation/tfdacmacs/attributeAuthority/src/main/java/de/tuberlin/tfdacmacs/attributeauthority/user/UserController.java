@@ -1,16 +1,19 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeService;
+import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.CreateUserRequest;
+import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.UserResponse;
 import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.lib.exceptions.BadRequestException;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,6 +30,7 @@ public class UserController {
     public final AttributeService attributeService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         Set<UserAttributeKey> preKeys = createUserRequest.getAttributeValueRequests()
@@ -53,6 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UserResponse getAttributeKeys(@PathVariable("email") String email) {
         User user = userService.findUser(email).orElseThrow(
                 () -> new NotFoundException(email)
@@ -61,6 +66,7 @@ public class UserController {
     }
 
     @PutMapping("/{email}/approve/{deviceId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UserResponse approve(@PathVariable("email") String email, @PathVariable("deviceId") String deviceId) {
         User user = userService.findUser(email).orElseThrow(
                 () -> new NotFoundException(email)
@@ -69,5 +75,22 @@ public class UserController {
         userService.approve(user, deviceId);
 
         return UserResponse.from(user);
+    }
+
+    @GetMapping("/{email}/devices/{deviceId}")
+    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    public DeviceResponse getDevice(
+            @PathVariable("email") String email,
+            @PathVariable("deviceId") String deviceId) {
+
+        User user = userService.findUser(email).orElseThrow(
+                () -> new NotFoundException(email)
+        );
+
+        if(user.getDevices().stream().map(Certificate::getId).anyMatch(deviceId::equals)) {
+            return new DeviceResponse(deviceId);
+        } else {
+            throw new NotFoundException(deviceId);
+        }
     }
 }

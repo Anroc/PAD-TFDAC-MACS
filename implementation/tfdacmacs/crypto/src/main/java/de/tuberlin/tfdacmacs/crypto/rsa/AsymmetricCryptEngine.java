@@ -138,7 +138,25 @@ public abstract class AsymmetricCryptEngine<T> extends CypherProcessor {
      * @throws InvalidKeyException       on wrong cipher instance
      * @throws IllegalBlockSizeException on wrong alignment
      */
-    abstract public String sign(T data)
+    public String sign(T data)
+            throws IllegalBlockSizeException, BadPaddingException,
+            InvalidKeyException {
+        return sign(data, getPrivateKey());
+    }
+
+    /**
+     * Returns a mac of the given data.
+     * To do so this method will call {@link #getSHA256Hash(Object)} to create a SHA-256
+     * hash of the given message. Then this hash will be digitally signed with the private key.
+     *
+     * @param data the data that shell be singed
+     * @param key the private key that shell be used for signature
+     * @return the base64 encoded MAC
+     * @throws BadPaddingException       on padding mismatch
+     * @throws InvalidKeyException       on wrong cipher instance
+     * @throws IllegalBlockSizeException on wrong alignment
+     */
+    abstract public String sign(T data, PrivateKey key)
             throws IllegalBlockSizeException, BadPaddingException,
             InvalidKeyException;
 

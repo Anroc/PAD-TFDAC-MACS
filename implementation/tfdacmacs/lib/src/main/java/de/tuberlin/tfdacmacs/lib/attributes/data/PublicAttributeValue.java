@@ -18,9 +18,13 @@ public class PublicAttributeValue<T> extends ElementKey implements AttributeValu
     @NotBlank
     private T value;
 
-    public PublicAttributeValue(@NotNull @NonNull Element key, @NonNull T value) {
+    @NotBlank
+    private String signature;
+
+    public PublicAttributeValue(@NotNull @NonNull Element key, @NonNull T value, @NonNull String signature) {
         super(key);
         this.value = value;
+        this.signature = signature;
     }
 
     @Override

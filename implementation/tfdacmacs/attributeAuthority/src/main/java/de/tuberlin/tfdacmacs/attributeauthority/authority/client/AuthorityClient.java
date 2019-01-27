@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.authority.client;
+package de.tuberlin.tfdacmacs.attributeauthority.authority.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;

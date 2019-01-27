@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCreationRequest;
+import de.tuberlin.tfdacmacs.attributeauthority.authority.data.TrustedAuthority;
+import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueResponse;
@@ -19,6 +21,7 @@ import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
@@ -32,7 +35,9 @@ import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,8 +63,8 @@ public class UserRestTest extends RestTestSuite {
         attributeCreationRequest.setName("role");
         attributeCreationRequest.setType(AttributeType.STRING);
         attributeCreationRequest.setValues(Lists.newArrayList("student"));
-        ResponseEntity<PublicAttributeResponse> exchange = restTemplate
-                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest, basicAuth()),
                         PublicAttributeResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
@@ -108,8 +113,8 @@ public class UserRestTest extends RestTestSuite {
                                 attributeId,
                                 Sets.newHashSet("student"))));
 
-        ResponseEntity<UserResponse> exchange = restTemplate
-                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest), UserResponse.class);
+        ResponseEntity<UserResponse> exchange = sslRestTemplate
+                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest, basicAuth()), UserResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         UserResponse body = exchange.getBody();
@@ -132,8 +137,8 @@ public class UserRestTest extends RestTestSuite {
                                 attributeId,
                                 Sets.newHashSet("professor"))));
 
-        ResponseEntity<UserResponse> exchange = restTemplate
-                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest), UserResponse.class);
+        ResponseEntity<UserResponse> exchange = sslRestTemplate
+                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest, basicAuth()), UserResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         UserResponse body = exchange.getBody();
@@ -152,9 +157,8 @@ public class UserRestTest extends RestTestSuite {
         // setup
         createUser_passes_nonNonExistingAttributeValue();
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
-        ResponseEntity<UserResponse> exchange = restTemplate
+        HttpEntity<Object> httpEntity = new HttpEntity<>(basicAuth());
+        ResponseEntity<UserResponse> exchange = sslRestTemplate
                 .exchange("/users/" + email, HttpMethod.GET, httpEntity, UserResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
@@ -178,10 +182,10 @@ public class UserRestTest extends RestTestSuite {
     public void approveUser() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         getAttributeKeys();
 
-        ResponseEntity<UserResponse> exchange = restTemplate.exchange(
+        ResponseEntity<UserResponse> exchange = sslRestTemplate.exchange(
                 String.format("/users/%s/approve/%s", email, userCertificateResponse.getId()),
                 HttpMethod.PUT,
-                HttpEntity.EMPTY,
+                new HttpEntity<>(basicAuth()),
                 UserResponse.class
         );
 
@@ -211,6 +215,95 @@ public class UserRestTest extends RestTestSuite {
         byte[] originalBytes = extractFromSet(user.getAttributes()).getKey().getKey().toBytes();
 
         assertSameElements(rawElement, originalBytes);
+    }
+
+    @Test
+    public void requestDeviceAsUser_fails_forbidden() {
+        ResponseEntity<de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse> exchange =
+                mutualAuthRestTemplate.exchange(
+                        String.format("/users/%s/devices/%s", email, "someId"),
+                        HttpMethod.GET,
+                        HttpEntity.EMPTY,
+                        de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse.class
+                );
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void requestApprovedDevice() throws CertificateException, CertIOException, OperatorCreationException {
+        mutualAuthenticationRestTemplate(RestTestSuite.AUTHORITY_KEYSTORE);
+
+        TrustedAuthority trustedAuthority = new TrustedAuthority(
+                "aa.tu-berlin.de",
+                UUID.randomUUID().toString()
+        );
+
+        trustedAuthorityDB.insert(trustedAuthority);
+
+        String deviceId = UUID.randomUUID().toString();
+        String email ="someRnadom@email.de";
+        User user = new User(email);
+        user.setDevices(
+                Sets.newHashSet(new Certificate(deviceId, certificateTestFactory.createRootCertificate()))
+        );
+
+        userDB.insert(user);
+
+        doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
+                email,
+                UUID.randomUUID().toString(),
+                new HashSet<>()
+        )).when(caClient).getUser(email);
+
+        ResponseEntity<de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse> exchange =
+                mutualAuthRestTemplate.exchange(
+                    String.format("/users/%s/devices/%s", email, deviceId),
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse.class
+                );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse body = exchange.getBody();
+        assertThat(body.getId()).isEqualTo(deviceId);
+    }
+
+    @Test
+    public void requestUnapprovedDevice() throws CertificateException, CertIOException, OperatorCreationException {
+        mutualAuthenticationRestTemplate(RestTestSuite.AUTHORITY_KEYSTORE);
+
+        TrustedAuthority trustedAuthority = new TrustedAuthority(
+                "aa.tu-berlin.de",
+                UUID.randomUUID().toString()
+        );
+
+        trustedAuthorityDB.insert(trustedAuthority);
+
+        String deviceId = UUID.randomUUID().toString();
+        String email ="someRnadom@email.de";
+
+        User user = new User(email);
+        user.setUnapprovedDevices(
+                Sets.newHashSet(new Certificate(deviceId, certificateTestFactory.createRootCertificate()))
+        );
+
+        userDB.insert(user);
+
+        doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
+                email,
+                UUID.randomUUID().toString(),
+                new HashSet<>()
+        )).when(caClient).getUser(email);
+
+        ResponseEntity<de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse> exchange =
+                mutualAuthRestTemplate.exchange(
+                        String.format("/users/%s/devices/%s", email, deviceId),
+                        HttpMethod.GET,
+                        HttpEntity.EMPTY,
+                        de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse.class
+                );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.NOT_FOUND);
     }
 
     private <T> T extractFromSet(Set<T> set) {

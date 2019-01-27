@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.config;
+package de.tuberlin.tfdacmacs.attributeauthority.security.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,18 +7,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Configuration
-@ConfigurationProperties(prefix = "attribute-authority")
-public class AttributeAuthorityConfig {
+@ConfigurationProperties(prefix = "attribute-authority.credentials")
+public class CredentialConfig {
 
     @NotBlank
-    private String id;
-    @NotBlank
-    private String caRootUrl;
-
-    private boolean requestCaOnInit = true;
+    private String username;
+    @NotNull
+    private String password;
 }

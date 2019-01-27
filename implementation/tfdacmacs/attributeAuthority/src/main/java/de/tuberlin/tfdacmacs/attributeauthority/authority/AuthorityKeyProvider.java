@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.authority;
+package de.tuberlin.tfdacmacs.attributeauthority.authority;
 
-import de.tuberlin.tfdacmacs.attributeauthority.init.authority.events.AuthorityKeyCreatedEvent;
+import de.tuberlin.tfdacmacs.attributeauthority.authority.events.AuthorityKeyCreatedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.AuthorityKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorityKeyService {
+public class AuthorityKeyProvider {
 
     private final AuthorityKeyGenerator authorityKeyGenerator;
 

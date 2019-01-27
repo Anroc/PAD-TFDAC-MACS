@@ -17,17 +17,20 @@ server:
   ssl:
     key-store: classpath:aa-authority-keystore.jks
     key-store-password: foobar
-    key-alias: localhost
+    key-alias: 1 # default alias is '1'
     ca-alias: ca
     key-password: foobar
-    enabled: false
-    # client-auth: need
+    enabled: true
+    client-auth: want
     trust-store: classpath:aa-truststore.jks
     trust-store-password: foobar
 
 attribute-authority:
   id: "aa.tu-berlin.de"
-  caRootUrl: "https://localhost:9001/"
+  ca-root-url: "https://localhost:9001/"
+  credentials:
+    username: admin
+    password: foobar
 ---
 spring:
   profiles: test
