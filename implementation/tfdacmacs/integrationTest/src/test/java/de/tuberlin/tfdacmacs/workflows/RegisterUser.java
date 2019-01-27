@@ -61,7 +61,7 @@ public class RegisterUser extends IntegrationTestSuite {
     }
 
     public String createAttribute() {
-        RestTemplate adminRestTemplate = plainRestTemplate(AA_URL);
+        RestTemplate adminRestTemplate = sslRestTemplate(AA_URL);
 
         AttributeCreationRequest attributeCreationRequest = new AttributeCreationRequest();
         attributeCreationRequest.setName("role");
@@ -69,7 +69,7 @@ public class RegisterUser extends IntegrationTestSuite {
         attributeCreationRequest.setValues(Lists.newArrayList("student", "professor"));
 
         ResponseEntity<PublicAttributeResponse> exchange = adminRestTemplate
-                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest, basicAuth()),
                         PublicAttributeResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
@@ -77,7 +77,7 @@ public class RegisterUser extends IntegrationTestSuite {
     }
 
     private String createUser(String attributeId) {
-        RestTemplate adminRestTemplate = plainRestTemplate(AA_URL);
+        RestTemplate adminRestTemplate = sslRestTemplate(AA_URL);
 
         CreateUserRequest createUserRequest = new CreateUserRequest(
                 email,
@@ -87,7 +87,7 @@ public class RegisterUser extends IntegrationTestSuite {
                                 Sets.newHashSet("student"))));
 
         ResponseEntity<UserResponse> exchange = adminRestTemplate
-                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest), UserResponse.class);
+                .exchange("/users", HttpMethod.POST, new HttpEntity<>(createUserRequest, basicAuth()), UserResponse.class);
 
         Java6Assertions.assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         return exchange.getBody().getId();
@@ -192,12 +192,12 @@ public class RegisterUser extends IntegrationTestSuite {
     }
 
     private String getUser() {
-        RestTemplate restTemplate = plainRestTemplate(AA_URL);
+        RestTemplate restTemplate = sslRestTemplate(AA_URL);
 
         ResponseEntity<UserResponse> exchange = restTemplate.exchange(
                 "/users/" + email,
                 HttpMethod.GET,
-                HttpEntity.EMPTY,
+                new HttpEntity<>(basicAuth()),
                 UserResponse.class
         );
 
