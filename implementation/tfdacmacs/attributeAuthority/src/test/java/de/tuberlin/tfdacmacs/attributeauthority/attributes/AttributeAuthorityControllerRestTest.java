@@ -66,7 +66,7 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
                 .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
                         PublicAttributeResponse.class);
 
-        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.FORBIDDEN);
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
