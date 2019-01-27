@@ -56,9 +56,9 @@ import static org.mockito.Mockito.doReturn;
 @ActiveProfiles("test")
 public abstract class CommandTestSuite {
 
-    @MockBean
+    @SpyBean
     protected CAClient caClient;
-    @MockBean
+    @SpyBean
     protected CSPClient cspClient;
 
     @SpyBean

@@ -184,7 +184,7 @@ node {
                     archiveArtifacts artifacts: "/var/lib/jenkins/deploy/*.log", fingerprint: true
                     throw e
                 } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
+                    step([$class: 'JUnitResultArchiver', testResults: 'client/build/test-results/test/*.xml'])
                     archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
                 }
             }

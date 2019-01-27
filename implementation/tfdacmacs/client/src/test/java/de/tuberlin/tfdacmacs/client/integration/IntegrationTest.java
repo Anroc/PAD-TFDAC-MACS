@@ -9,7 +9,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -70,11 +68,15 @@ public class IntegrationTest extends CommandTestSuite {
 
     @Test
     public void integrationTest() {
-        evaluate(String.format("register %s", email));
-        sleep(3);
+        Thread thread = new Thread(
+                () -> {
+                    sleep(10);
+                    approveDevice(certificateDB.find(email).get().getId());
+                }
+        );
 
-        approveDevice(certificateDB.find(email).get().getId());
-        sleep(10);
+        thread.start();
+        evaluate(String.format("register %s", email));
 
         evaluate("attributes update");
         assertThat(attributeDB.findAll()).isNotEmpty();
