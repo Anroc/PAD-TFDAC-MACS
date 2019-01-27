@@ -16,5 +16,7 @@ public class PublicAttributeValueResponse {
     private String publicKey;
     @NotNull
     private Object value;
+    @NotBlank
+    private String signature;
 
 }
