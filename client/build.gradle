@@ -41,3 +41,13 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
+
+test {
+    exclude '**/integration/**'
+}
+
+task ingegrationTest( type: Test ) {
+    filter {
+        includeTestsMatching "de.tuberlin.tfdacmacs.client.integration.*"
+    }
+}

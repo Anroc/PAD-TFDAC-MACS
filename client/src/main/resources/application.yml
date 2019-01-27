@@ -6,6 +6,7 @@ client:
   db:
     data-dir: data-client
   ca-root-url: https://server.vpn:9001/
+  aa-root-url: https://server.vpn:9002/
   csp-root-url: https://server.vpn:9003/
   private-key:
     location: ./
@@ -18,3 +19,11 @@ client:
     key-password: foobar
   trust-store: classpath:ca-truststore.jks
   trust-store-password: foobar
+---
+spring:
+  profiles: test
+
+client:
+  ca-root-url: https://localhost:9001/
+  aa-root-url: https://localhost:9002/
+  csp-root-url: https://localhost:9003/

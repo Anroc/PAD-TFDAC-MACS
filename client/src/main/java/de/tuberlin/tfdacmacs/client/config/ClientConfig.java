@@ -25,6 +25,8 @@ public class ClientConfig {
     @NotBlank
     private String cspRootUrl;
     @NotBlank
+    private String aaRootUrl;
+    @NotBlank
     private String trustStore;
     @NotBlank
     private String trustStorePassword;
