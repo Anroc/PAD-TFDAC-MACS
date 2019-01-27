@@ -19,6 +19,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.factory.CertificateTestFactory;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.doReturn;
         InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
 
 })
+@Slf4j
 @ActiveProfiles("test")
 public abstract class CommandTestSuite {
 
@@ -141,6 +143,7 @@ public abstract class CommandTestSuite {
     }
 
     public void evaluate(String command) {
+        log.info("executing: {}", command);
         Object ret = shell.evaluate(() -> command);
 
         if(ret instanceof Exception) {

@@ -48,11 +48,13 @@ public class EncryptCommandTest extends CommandTestSuite {
     public void encrypt_without2FA() {
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
-                "Student"
+                "Student",
+                "signature"
         )).when(caClient).getAttributeValue(attrId1.split(":")[0], attrId1.split(":")[1]);
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
-                "Professor"
+                "Professor",
+                "signature"
         )).when(caClient).getAttributeValue(attrId2.split(":")[0], attrId2.split(":")[1]);
         doReturn(new AttributeAuthorityResponse(
                 authorityId,

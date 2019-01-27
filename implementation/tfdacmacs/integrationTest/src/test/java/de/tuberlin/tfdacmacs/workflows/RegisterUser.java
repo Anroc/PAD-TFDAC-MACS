@@ -208,12 +208,12 @@ public class RegisterUser extends IntegrationTestSuite {
     }
 
     private void approveDevice() {
-        RestTemplate restTemplate = plainRestTemplate(AA_URL);
+        RestTemplate restTemplate = sslRestTemplate(AA_URL);
 
         ResponseEntity<UserResponse> exchange = restTemplate.exchange(
                 "/users/" + email + "/approve/" + deviceId,
                 HttpMethod.PUT,
-                HttpEntity.EMPTY,
+                new HttpEntity<>(basicAuth()),
                 UserResponse.class
         );
 

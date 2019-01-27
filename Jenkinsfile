@@ -145,7 +145,7 @@ node {
             }
         }
 
-        stage('integrationTest') {
+        stage('integrationTest:services') {
             copyArtifacts(
                 projectName: "${env.JOB_NAME}", 
                 selector: specific("${BUILD_NUMBER}"),
@@ -165,6 +165,21 @@ node {
             dir (SOURCE_DIR) {
                 try {
                     sh('./gradlew integrationTest:test')
+                } catch (e) {
+                    archiveArtifacts artifacts: "/var/lib/jenkins/deploy/*.log", fingerprint: true
+                    throw e
+                } finally {
+                    step([$class: 'JUnitResultArchiver', testResults: 'integrationTest/build/test-results/test/*.xml'])
+                    archiveArtifacts artifacts: "**/test@tu-berlin.de.*", fingerprint: true
+                }
+            }
+        }
+
+
+        stage('integrationTest:client') {
+            dir (SOURCE_DIR) {
+                try {
+                    sh('./gradlew client:integrationTest')
                 } catch (e) {
                     archiveArtifacts artifacts: "/var/lib/jenkins/deploy/*.log", fingerprint: true
                     throw e
