@@ -46,7 +46,7 @@ test {
     exclude '**/integration/**'
 }
 
-task ingegrationTest( type: Test ) {
+task integrationTest( type: Test ) {
     filter {
         includeTestsMatching "de.tuberlin.tfdacmacs.client.integration.*"
     }
