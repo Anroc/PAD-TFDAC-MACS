@@ -71,6 +71,6 @@ public class AttributeCommandTest extends CommandTestSuite {
 
         shell.evaluate(() -> "attributes update");
 
-        verify(attributeDB).upsert(attribute.getId(), attribute);
+        verify(attributeDB).upsert(attribute.getId(), any(Attribute.class));
     }
 }
