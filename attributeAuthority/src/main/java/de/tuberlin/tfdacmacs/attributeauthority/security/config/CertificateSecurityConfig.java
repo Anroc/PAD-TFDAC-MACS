@@ -1,5 +1,7 @@
-package de.tuberlin.tfdacmacs.csp.security.config;
+package de.tuberlin.tfdacmacs.attributeauthority.security.config;
 
+import de.tuberlin.tfdacmacs.attributeauthority.authority.TrustedAuthorityService;
+import de.tuberlin.tfdacmacs.attributeauthority.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +11,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -24,15 +25,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @RequiredArgsConstructor
 public class CertificateSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final UserService userService;
+    private final TrustedAuthorityService trustedAuthorityService;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    // swagger resources
-                    .antMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
-                    .antMatchers(HttpMethod.GET,"/v2/api-docs").permitAll()
-                    // device registration
-                    .anyRequest().authenticated()
+                .requestMatchers()
+                    // endpoint for users
+                    .antMatchers(HttpMethod.GET,"/authority")
+                    // endpoint for other AA
+                    .antMatchers(HttpMethod.GET, "/users/*/devices/*")
+                .and()
+                    .authorizeRequests().anyRequest().authenticated()
                 .and()
                     .x509()
                         .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
@@ -41,15 +46,16 @@ public class CertificateSecurityConfig extends WebSecurityConfigurerAdapter {
                     .csrf().disable();
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**");
-    }
-
     @Bean
     public UserDetailsService userDetailsService() {
         return commonName -> {
-            String role = "ROLE_USER";
+
+            String role = "ROLE_EXTERN";
+            if(userService.existUser(commonName)) {
+                role = "ROLE_USER";
+            } else if(trustedAuthorityService.existTrustedAuthority(commonName)) {
+                role = "ROLE_AUTHORITY";
+            }
 
             log.info("Certificate authentication of [{}] role [{}]", commonName, role);
 

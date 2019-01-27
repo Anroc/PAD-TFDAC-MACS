@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
+import de.tuberlin.tfdacmacs.attributeauthority.gpp.GPPProvider;
 import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
@@ -27,7 +27,7 @@ public class AttributeService {
 
     private final AttributeDB attributeDB;
     private final AttributeValueKeyGenerator attributeValueKeyGenerator;
-    private final GPPService gppService;
+    private final GPPProvider gppProvider;
     private final AttributeAuthorityConfig config;
 
     public Collection<Attribute> findAllAttributes() {
@@ -39,7 +39,7 @@ public class AttributeService {
     }
 
     public Attribute createAttribute(@NonNull String name, @NonNull AttributeType type, List<?> values) {
-        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
+        GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
 
         Set<AttributeValue> attrValues = values.stream()
                 .map(value -> generateAttributeKeys(value, AttributeValue.generateId(config.getId(), name, value), gpp))

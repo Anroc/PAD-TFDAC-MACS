@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.certificate.events;
+package de.tuberlin.tfdacmacs.attributeauthority.certificate.events;
 
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.lib.events.DomainEvent;

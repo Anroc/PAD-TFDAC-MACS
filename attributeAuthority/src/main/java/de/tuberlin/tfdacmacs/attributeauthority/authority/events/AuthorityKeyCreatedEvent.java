@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.authority.events;
+package de.tuberlin.tfdacmacs.attributeauthority.authority.events;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.lib.events.DomainEvent;

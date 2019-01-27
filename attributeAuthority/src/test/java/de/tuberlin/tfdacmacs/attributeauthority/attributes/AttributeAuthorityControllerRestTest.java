@@ -35,8 +35,8 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
         attributeCreationRequest.setType(AttributeType.STRING);
         attributeCreationRequest.setValues(Lists.newArrayList("student", "professor"));
 
-        ResponseEntity<PublicAttributeResponse> exchange = restTemplate
-                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest, basicAuth()),
                         PublicAttributeResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
@@ -56,6 +56,20 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
     }
 
     @Test
+    public void createAttribute_fails_onUnauthoritzed() {
+        AttributeCreationRequest attributeCreationRequest = new AttributeCreationRequest();
+        attributeCreationRequest.setName("role");
+        attributeCreationRequest.setType(AttributeType.STRING);
+        attributeCreationRequest.setValues(Lists.newArrayList("student", "professor"));
+
+        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+                        PublicAttributeResponse.class);
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
     public void createAttribute_fails_forInvalidName() {
         AttributeCreationRequest attributeCreationRequest = new AttributeCreationRequest();
 
@@ -63,8 +77,8 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
         attributeCreationRequest.setType(AttributeType.STRING);
         attributeCreationRequest.setValues(Lists.newArrayList("student", "professor"));
 
-        ResponseEntity<PublicAttributeResponse> exchange = restTemplate
-                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest, basicAuth()),
                         PublicAttributeResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
@@ -78,8 +92,8 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
         attributeCreationRequest.setType(AttributeType.STRING);
         attributeCreationRequest.setValues(Lists.newArrayList("student:asd", "professor:asd"));
 
-        ResponseEntity<PublicAttributeResponse> exchange = restTemplate
-                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest),
+        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate
+                .exchange("/attributes", HttpMethod.POST, new HttpEntity<>(attributeCreationRequest, basicAuth()),
                         PublicAttributeResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
@@ -87,8 +101,8 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
 
     @Test
     public void getAllAttributes() {
-        ResponseEntity<List<PublicAttributeResponse>> responseEntity = restTemplate.exchange("/attributes",
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<PublicAttributeResponse>>() {});
+        ResponseEntity<List<PublicAttributeResponse>> responseEntity = sslRestTemplate.exchange("/attributes",
+                HttpMethod.GET, new HttpEntity<>(basicAuth()), new ParameterizedTypeReference<List<PublicAttributeResponse>>() {});
 
         assertThat(responseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).hasSize(1);
@@ -96,14 +110,11 @@ public class AttributeAuthorityControllerRestTest extends RestTestSuite {
 
     @Test
     public void getAttribute() {
-        ResponseEntity<PublicAttributeResponse> responseEntity = restTemplate.exchange(
-                String.format("/attributes/%s", attribute.getId()), HttpMethod.GET, HttpEntity.EMPTY,
-                PublicAttributeResponse.class);
+        ResponseEntity<PublicAttributeResponse> responseEntity = sslRestTemplate
+                .exchange(String.format("/attributes/%s", attribute.getId()), HttpMethod.GET, new HttpEntity<>(basicAuth()),
+                    PublicAttributeResponse.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
     }
-
-
-
 }

@@ -8,6 +8,7 @@ import de.tuberlin.tfdacmacs.lib.exceptions.BadRequestException;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,6 +23,7 @@ public class AttributeController {
     private final AttributeService attributeService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PublicAttributeResponse> getAttributes() {
         return attributeService.findAllAttributes()
                 .stream()
@@ -30,6 +32,7 @@ public class AttributeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PublicAttributeResponse getAttribute(@PathVariable("id") String attributeId) {
         return attributeService.findAttribute(attributeId)
                 .map(PublicAttributeResponse::from)
@@ -38,6 +41,7 @@ public class AttributeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PublicAttributeResponse createAttribute(
             @Valid @RequestBody AttributeCreationRequest attributeCreationRequest) {
 

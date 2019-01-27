@@ -17,7 +17,7 @@ server:
   ssl:
     key-store: classpath:csp.1@system.abe.jks
     key-store-password: foobar
-    key-alias: 1
+    key-alias: aa.tu-berlin.de
     ca-alias: ca
     key-password: foobar
     enabled: true

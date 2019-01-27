@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user;
 
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeService;
-import de.tuberlin.tfdacmacs.attributeauthority.init.authority.AuthorityKeyService;
-import de.tuberlin.tfdacmacs.attributeauthority.init.gpp.GPPService;
+import de.tuberlin.tfdacmacs.attributeauthority.authority.AuthorityKeyProvider;
+import de.tuberlin.tfdacmacs.attributeauthority.gpp.GPPProvider;
 import de.tuberlin.tfdacmacs.attributeauthority.user.client.UserClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final GPPService gppService;
+    private final GPPProvider gppProvider;
     private final AttributeService attributeService;
-    private final AuthorityKeyService authorityKeyService;
+    private final AuthorityKeyProvider authorityKeyProvider;
     private final UserClient userClient;
 
     private final UserDB userDB;
@@ -39,6 +39,10 @@ public class UserService {
 
     public Optional<User> findUser(@NonNull String userId) {
         return userDB.findEntity(userId).map(this::extendWithCAUser);
+    }
+
+    public boolean existUser(@NonNull String userId) {
+        return userDB.exist(userId);
     }
 
     public User extendWithCAUser(User user) {
@@ -64,8 +68,8 @@ public class UserService {
 
     private Set<UserAttributeKey> enrichWithUserAttributeSecretKeys(String userId, Set<UserAttributeKey> attributes) {
         log.info("Generating secret keys for user {}", userId);
-        GlobalPublicParameter gpp = gppService.getGlobalPublicParameter();
-        AuthorityKey.Private authorityPrivateKey = authorityKeyService.getPrivateKey();
+        GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
+        AuthorityKey.Private authorityPrivateKey = authorityKeyProvider.getPrivateKey();
 
         return attributes.stream().map(
                 userAttributeKey -> {

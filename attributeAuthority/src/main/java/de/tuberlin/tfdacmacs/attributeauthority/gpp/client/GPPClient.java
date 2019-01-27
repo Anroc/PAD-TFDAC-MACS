@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.attributeauthority.init.gpp.client;
+package de.tuberlin.tfdacmacs.attributeauthority.gpp.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;

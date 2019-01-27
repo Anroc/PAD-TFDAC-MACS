@@ -23,17 +23,22 @@ public class AttributeValueCreationRequest {
     @NotBlank
     private String publicKey;
 
-    public static AttributeValueCreationRequest from(AttributeValueComponent attributeValue) {
+    @NotBlank
+    private String signature;
+
+    public static AttributeValueCreationRequest from(AttributeValueComponent attributeValue, String signature) {
         return new AttributeValueCreationRequest(
                 attributeValue.getValue().toString(),
-                ElementConverter.convert(attributeValue.getPublicKeyComponent())
+                ElementConverter.convert(attributeValue.getPublicKeyComponent()),
+                signature
         );
     }
 
     public PublicAttributeValue toAttributeValue(@NonNull Field field, @NonNull AttributeType type) {
         return new PublicAttributeValue(
                 ElementConverter.convert(getPublicKey(), field),
-                type.cast(value)
+                type.cast(value),
+                signature
         );
     }
 }
