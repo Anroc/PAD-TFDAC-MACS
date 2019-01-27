@@ -1,25 +1,17 @@
 package de.tuberlin.tfdacmacs.files;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.csp.files.data.FileInformation;
 import de.tuberlin.tfdacmacs.csp.files.data.dto.FileInformationResponse;
-import org.apache.http.entity.ContentType;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,12 +20,8 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class FileControllerRestTest extends RestTestSuite {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     private String id;
     private FileInformation fileInformation;
@@ -67,19 +55,7 @@ public class FileControllerRestTest extends RestTestSuite {
         String fileName = "obvious_p0rn";
         byte[] content = "only over 18!!!".getBytes();
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        MockMultipartFile firstFile = new MockMultipartFile("file", fileName, ContentType.APPLICATION_OCTET_STREAM.toString(), content);
-        MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
-                .multipart(sslRestTemplate.getRootUri() + "/files")
-                .file(firstFile);
-        MvcResult mvcResult = mockMvc.perform(file)
-                .andExpect(status().is(201))
-                .andReturn();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        FileInformationResponse fileInformationResponse = objectMapper
-                .readValue(mvcResult.getResponse().getContentAsString(), FileInformationResponse.class);
+        FileInformationResponse fileInformationResponse = createFile(fileName, content, null);
 
         String id = fileInformationResponse.getId();
         assertThat(id).isNotBlank();
@@ -100,19 +76,7 @@ public class FileControllerRestTest extends RestTestSuite {
         byte[] content = "only over 18!!!".getBytes();
         String id = UUID.randomUUID().toString();
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        MockMultipartFile firstFile = new MockMultipartFile("file", fileName, ContentType.APPLICATION_OCTET_STREAM.toString(), content);
-        MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
-                .multipart(sslRestTemplate.getRootUri() + "/files?id=" + id)
-                .file(firstFile);
-        MvcResult mvcResult = mockMvc.perform(file)
-                .andExpect(status().is(201))
-                .andReturn();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        FileInformationResponse fileInformationResponse = objectMapper
-                .readValue(mvcResult.getResponse().getContentAsString(), FileInformationResponse.class);
+        FileInformationResponse fileInformationResponse = createFile(fileName, content, id);
 
         String receivedId = fileInformationResponse.getId();
         assertThat(receivedId).isNotBlank().isEqualTo(id);
@@ -127,9 +91,35 @@ public class FileControllerRestTest extends RestTestSuite {
         assertSameElements(bytes, content);
     }
 
+    private FileInformationResponse createFile(String fileName, byte[] content, String id) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("name", fileName);
+        map.add("filename", fileName);
+        ByteArrayResource contentsAsResource = new ByteArrayResource(content){
+            @Override
+            public String getFilename(){
+                return fileName;
+            }
+        };
+        map.add("file", contentsAsResource);
+
+        ResponseEntity<FileInformationResponse> exchange = mutualAuthRestTemplate.exchange(
+                (id == null)? "/files" : String.format("/files?id=%s", id),
+                HttpMethod.POST,
+                new HttpEntity<>(map, httpHeaders),
+                FileInformationResponse.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+        return exchange.getBody();
+    }
+
     @Test
     public void getFile() {
-        ResponseEntity<byte[]> responseEntity = sslRestTemplate.getForEntity("/files/" + fileInformation.getId(), byte[].class);
+        ResponseEntity<byte[]> responseEntity = mutualAuthRestTemplate
+                .getForEntity("/files/" + fileInformation.getId(), byte[].class);
 
         assertThat(responseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         System.out.println(new String(responseEntity.getBody()));
@@ -138,7 +128,8 @@ public class FileControllerRestTest extends RestTestSuite {
 
     @Test
     public void getFileInformation() {
-        ResponseEntity<FileInformationResponse> responseEntity = sslRestTemplate.getForEntity("/files/" + fileInformation.getId() + "/information", FileInformationResponse.class);
+        ResponseEntity<FileInformationResponse> responseEntity = mutualAuthRestTemplate
+                .getForEntity("/files/" + fileInformation.getId() + "/information", FileInformationResponse.class);
         assertThat(responseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(responseEntity.getBody().getId()).isEqualTo(fileInformation.getId());
     }

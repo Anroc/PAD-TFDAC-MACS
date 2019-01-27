@@ -43,8 +43,8 @@ public abstract class RestTestSuite {
 
     protected static final String CLIENT_KEYSTORE = "classpath:ca-client-keystore.jks";
 
-    protected TestRestTemplate restTemplate;
     protected TestRestTemplate sslRestTemplate;
+    protected TestRestTemplate mutualAuthRestTemplate;
 
     // Mock beans
     @MockBean
@@ -105,8 +105,8 @@ public abstract class RestTestSuite {
                     .build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
             HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-            restTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
-            ((HttpComponentsClientHttpRequestFactory) restTemplate.getRestTemplate().getRequestFactory()).setHttpClient(httpClient);
+            sslRestTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
+            ((HttpComponentsClientHttpRequestFactory) sslRestTemplate.getRestTemplate().getRequestFactory()).setHttpClient(httpClient);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -124,9 +124,9 @@ public abstract class RestTestSuite {
                     ).build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
             HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-            sslRestTemplate = new TestRestTemplate(
+            mutualAuthRestTemplate = new TestRestTemplate(
                     new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
-            ((HttpComponentsClientHttpRequestFactory) sslRestTemplate.getRestTemplate().getRequestFactory())
+            ((HttpComponentsClientHttpRequestFactory) mutualAuthRestTemplate.getRestTemplate().getRequestFactory())
                     .setHttpClient(httpClient);
         } catch(Exception e) {
             throw new RuntimeException(e);

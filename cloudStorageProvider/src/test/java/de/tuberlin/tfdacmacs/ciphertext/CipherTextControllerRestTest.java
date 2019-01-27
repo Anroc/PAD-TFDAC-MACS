@@ -18,7 +18,7 @@ public class CipherTextControllerRestTest extends RestTestSuite {
         CipherTextEntity originalCT = cipherTextTestFactory.createRandom();
         CipherTextDTO ctDTO = CipherTextDTO.from(originalCT);
 
-        ResponseEntity<CipherTextDTO> exchange = sslRestTemplate
+        ResponseEntity<CipherTextDTO> exchange = mutualAuthRestTemplate
                 .exchange("/ciphertexts", HttpMethod.POST, new HttpEntity<>(ctDTO), CipherTextDTO.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
@@ -33,7 +33,7 @@ public class CipherTextControllerRestTest extends RestTestSuite {
         CipherTextEntity originalCT = cipherTextTestFactory.createRandom();
         cipherTextDB.insert(originalCT);
 
-        ResponseEntity<CipherTextDTO> exchange = sslRestTemplate
+        ResponseEntity<CipherTextDTO> exchange = mutualAuthRestTemplate
                 .exchange("/ciphertexts/" + originalCT.getId(), HttpMethod.GET, HttpEntity.EMPTY, CipherTextDTO.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
