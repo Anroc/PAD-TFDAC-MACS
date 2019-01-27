@@ -243,12 +243,12 @@ public class RegisterUser extends IntegrationTestSuite {
     }
 
     private void getRawAttributeKeys() {
-        RestTemplate restTemplate = plainRestTemplate(AA_URL);
+        RestTemplate restTemplate = sslRestTemplate(AA_URL);
 
         ResponseEntity<UserResponse> exchange = restTemplate.exchange(
                 "/users/" + email,
                 HttpMethod.GET,
-                HttpEntity.EMPTY,
+                new HttpEntity<>(basicAuth()),
                 UserResponse.class
         );
 
