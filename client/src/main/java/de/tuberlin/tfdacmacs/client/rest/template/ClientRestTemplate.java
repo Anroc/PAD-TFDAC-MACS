@@ -4,11 +4,13 @@ import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -46,6 +48,32 @@ public abstract class ClientRestTemplate {
             }
 
             log.info("Asking CA for [{}:{}]: {}", httpMethod, url, responseStatus);
+        } while (shouldRetry(responseStatus));
+
+        httpHeaders.remove(Thread.currentThread().getId());
+        return response.getBody();
+    }
+
+    public <T> List<T> listRequest(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+        log.info("Asking {} for [{}:{}]", serviceName, httpMethod, url);
+
+        HttpStatus responseStatus = null;
+        ResponseEntity<List<T>> response = null;
+
+        do{
+            try {
+                response = restTemplate.exchange(
+                        url,
+                        httpMethod,
+                        body != null ? new HttpEntity<>(body) : HttpEntity.EMPTY,
+                        new ParameterizedTypeReference<List<T>>(){}
+                );
+                responseStatus = response.getStatusCode();
+            } catch(HttpClientErrorException e) {
+                responseStatus = e.getStatusCode();
+                handleClientErrorException(url, httpMethod, e);
+            }
+            log.info("Asking {} for [{}:{}]: {}", serviceName, httpMethod, url, response.getStatusCode());
         } while (shouldRetry(responseStatus));
 
         httpHeaders.remove(Thread.currentThread().getId());

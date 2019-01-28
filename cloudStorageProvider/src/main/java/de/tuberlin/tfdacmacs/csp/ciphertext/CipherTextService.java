@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,5 +21,13 @@ public class CipherTextService {
 
     public Optional<CipherTextEntity> findCipherText(String id) {
         return cipherTextDB.findEntity(id);
+    }
+
+    public List<CipherTextEntity> findAll() {
+        return cipherTextDB.findAll();
+    }
+
+    public List<CipherTextEntity> findAllByPolicyContaining(List<String> attributeIds) {
+        return cipherTextDB.findAllByPolicyContaining(attributeIds);
     }
 }
