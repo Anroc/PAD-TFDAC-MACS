@@ -13,4 +13,7 @@ public class AttributeAuthorityPublicKeyRequest {
 
     @NotBlank
     private String authorityPublicKey;
+
+    @NotBlank
+    private String signature;
 }

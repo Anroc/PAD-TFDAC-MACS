@@ -59,7 +59,8 @@ public class EncryptCommandTest extends CommandTestSuite {
         doReturn(new AttributeAuthorityResponse(
                 authorityId,
                 "SomeCertId",
-                ElementConverter.convert(randomElementG1())
+                ElementConverter.convert(randomElementG1()),
+                "signature"
         )).when(caClient).getAuthority(authorityId);
 
         doNothing().when(cspClient).createCipherText(any(CipherTextDTO.class));

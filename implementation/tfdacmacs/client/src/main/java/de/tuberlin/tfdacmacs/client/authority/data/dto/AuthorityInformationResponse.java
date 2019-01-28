@@ -5,19 +5,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class AttributeAuthorityResponse {
-
+@NoArgsConstructor
+public class AuthorityInformationResponse {
     @NotBlank
     private String id;
     @NotBlank
     private String certificateId;
-
-    @NotBlank
-    private String publicKey;
-    @NotBlank
-    private String signature;
+    @NotNull
+    private Map<String, String> trustedAuthorityIds;
 }

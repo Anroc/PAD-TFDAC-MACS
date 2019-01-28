@@ -30,6 +30,7 @@ public class RestTemplateFactory {
 
     public static final String CA_REST_TEMPLATE_BEAN_NAME = "caRestTemplate";
     public static final String CSP_REST_TEMPLATE_BEAN_NAME = "cspRestTemplate";
+    public static final String AA_REST_TEMPLATE_BEAN_NAME = "aaRestTemplate";
 
     private final ClientConfig clientConfig;
     private final ApplicationContext applicationContext;
@@ -49,14 +50,22 @@ public class RestTemplateFactory {
         return buildRestTemplate(clientConfig.getCspRootUrl(), null);
     }
 
+    @Bean(RestTemplateFactory.AA_REST_TEMPLATE_BEAN_NAME)
+    protected RestTemplate sslAARestTemplate() {
+        return buildRestTemplate(clientConfig.getAaRootUrl(), null);
+    }
+
     public void updateForMutualAuthentication(@NonNull String email) {
         RestTemplate caRestTemplate = applicationContext
                 .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
         RestTemplate cspRestTemplate = applicationContext
                 .getBean(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
+        RestTemplate aaRestTemplate = applicationContext
+                .getBean(RestTemplateFactory.AA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
 
         updateRestTemplate(email, caRestTemplate);
         updateRestTemplate(email, cspRestTemplate);
+        updateRestTemplate(email, aaRestTemplate);
     }
 
     private RestTemplate updateRestTemplate(@NonNull String email, RestTemplate restTemplate) {

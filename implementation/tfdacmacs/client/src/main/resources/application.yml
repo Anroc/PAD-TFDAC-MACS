@@ -6,6 +6,7 @@ client:
   db:
     data-dir: data-client
   ca-root-url: https://server.vpn:9001/
+  # the url of this devices attribute authority
   aa-root-url: https://server.vpn:9002/
   csp-root-url: https://server.vpn:9003/
   private-key:

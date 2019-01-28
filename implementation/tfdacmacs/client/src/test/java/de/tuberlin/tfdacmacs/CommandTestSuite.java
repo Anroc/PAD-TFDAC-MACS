@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
+import de.tuberlin.tfdacmacs.client.authority.data.dto.AuthorityInformationResponse;
 import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.config.StandardStreams;
@@ -10,8 +11,10 @@ import de.tuberlin.tfdacmacs.client.gpp.factory.GPPDTOTestFactory;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
 import de.tuberlin.tfdacmacs.client.register.Session;
+import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
+import de.tuberlin.tfdacmacs.client.rest.SignatureVerifier;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
@@ -40,11 +43,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
@@ -60,10 +64,13 @@ public abstract class CommandTestSuite {
     protected CAClient caClient;
     @SpyBean
     protected CSPClient cspClient;
+    @SpyBean
+    protected AAClient aaClient;
+    @SpyBean
+    protected SignatureVerifier signatureVerifier;
 
     @SpyBean
     protected RestTemplateFactory restTemplateFactory;
-
     @SpyBean
     protected AttributeDB attributeDB;
     @Autowired
@@ -129,6 +136,13 @@ public abstract class CommandTestSuite {
                     return null;
                 }
         ).when(standardStreams).error(anyString());
+
+        doNothing().when(signatureVerifier).verifySignature(anyString(), anyString(), anyString());
+        doReturn(new AuthorityInformationResponse(
+                "aa.tu-berlin.de",
+                UUID.randomUUID().toString(),
+                new HashMap<>()
+        )).when(aaClient).getTrustedAuthorities();
     }
 
     @After

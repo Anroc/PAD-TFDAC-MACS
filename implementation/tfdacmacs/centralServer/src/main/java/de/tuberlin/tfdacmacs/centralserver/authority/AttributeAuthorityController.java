@@ -68,7 +68,9 @@ public class AttributeAuthorityController {
                 globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1()
         ));
 
-        attributeAuthority = attributeAuthorityService.updatePublicKey(attributeAuthority, publicKey);
+        attributeAuthority.setPublicKey(publicKey);
+        attributeAuthority.setSignature(attributeAuthorityPublicKeyRequest.getSignature());
+        attributeAuthority = attributeAuthorityService.updateAttributeAuthority(attributeAuthority);
 
         return buildAttributeAuthorityResponse(attributeAuthority);
     }
@@ -88,7 +90,8 @@ public class AttributeAuthorityController {
                 Optional.ofNullable(attributeAuthority.getPublicKey())
                     .map(AuthorityKey.Public::getKey)
                     .map(ElementConverter::convert)
-                    .orElse(null)
+                    .orElse(null),
+                attributeAuthority.getSignature()
         );
     }
 }

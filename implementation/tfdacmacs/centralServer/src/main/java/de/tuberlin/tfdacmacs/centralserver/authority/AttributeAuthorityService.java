@@ -2,7 +2,6 @@ package de.tuberlin.tfdacmacs.centralserver.authority;
 
 import de.tuberlin.tfdacmacs.centralserver.authority.data.AttributeAuthority;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +26,7 @@ public class AttributeAuthorityService {
         attributeAuthorityDB.insert(attributeAuthority);
     }
 
-    public AttributeAuthority updatePublicKey(@NonNull AttributeAuthority attributeAuthority, @NonNull AuthorityKey.Public publicKey) {
-        attributeAuthority.setPublicKey(publicKey);
+    public AttributeAuthority updateAttributeAuthority(@NonNull AttributeAuthority attributeAuthority) {
         attributeAuthorityDB.update(attributeAuthority);
         return attributeAuthority;
     }

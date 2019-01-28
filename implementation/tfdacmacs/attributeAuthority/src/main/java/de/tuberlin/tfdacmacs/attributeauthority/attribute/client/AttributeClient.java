@@ -1,8 +1,7 @@
 package de.tuberlin.tfdacmacs.attributeauthority.attribute.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
-import de.tuberlin.tfdacmacs.attributeauthority.keypair.KeyPairService;
-import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.attributeauthority.client.ContentSigner;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValueComponent;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
@@ -12,17 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import java.security.InvalidKeyException;
-
 @Component
 @RequiredArgsConstructor
 public class AttributeClient {
 
     private final CAClient caClient;
-    private final KeyPairService keyPairService;
-    private final StringAsymmetricCryptEngine stringAsymmetricCryptEngine;
+    private final ContentSigner contentSigner;
 
     @EventListener
     public void createAttribute(AttributeCreatedEvent attributeEvent) {
@@ -47,10 +41,6 @@ public class AttributeClient {
     }
 
     private String sign(AttributeValueComponent value) {
-        try {
-            return stringAsymmetricCryptEngine.sign(value.buildSignatureBody(), keyPairService.getPrivateKey());
-        } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+        return contentSigner.sign(value.buildSignatureBody());
     }
 }

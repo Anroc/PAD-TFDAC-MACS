@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.client.attribute;
 
+import de.tuberlin.tfdacmacs.client.attribute.client.AttributeClient;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.client.attribute.exceptions.InvalidAttributeValueIdentifierException;

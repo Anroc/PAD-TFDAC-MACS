@@ -78,8 +78,10 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
 
         Element element = globalPublicParameter.getPairing().getG1().newRandomElement();
         String publicKey = ElementConverter.convert(element);
+        String signature = "someSignature";
         AttributeAuthorityPublicKeyRequest attributeAuthorityPublicKeyRequest = new AttributeAuthorityPublicKeyRequest(
-                publicKey
+                publicKey,
+                signature
         );
 
         ResponseEntity<AttributeAuthorityResponse> exchange = sslRestTemplate
@@ -92,6 +94,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
         AttributeAuthorityResponse body = exchange.getBody();
         assertThat(body.getId()).isEqualTo(attributeAuthority.getId());
         assertThat(body.getCertificateId()).isEqualTo(attributeAuthority.getCertificateId());
+        assertThat(body.getSignature()).isEqualTo(signature);
         assertThat(body.getPublicKey()).isEqualTo(publicKey);
         Element elementPublicKey = attributeAuthorityDB.findEntity(body.getId()).get().getPublicKey().getKey();
         assertThat(elementPublicKey).isEqualTo(element);

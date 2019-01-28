@@ -11,6 +11,8 @@ public interface CAClient {
 
     CertificateResponse postCertificateRequest(CertificateRequest certificateRequest);
 
+    CertificateResponse getCertificate(String certificateId);
+
     DeviceResponse getAttributes(String userId, String deviceId);
 
     GlobalPublicParameterDTO getGPP();
