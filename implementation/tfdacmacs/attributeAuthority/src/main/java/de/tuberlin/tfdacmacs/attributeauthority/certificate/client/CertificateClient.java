@@ -40,9 +40,19 @@ public class CertificateClient {
     public Certificate getCertificate(@NonNull String id, @NonNull String userId) {
         CertificateResponse certificateResponse = caClient.getCertificate(id);
         Certificate certificate = mapToCertificate(certificateResponse);
+        validateFingerprint(id, certificate.getCertificate());
         validateCommonName(userId, certificate.getCertificate());
         validateCertificateChain(certificate.getCertificate(), rootCertificateProvider.getRootCertificate().getCertificate());
         return certificate;
+    }
+
+    private void validateFingerprint(String id, X509Certificate certificate) {
+        String calucatedFingerprint = certificateUtils.fingerprint(certificate);
+        if( ! id.equals(calucatedFingerprint)) {
+            throw new CertificateUntrustedException(
+                    String.format("Fingerprint does not match. Expected %s but was %s.", id, calucatedFingerprint)
+            );
+        }
     }
 
     private void validateCommonName(@NonNull String id, @NonNull X509Certificate certificate) {
