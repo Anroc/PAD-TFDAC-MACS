@@ -79,7 +79,7 @@ public class PublicAttributeController {
 
         try {
             publicAttributeService.addValue(publicAttribute, publicAttributeValue);
-            return PublicAttributeValueResponse.from(publicAttributeValue);
+            return PublicAttributeValueResponse.from(publicAttributeValue, publicAttributeValue.getSignature());
         } catch(IllegalArgumentException e) {
             throw new ServiceException(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -94,7 +94,7 @@ public class PublicAttributeController {
                 .orElseThrow(() -> new NotFoundException(attributeId))
                 .filter(attributeValue -> attributeValue.getValue().toString().equals(valueId))
                 .findAny()
-                .map(PublicAttributeValueResponse::from)
+                .map(publicAttributeValue -> PublicAttributeValueResponse.from(publicAttributeValue, publicAttributeValue.getSignature()))
                 .orElseThrow(() -> new NotFoundException(valueId));
     }
 

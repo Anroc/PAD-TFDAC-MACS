@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.lib.attributes.data.dto;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AbstractAttribute;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValueComponent;
+import de.tuberlin.tfdacmacs.lib.attributes.data.PublicAttributeValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,8 +36,13 @@ public class PublicAttributeResponse {
         publicAttributeResponse.setName(attribute.getName());
         publicAttributeResponse.setValues(
                 attribute.getValues().stream()
-                        .map(attributeValue -> PublicAttributeValueResponse.from(attributeValue))
-                        .collect(Collectors.toList())
+                        .map(attributeValue -> {
+                            String signature = null;
+                            if(attributeValue instanceof PublicAttributeValue) {
+                                signature = ((PublicAttributeValue) attributeValue).getSignature();
+                            }
+                            return PublicAttributeValueResponse.from(attributeValue, signature);
+                        }).collect(Collectors.toList())
         );
         publicAttributeResponse.setType(attribute.getType());
         publicAttributeResponse.setId(attribute.getId());
