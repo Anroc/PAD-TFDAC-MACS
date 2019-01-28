@@ -11,6 +11,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ciphertexts")
@@ -28,6 +31,22 @@ public class CipherTextController {
         Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
         cipherTextService.insert(cipherTextDTO.toCipherTextEntity(g1));
         return cipherTextDTO;
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public List<CipherTextDTO> getCipherTexts(@RequestParam(value = "attrId", defaultValue = "") String query) {
+        if(query.isEmpty()) {
+            return cipherTextService.findAll().stream()
+                    .map(CipherTextDTO::from)
+                    .collect(Collectors.toList());
+        } else {
+            List<String> attributeIds = Arrays.asList(query.split("\\+"));
+            return cipherTextService.findAllByPolicyContaining(attributeIds)
+                    .stream()
+                    .map(CipherTextDTO::from)
+                    .collect(Collectors.toList());
+        }
     }
 
     @GetMapping("/{id}")

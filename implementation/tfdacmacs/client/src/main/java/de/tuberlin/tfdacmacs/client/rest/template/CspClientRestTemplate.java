@@ -9,7 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Component
 public class CspClientRestTemplate extends ClientRestTemplate implements CSPClient {
@@ -39,6 +42,17 @@ public class CspClientRestTemplate extends ClientRestTemplate implements CSPClie
                 HttpMethod.POST,
                 Void.class,
                 file
+        );
+    }
+
+    @Override
+    public List<CipherTextDTO> getCipherTexts(List<String> attributeIds) {
+        String joinedQuery = StringUtils.collectionToDelimitedString(attributeIds, "+");
+        return listRequest(
+                String.format("/ciphertexts?attrIds=%s", joinedQuery),
+                HttpMethod.GET,
+                CipherTextDTO.class,
+                null
         );
     }
 }

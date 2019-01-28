@@ -37,12 +37,12 @@ public class CipherTextDTO {
     @NotBlank
     private String fileId;
 
-    public CipherText toCipherText(@NonNull Field field) {
+    public CipherText toCipherText(@NonNull Field g1, @NonNull Field gt) {
         return new CipherText(
                 id,
-                ElementConverter.convert(c1, field),
-                ElementConverter.convert(c2, field),
-                ElementConverter.convert(c3, field),
+                ElementConverter.convert(c1, gt),
+                ElementConverter.convert(c2, g1),
+                ElementConverter.convert(c3, g1),
                 new HashSet<>(accessPolicy),
                 ownerId,
                 fileId
