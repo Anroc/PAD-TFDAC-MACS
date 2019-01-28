@@ -1,23 +1,21 @@
-package de.tuberlin.tfdacmacs.client.authority.data.dto;
+package de.tuberlin.tfdacmacs.client.authority.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.security.cert.X509Certificate;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttributeAuthorityResponse {
-
+public class TrustedAuthority {
     @NotBlank
     private String id;
     @NotBlank
     private String certificateId;
-
-    @NotBlank
-    private String publicKey;
-    @NotBlank
-    private String signature;
+    @NotNull
+    private X509Certificate certificate;
 }

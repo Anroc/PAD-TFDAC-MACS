@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.attributeauthority.authority.client;
 
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
+import de.tuberlin.tfdacmacs.attributeauthority.client.ContentSigner;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
@@ -16,11 +17,15 @@ public class AuthorityClient {
     private final CAClient caClient;
     private final AttributeAuthorityConfig attributeAuthorityConfig;
 
+    private final ContentSigner contentSigner;
+
     public void uploadAuthorityPublicKey(@NonNull AuthorityKey.Public authorityPublicKey) {
+        String publicKey = ElementConverter.convert(authorityPublicKey.getKey());
         caClient.updateAuthorityPublicKey(
                 attributeAuthorityConfig.getId(),
                 new AttributeAuthorityPublicKeyRequest(
-                        ElementConverter.convert(authorityPublicKey.getKey())
+                        publicKey,
+                        contentSigner.sign(publicKey)
                 )
         );
     }

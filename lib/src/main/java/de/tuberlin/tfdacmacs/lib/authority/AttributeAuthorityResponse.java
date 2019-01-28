@@ -25,4 +25,6 @@ public class AttributeAuthorityResponse {
 
     @Nullable
     private String publicKey;
+    @Nullable
+    private String signature;
 }

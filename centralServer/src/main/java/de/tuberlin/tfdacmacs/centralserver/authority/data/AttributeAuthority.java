@@ -9,6 +9,7 @@ import lombok.NonNull;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +20,9 @@ public class AttributeAuthority extends Entity {
 
     @Nullable
     private AuthorityKey.Public publicKey;
+
+    @Nullable
+    private String signature;
 
     public AttributeAuthority(@NonNull String id, @NonNull String certificateId) {
         super(id);

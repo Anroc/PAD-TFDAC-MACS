@@ -23,7 +23,7 @@ public class CertificateDB extends JsonDB<Certificate> {
         };
     }
 
-    private Module x509Module() {
+    public static Module x509Module() {
         SimpleModule module = new SimpleModule();
         module.addSerializer(X509Certificate.class, new X509Serializer());
         module.addDeserializer(X509Certificate.class, new X509Deserializer());

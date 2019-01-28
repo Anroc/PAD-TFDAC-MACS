@@ -29,6 +29,16 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
     }
 
     @Override
+    public CertificateResponse getCertificate(String certificateId) {
+        return request(
+                "/certificates/" + certificateId,
+                HttpMethod.GET,
+                CertificateResponse.class,
+                null
+        );
+    }
+
+    @Override
     public DeviceResponse getAttributes(String userId, String deviceId) {
         return request(
                 String.format("/users/%s/devices/%s", userId, deviceId),
