@@ -2,8 +2,9 @@ package de.tuberlin.tfdacmacs.client.encrypt;
 
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
 import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AuthorityInformationResponse;
+import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEvent;
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
@@ -21,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PublicKey;
-import java.util.HashMap;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,11 +55,13 @@ public class EncryptCommandTest extends CommandTestSuite {
     public void encrypt_without2FA() {
         doReturn(true)
                 .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
-        doReturn(new AuthorityInformationResponse(
-                "aa.tu-berlin.de",
-                UUID.randomUUID().toString(),
-                new HashMap<>()
-        )).when(aaClient).getTrustedAuthorities();
+        X509Certificate certificate = mock(X509Certificate.class);
+        doReturn(mock(PublicKey.class)).when(certificate).getPublicKey();
+        signatureVerifier.updateTrustedPublicKeys(
+                new TrustedAuthorityUpdatedEvent(
+                        new TrustedAuthority(authorityId, UUID.randomUUID().toString(), certificate)
+                )
+        );
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "Student",
@@ -104,11 +107,6 @@ public class EncryptCommandTest extends CommandTestSuite {
         )).when(caClient).getAuthority(hpiAuthorityId);
         doReturn(true)
                 .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
-        doReturn(new AuthorityInformationResponse(
-                this.authorityId,
-                UUID.randomUUID().toString(),
-                new HashMap<>()
-        )).when(aaClient).getTrustedAuthorities();
 
         Assertions.assertThatExceptionOfType(NotTrustedAuthorityException.class).isThrownBy(
                 () -> encryptCommand.encrypt(FILE_NAME, null, hpiAttrId)

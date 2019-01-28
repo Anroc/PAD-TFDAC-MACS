@@ -13,6 +13,7 @@ import de.tuberlin.tfdacmacs.client.register.Session;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
+import de.tuberlin.tfdacmacs.client.rest.SignatureVerifier;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
@@ -64,6 +65,9 @@ public abstract class CommandTestSuite {
     protected CSPClient cspClient;
     @MockBean
     protected AAClient aaClient;
+
+    @Autowired
+    protected SignatureVerifier signatureVerifier;
 
     @SpyBean
     protected StringAsymmetricCryptEngine stringAsymmetricCryptEngine;
