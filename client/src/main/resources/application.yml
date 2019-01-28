@@ -25,6 +25,6 @@ spring:
   profiles: test
 
 client:
-  ca-root-url: https://server.vpn:9001/
-  aa-root-url: https://server.vpn:9002/
-  csp-root-url: https://server.vpn:9003/
+  ca-root-url: https://localhost:9001/
+  aa-root-url: https://localhost:9002/
+  csp-root-url: https://localhost:9003/
