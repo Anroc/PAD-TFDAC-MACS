@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class CspClientRestTemplate extends ClientRestTemplate implements CSPClie
         return listRequest(
                 String.format("/ciphertexts?attrIds=%s", joinedQuery),
                 HttpMethod.GET,
-                CipherTextDTO.class,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
                 null
         );
     }

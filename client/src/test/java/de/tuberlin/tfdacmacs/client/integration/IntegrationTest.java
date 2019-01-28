@@ -48,6 +48,11 @@ public class IntegrationTest extends IntegrationTestSuite {
         assertThat(attributeDB.findAll()).isNotEmpty();
 
         encryptCommand.encrypt(FILE_NAME, null, "(aa.tu-berlin.de.role:student)");
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isTrue();
+
     }
 
     private void approveDevice(String deviceId) {

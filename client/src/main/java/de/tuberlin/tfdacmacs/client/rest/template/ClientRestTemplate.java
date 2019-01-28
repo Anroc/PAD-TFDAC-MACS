@@ -54,7 +54,7 @@ public abstract class ClientRestTemplate {
         return response.getBody();
     }
 
-    public <T> List<T> listRequest(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+    public <T> List<T> listRequest(String url, HttpMethod httpMethod, ParameterizedTypeReference<List<T>> responseType, Object body) {
         log.info("Asking {} for [{}:{}]", serviceName, httpMethod, url);
 
         HttpStatus responseStatus = null;
@@ -66,7 +66,7 @@ public abstract class ClientRestTemplate {
                         url,
                         httpMethod,
                         body != null ? new HttpEntity<>(body) : HttpEntity.EMPTY,
-                        new ParameterizedTypeReference<List<T>>(){}
+                        responseType
                 );
                 responseStatus = response.getStatusCode();
             } catch(HttpClientErrorException e) {

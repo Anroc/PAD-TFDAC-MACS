@@ -4,15 +4,19 @@ import de.tuberlin.tfdacmacs.ClientApplication;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
+import de.tuberlin.tfdacmacs.client.config.StandardStreams;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.shell.Shell;
@@ -24,6 +28,11 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ClientApplication.class,
@@ -42,13 +51,41 @@ public abstract class IntegrationTestSuite {
     protected CertificateDB certificateDB;
     @Autowired
     protected KeyPairDB keyPairDB;
-
     @Autowired
     protected ClientConfig clientConfig;
-
     @Autowired
     protected Shell shell;
+    @SpyBean
+    protected StandardStreams standardStreams;
 
+    @Getter
+    private List<String> outContent = new ArrayList<>();
+    @Getter
+    private List<String> errorContent = new ArrayList<>();
+
+    public void resetStdStreams() {
+        outContent.clear();
+        errorContent.clear();
+    }
+
+    @Before
+    public void stdStream() {
+        doAnswer(args -> {
+                    outContent.add(args.getArgument(0));
+                    return args.callRealMethod();
+                }
+        ).when(standardStreams).out(anyString());
+
+        doAnswer(args -> {
+                    errorContent.add(args.getArgument(0));
+                    return args.callRealMethod();
+                }
+        ).when(standardStreams).error(anyString());
+    }
+
+    public boolean containsSubSequence(List<String> stream, String subSequence) {
+        return stream.stream().anyMatch(line -> line.contains(subSequence));
+    }
 
     protected RestTemplate plainRestTemplate(String rootURL) {
         RestTemplate restTemplate = new RestTemplateBuilder().rootUri(rootURL).build();
