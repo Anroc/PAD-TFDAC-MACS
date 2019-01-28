@@ -3,9 +3,12 @@ package de.tuberlin.tfdacmacs.client.encrypt;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.authority.data.dto.AuthorityInformationResponse;
+import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import it.unisa.dia.gas.jpbc.Element;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -46,6 +52,13 @@ public class EncryptCommandTest extends CommandTestSuite {
 
     @Test
     public void encrypt_without2FA() {
+        doReturn(true)
+                .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
+        doReturn(new AuthorityInformationResponse(
+                "aa.tu-berlin.de",
+                UUID.randomUUID().toString(),
+                new HashMap<>()
+        )).when(aaClient).getTrustedAuthorities();
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "Student",
@@ -71,7 +84,38 @@ public class EncryptCommandTest extends CommandTestSuite {
 
         verify(cspClient, times(2)).createCipherText(any(CipherTextDTO.class));
         verify(cspClient, times(1)).createFile(anyString(), any(MultiValueMap.class));
+    }
 
+    @Test
+    public void encrypt_fails_onUntrustedAuthority() {
+        String hpiAuthorityId = "aa.hpi.de";
+        String hpiAttrId = "aa.hpi.de.role:Student";
+
+        doReturn(new PublicAttributeValueResponse(
+                ElementConverter.convert(randomElementG1()),
+                "Student",
+                "signature"
+        )).when(caClient).getAttributeValue(hpiAttrId.split(":")[0], hpiAttrId.split(":")[1]);
+        doReturn(new AttributeAuthorityResponse(
+                hpiAuthorityId,
+                "SomeCertId",
+                ElementConverter.convert(randomElementG1()),
+                "signature"
+        )).when(caClient).getAuthority(hpiAuthorityId);
+        doReturn(true)
+                .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
+        doReturn(new AuthorityInformationResponse(
+                this.authorityId,
+                UUID.randomUUID().toString(),
+                new HashMap<>()
+        )).when(aaClient).getTrustedAuthorities();
+
+        Assertions.assertThatExceptionOfType(NotTrustedAuthorityException.class).isThrownBy(
+                () -> encryptCommand.encrypt(FILE_NAME, null, hpiAttrId)
+        );
+
+        verify(cspClient, times(0)).createCipherText(any(CipherTextDTO.class));
+        verify(cspClient, times(0)).createFile(anyString(), any(MultiValueMap.class));
     }
 
     private Element randomElementG1() {
