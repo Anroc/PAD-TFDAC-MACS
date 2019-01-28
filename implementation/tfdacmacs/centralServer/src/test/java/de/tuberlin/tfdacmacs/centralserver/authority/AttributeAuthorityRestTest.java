@@ -39,7 +39,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         AttributeAuthorityResponse body = exchange.getBody();
-        assertThat(body).hasNoNullFieldsOrPropertiesExcept("publicKey");
+        assertThat(body).hasNoNullFieldsOrPropertiesExcept("publicKey", "signature");
         assertThat(body.getId()).isEqualTo(aid);
         Optional<Certificate> certificateOptional = certificateDB.findEntity(body.getCertificateId());
         assertThat(certificateOptional).isPresent();
