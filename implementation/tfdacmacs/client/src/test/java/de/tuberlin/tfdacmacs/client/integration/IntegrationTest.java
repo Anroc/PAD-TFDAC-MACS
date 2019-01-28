@@ -1,24 +1,15 @@
 package de.tuberlin.tfdacmacs.client.integration;
 
-import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.encrypt.EncryptCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -27,7 +18,7 @@ import java.nio.file.Paths;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public class IntegrationTest extends CommandTestSuite {
+public class IntegrationTest extends IntegrationTestSuite {
 
     private static final String email = "test@tu-berlin.de";
     private static final String FILE_NAME = "./file.dat";
@@ -35,36 +26,11 @@ public class IntegrationTest extends CommandTestSuite {
     @Autowired
     private EncryptCommand encryptCommand;
 
-    @Override
-    public void initMocks() {
-        return;
-    }
-
     @Before
     public void setup() throws IOException {
         Files.write(Paths.get(FILE_NAME), "hello World".getBytes()).toFile().deleteOnExit();
     }
 
-    protected RestTemplate plainRestTemplate(String rootURL) {
-        RestTemplate restTemplate = new RestTemplateBuilder().rootUri(rootURL).build();
-        return restTemplate;
-    }
-
-    protected RestTemplate sslRestTemplate(String rootURL) {
-        try {
-            SSLContext sslContext = SSLContexts
-                    .custom()
-                    .loadTrustMaterial(ResourceUtils.getFile("classpath:ca-truststore.jks"), "foobar".toCharArray())
-                    .build();
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
-            HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-            RestTemplate restTemplate = plainRestTemplate(rootURL);
-            ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
-            return restTemplate;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Test
     public void integrationTest() {
