@@ -30,7 +30,7 @@ public class CipherTextControllerRestTest extends RestTestSuite {
 
         String id = exchange.getBody().getId();
         CipherTextEntity cipherTextEntity = cipherTextDB.findEntity(id).get();
-        assertThat(cipherTextEntity).isEqualTo(originalCT);
+        assertThat(CipherTextDTO.from(cipherTextEntity)).isEqualTo(CipherTextDTO.from(originalCT));
     }
 
     @Test
