@@ -16,9 +16,13 @@ public class FileInformationResponse {
     @NotBlank
     private String id;
 
+    @NotBlank
+    private String name;
+
     public static FileInformationResponse from(@NonNull FileInformation fileInformation) {
         return new FileInformationResponse(
-                fileInformation.getId()
+                fileInformation.getId(),
+                fileInformation.getOriginalName()
         );
     }
 }

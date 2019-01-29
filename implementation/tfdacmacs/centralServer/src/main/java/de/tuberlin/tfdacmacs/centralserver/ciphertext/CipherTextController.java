@@ -29,19 +29,20 @@ public class CipherTextController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public CipherTextDTO createCipherText(@Valid @RequestBody CipherTextDTO cipherTextDTO) {
         Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
-        cipherTextService.insert(cipherTextDTO.toCipherTextEntity(g1));
+        Field gt = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getGT();
+        cipherTextService.insert(cipherTextDTO.toCipherTextEntity(g1, gt));
         return cipherTextDTO;
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public List<CipherTextDTO> getCipherTexts(@RequestParam(value = "attrId", defaultValue = "") String query) {
+    public List<CipherTextDTO> getCipherTexts(@RequestParam(value = "attrIds", defaultValue = "") String query) {
         if(query.isEmpty()) {
             return cipherTextService.findAll().stream()
                     .map(CipherTextDTO::from)
                     .collect(Collectors.toList());
         } else {
-            List<String> attributeIds = Arrays.asList(query.split("\\+"));
+            List<String> attributeIds = Arrays.asList(query.split(","));
             return cipherTextService.findAllByPolicyContaining(attributeIds)
                     .stream()
                     .map(CipherTextDTO::from)

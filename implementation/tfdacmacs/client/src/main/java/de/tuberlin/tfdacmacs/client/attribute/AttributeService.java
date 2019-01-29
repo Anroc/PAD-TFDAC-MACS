@@ -5,7 +5,9 @@ import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.client.attribute.exceptions.InvalidAttributeValueIdentifierException;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.UserAttributeSecretComponent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +54,15 @@ public class AttributeService implements AttributeValueKeyProvider {
         return findAttributeValuePublicKey(attributeValueId).orElseThrow(
                 () -> new InvalidAttributeValueIdentifierException(attributeValueId)
         );
+    }
+
+    public Set<UserAttributeSecretComponent> getUserAttributeSecretComponents(@NonNull Set<String> attributeIds) {
+        return getAttributes().stream()
+                .filter(attribute -> attributeIds.contains(attribute.getId()))
+                .map(attribute -> new UserAttributeSecretComponent(
+                        new UserAttributeValueKey(attribute.getKey()),
+                        getAttributeValuePublicKey(attribute.getId()),
+                        attribute.getId()))
+                .collect(Collectors.toSet());
     }
 }

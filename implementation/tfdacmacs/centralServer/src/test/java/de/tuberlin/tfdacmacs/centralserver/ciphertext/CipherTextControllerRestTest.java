@@ -43,7 +43,9 @@ public class CipherTextControllerRestTest extends RestTestSuite {
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
 
-        CipherTextEntity ct = exchange.getBody().toCipherTextEntity(gppTestFactory.create().getPairing().getG1());
+        CipherTextEntity ct = exchange.getBody().toCipherTextEntity(
+                getGPP().getPairing().getG1(),
+                getGPP().getPairing().getGT());
         assertThat(ct).isEqualTo(originalCT);
     }
 
@@ -81,7 +83,7 @@ public class CipherTextControllerRestTest extends RestTestSuite {
         cipherTextDB.insert(cipherTextEntity2);
 
         ResponseEntity<List<CipherTextDTO>> exchange = mutualAuthRestTemplate
-                .exchange(cipherTextsQueryParameter(attributeId),
+                .exchange(cipherTextsQueryParameter(attributeId, attributeId2),
                         HttpMethod.GET,
                         HttpEntity.EMPTY,
                         new ParameterizedTypeReference<List<CipherTextDTO>>() {});
@@ -94,6 +96,6 @@ public class CipherTextControllerRestTest extends RestTestSuite {
     }
 
     private String cipherTextsQueryParameter(String... attributeIds) {
-        return "/ciphertexts?attrId=" + StringUtils.collectionToDelimitedString(Arrays.asList(attributeIds), "+");
+        return "/ciphertexts?attrIds=" + StringUtils.collectionToDelimitedString(Arrays.asList(attributeIds), ",");
     }
 }

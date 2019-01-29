@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.client.csp;
 
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
-import de.tuberlin.tfdacmacs.client.csp.client.FileKeyClient;
+import de.tuberlin.tfdacmacs.client.csp.client.CipherTextClient;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import lombok.NonNull;
@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CSPService {
 
-    private final FileKeyClient fileKeyClient;
+    private final CipherTextClient cipherTextClient;
 
     public void createCipherTexts(@NonNull List<CipherText> cipherTexts) {
-        fileKeyClient.bulkCreateCipherText(cipherTexts);
+        cipherTextClient.bulkCreateCipherText(cipherTexts);
     }
 
     public void uploadFile(@NonNull EncryptedFile file) {
-        fileKeyClient.createFile(file);
+        cipherTextClient.createFile(file);
     }
 
     public List<CipherText> checkForDecryptableFiles(@NonNull Set<Attribute> attributes) {
-        return fileKeyClient.getCipherTexts(
+        return cipherTextClient.getCipherTexts(
                     attributes.stream()
                             .map(Attribute::getId)
                             .collect(Collectors.toList()));

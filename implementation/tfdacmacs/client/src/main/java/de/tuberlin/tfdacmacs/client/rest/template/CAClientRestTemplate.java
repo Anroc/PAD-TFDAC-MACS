@@ -94,7 +94,7 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
 
     @Override
     public List<CipherTextDTO> getCipherTexts(List<String> attributeIds) {
-        String joinedQuery = StringUtils.collectionToDelimitedString(attributeIds, "+");
+        String joinedQuery = StringUtils.collectionToDelimitedString(attributeIds, ",");
         return listRequest(
                 String.format("/ciphertexts?attrIds=%s", joinedQuery),
                 HttpMethod.GET,

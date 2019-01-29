@@ -21,14 +21,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class IntegrationTest extends IntegrationTestSuite {
 
     private static final String email = "test@tu-berlin.de";
-    private static final String FILE_NAME = "./file.dat";
+    private static final String FILE_NAME = "file.dat";
+    private static final String FILE_DIR = "./";
+    private static final String FILE_PATH = FILE_DIR + FILE_NAME;
+    private static final String DECRYPT_DIR = "./decrypted-files";
+    private static final byte[] CONTENT = "hello World".getBytes();
 
     @Autowired
     private EncryptCommand encryptCommand;
 
     @Before
     public void setup() throws IOException {
-        Files.write(Paths.get(FILE_NAME), "hello World".getBytes()).toFile().deleteOnExit();
+        Files.write(Paths.get(FILE_PATH), CONTENT).toFile().deleteOnExit();
     }
 
 
@@ -47,11 +51,16 @@ public class IntegrationTest extends IntegrationTestSuite {
         evaluate("attributes update");
         assertThat(attributeDB.findAll()).isNotEmpty();
 
-        encryptCommand.encrypt(FILE_NAME, null, "(aa.tu-berlin.de.role:student)");
+        encryptCommand.encrypt(FILE_PATH, null, "(aa.tu-berlin.de.role:student)");
 
         resetStdStreams();
         evaluate("check");
         assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isTrue();
+
+        evaluate(String.format("decrypt %s 1", DECRYPT_DIR));
+        assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
+                .exists()
+                .hasBinaryContent(CONTENT);
 
     }
 
