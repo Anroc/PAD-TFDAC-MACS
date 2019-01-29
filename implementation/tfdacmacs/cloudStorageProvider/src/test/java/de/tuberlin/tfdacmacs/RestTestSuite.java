@@ -1,8 +1,6 @@
 package de.tuberlin.tfdacmacs;
 
-import de.tuberlin.tfdacmacs.ciphertext.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.csp.ciphertext.db.CipherTextDB;
 import de.tuberlin.tfdacmacs.csp.client.CAClient;
 import de.tuberlin.tfdacmacs.csp.files.FileConfiguration;
 import de.tuberlin.tfdacmacs.csp.files.FileController;
@@ -61,12 +59,8 @@ public abstract class RestTestSuite {
     // DBs
     @Autowired
     protected FileInformationDB fileInformationDB;
-    @Autowired
-    protected CipherTextDB cipherTextDB;
 
     // Factories
-    @Autowired
-    protected CipherTextTestFactory cipherTextTestFactory;
     @Autowired
     protected BasicsGPPTestFactory gppTestFactory;
 
@@ -143,6 +137,5 @@ public abstract class RestTestSuite {
     @After
     public void cleanUp() {
         fileInformationDB.drop();
-        cipherTextDB.drop();
     }
 }

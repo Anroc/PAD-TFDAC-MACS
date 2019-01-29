@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.csp.ciphertext.data.dto;
+package de.tuberlin.tfdacmacs.centralserver.ciphertext.data.dto;
 
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
-import de.tuberlin.tfdacmacs.csp.ciphertext.data.CipherTextEntity;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;

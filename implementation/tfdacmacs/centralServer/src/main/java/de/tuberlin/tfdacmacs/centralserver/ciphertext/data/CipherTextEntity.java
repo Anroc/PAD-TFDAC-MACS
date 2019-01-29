@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.csp.ciphertext.data;
+package de.tuberlin.tfdacmacs.centralserver.ciphertext.data;
 
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import it.unisa.dia.gas.jpbc.Element;

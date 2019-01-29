@@ -6,7 +6,9 @@ import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.config.StandardStreams;
 import de.tuberlin.tfdacmacs.client.db.CRUDOperations;
 import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.client.gpp.factory.GPPDTOTestFactory;
+import de.tuberlin.tfdacmacs.client.encrypt.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
 import de.tuberlin.tfdacmacs.client.register.Session;
@@ -20,6 +22,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.factory.CertificateTestFactory;
+import it.unisa.dia.gas.jpbc.Element;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -31,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.shell.Shell;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
@@ -42,7 +46,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -102,6 +108,8 @@ public abstract class CommandTestSuite {
 
     protected GPPTestFactory gppTestFactory;
     @Autowired
+    protected CipherTextTestFactory cipherTextTestFacotry;
+    @Autowired
     protected TestEventListener testEventListener;
     @Autowired
     protected ApplicationContext applicationContext;
@@ -109,6 +117,8 @@ public abstract class CommandTestSuite {
     protected StandardStreams standardStreams;
     @SpyBean
     protected Session session;
+    @Autowired
+    protected ApplicationEventPublisher applicationEventPublisher;
 
     @Getter
     private List<String> outContent = new ArrayList<>();
@@ -118,6 +128,10 @@ public abstract class CommandTestSuite {
     @PostConstruct
     public void init() {
         gppTestFactory= new GPPTestFactory(pairingGenerator, cryptEngine);
+        cipherTextTestFacotry.postConstruct(
+                gppTestFactory.create().getPairing().getG1(),
+                gppTestFactory.create().getPairing().getGT()
+        );
     }
 
     @Before
@@ -139,9 +153,12 @@ public abstract class CommandTestSuite {
                     return null;
                 }
         ).when(standardStreams).error(anyString());
+
+        applicationEventPublisher.publishEvent(new GPPReceivedEvent(gppTestFactory.create()));
     }
 
     @After
+    @SuppressWarnings("all")
     public void cleanUp() throws IOException {
         applicationContext.getBeansOfType(CRUDOperations.class).values()
                 .forEach(CRUDOperations::drop);
@@ -150,6 +167,19 @@ public abstract class CommandTestSuite {
         if(p12Dir.exists()) {
             FileUtils.cleanDirectory(p12Dir);
         }
+    }
+
+    public boolean containsSubSequence(List<String> stream, String... subSequence) {
+        Predicate<String> predicate = (line -> Arrays.stream(subSequence).allMatch(line::contains));
+        return stream.stream().anyMatch(predicate);
+    }
+
+    public Element randomElementG1() {
+        return gppTestFactory.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
+    }
+
+    public Element randomElementGT() {
+        return gppTestFactory.getGlobalPublicParameter().getPairing().getGT().newRandomElement();
     }
 
     public void evaluate(String command) {

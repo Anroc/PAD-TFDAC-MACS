@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.client.rest.template;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
@@ -10,9 +11,13 @@ import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -74,6 +79,26 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
                 String.format("/authorities/%s", authorityId),
                 HttpMethod.GET,
                 AttributeAuthorityResponse.class,
+                null
+        );
+    }
+
+    @Override
+    public void createCipherText(CipherTextDTO cipherTextDTO) {
+        request("/ciphertexts",
+                HttpMethod.POST,
+                CipherTextDTO.class,
+                cipherTextDTO
+        );
+    }
+
+    @Override
+    public List<CipherTextDTO> getCipherTexts(List<String> attributeIds) {
+        String joinedQuery = StringUtils.collectionToDelimitedString(attributeIds, "+");
+        return listRequest(
+                String.format("/ciphertexts?attrIds=%s", joinedQuery),
+                HttpMethod.GET,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
                 null
         );
     }

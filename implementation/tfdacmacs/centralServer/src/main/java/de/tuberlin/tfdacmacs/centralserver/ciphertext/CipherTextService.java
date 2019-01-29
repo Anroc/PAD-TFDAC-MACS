@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.csp.ciphertext;
+package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 
-import de.tuberlin.tfdacmacs.csp.ciphertext.data.CipherTextEntity;
-import de.tuberlin.tfdacmacs.csp.ciphertext.db.CipherTextDB;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.db.CipherTextDB;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -33,7 +33,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
     public void createAuthority() throws IOException, OperatorCreationException {
         CertificateRequest certificateRequest = certificateRequestTestFactory.create(aid, keyPair);
 
-        ResponseEntity<AttributeAuthorityResponse> exchange = restTemplate
+        ResponseEntity<AttributeAuthorityResponse> exchange = sslRestTemplate
                 .exchange("/authorities", HttpMethod.POST, new HttpEntity(certificateRequest, basicAuth()),
                         AttributeAuthorityResponse.class);
 
@@ -57,7 +57,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
 
         attributeAuthorityDB.insert(attributeAuthority);
 
-        ResponseEntity<AttributeAuthorityResponse> exchange = sslRestTemplate
+        ResponseEntity<AttributeAuthorityResponse> exchange = mutualAuthRestTemplate
                 .exchange("/authorities/" + attributeAuthority.getId(), HttpMethod.GET, HttpEntity.EMPTY,
                         AttributeAuthorityResponse.class);
 
@@ -84,7 +84,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
                 signature
         );
 
-        ResponseEntity<AttributeAuthorityResponse> exchange = sslRestTemplate
+        ResponseEntity<AttributeAuthorityResponse> exchange = mutualAuthRestTemplate
                 .exchange("/authorities/" + attributeAuthority.getId() + "/public-key",
                         HttpMethod.PUT,
                         new HttpEntity<>(attributeAuthorityPublicKeyRequest),

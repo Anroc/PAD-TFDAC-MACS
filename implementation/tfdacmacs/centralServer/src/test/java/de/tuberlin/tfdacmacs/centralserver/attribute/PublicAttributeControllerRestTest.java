@@ -59,7 +59,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
                 publicAttribute, value -> "testSignature"
         );
 
-        ResponseEntity<PublicAttributeResponse> exchange = sslRestTemplate.exchange(
+        ResponseEntity<PublicAttributeResponse> exchange = mutualAuthRestTemplate.exchange(
                 "/attributes",
                 HttpMethod.POST,
                 new HttpEntity<>(attributeCreationRequest),
@@ -77,7 +77,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         publicAttributeDB.insert(publicAttribute);
 
         ResponseEntity<List<PublicAttributeResponse>> exchange =
-                sslRestTemplate.exchange(
+                mutualAuthRestTemplate.exchange(
                         "/attributes",
                         HttpMethod.GET,
                         HttpEntity.EMPTY,
@@ -97,7 +97,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         publicAttributeDB.insert(publicAttribute);
 
         ResponseEntity<PublicAttributeResponse> exchange =
-                sslRestTemplate.exchange(
+                mutualAuthRestTemplate.exchange(
                         "/attributes/" + publicAttribute.getId(),
                         HttpMethod.GET,
                         HttpEntity.EMPTY,
@@ -124,7 +124,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
             value, ElementConverter.convert(originalPublicKey), "testSignature"
         );
         ResponseEntity<PublicAttributeValueResponse> exchange =
-                sslRestTemplate.exchange(
+                mutualAuthRestTemplate.exchange(
                         "/attributes/" + publicAttribute.getId() + "/values",
                         HttpMethod.POST,
                         new HttpEntity<>(attributeValueCreationRequest),
@@ -143,7 +143,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         publicAttributeDB.insert(publicAttribute);
 
         ResponseEntity<PublicAttributeValueResponse> exchange =
-                sslRestTemplate.exchange(
+                mutualAuthRestTemplate.exchange(
                         "/attributes/" + publicAttribute.getId() + "/values/" + publicAttributeValue.getValue(),
                         HttpMethod.GET,
                         HttpEntity.EMPTY,

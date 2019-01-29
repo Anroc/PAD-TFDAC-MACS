@@ -38,7 +38,7 @@ public class UserRestTest extends RestTestSuite {
 
         UserCreationRequest creationRequest = new UserCreationRequest(email);
 
-        ResponseEntity<UserResponse> userCreationResponseResponseEntity = sslRestTemplate
+        ResponseEntity<UserResponse> userCreationResponseResponseEntity = mutualAuthRestTemplate
                 .exchange("/users", HttpMethod.POST, new HttpEntity(creationRequest), UserResponse.class);
         assertThat(userCreationResponseResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         UserResponse body = userCreationResponseResponseEntity.getBody();
@@ -57,7 +57,7 @@ public class UserRestTest extends RestTestSuite {
         User user = new User(userId, aid);
         userDB.insert(user);
 
-        ResponseEntity<UserResponse> response = sslRestTemplate
+        ResponseEntity<UserResponse> response = mutualAuthRestTemplate
                 .exchange("/users/" + userId, HttpMethod.GET, HttpEntity.EMPTY, UserResponse.class);
 
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
@@ -79,7 +79,7 @@ public class UserRestTest extends RestTestSuite {
         userDB.insert(user1);
         userDB.insert(user2);
 
-        ResponseEntity<List<UserResponse>> response = sslRestTemplate
+        ResponseEntity<List<UserResponse>> response = mutualAuthRestTemplate
                 .exchange("/users", HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<List<UserResponse>>(){});
 
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
@@ -96,7 +96,7 @@ public class UserRestTest extends RestTestSuite {
         user.setDevices(Sets.newHashSet(device));
         userDB.insert(user);
 
-        ResponseEntity<DeviceResponse> response = sslRestTemplate
+        ResponseEntity<DeviceResponse> response = mutualAuthRestTemplate
                 .exchange(String.format("/users/%s/devices/%s", email, device.getCertificateId()), HttpMethod.GET, HttpEntity.EMPTY, DeviceResponse.class);
 
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
@@ -113,7 +113,7 @@ public class UserRestTest extends RestTestSuite {
         user.setDevices(Sets.newHashSet(device));
         userDB.insert(user);
 
-        ResponseEntity<DeviceResponse> response = sslRestTemplate
+        ResponseEntity<DeviceResponse> response = mutualAuthRestTemplate
                 .exchange(String.format("/users/%s/devices/%s", email, device.getCertificateId()), HttpMethod.GET, HttpEntity.EMPTY, DeviceResponse.class);
 
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);

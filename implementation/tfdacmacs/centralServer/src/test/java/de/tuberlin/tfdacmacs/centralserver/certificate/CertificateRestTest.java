@@ -32,7 +32,7 @@ public class CertificateRestTest extends RestTestSuite {
 
     @Test
     public void getRootCA() {
-        ResponseEntity<CertificateResponse> userCreationResponseResponseEntity = restTemplate
+        ResponseEntity<CertificateResponse> userCreationResponseResponseEntity = sslRestTemplate
                 .exchange("/certificates/root", HttpMethod.GET, HttpEntity.EMPTY, CertificateResponse.class);
         assertThat(userCreationResponseResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         CertificateResponse body = userCreationResponseResponseEntity.getBody();
@@ -50,7 +50,7 @@ public class CertificateRestTest extends RestTestSuite {
 
 
         CertificateRequest certificateRequest = certificateRequestTestFactory.create(email, clientKeys);
-        ResponseEntity<CertificateResponse> certificateResponseEntity = restTemplate
+        ResponseEntity<CertificateResponse> certificateResponseEntity = sslRestTemplate
                 .exchange("/certificates", HttpMethod.POST, new HttpEntity(certificateRequest),  CertificateResponse.class);
 
         assertThat(certificateResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);

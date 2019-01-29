@@ -19,9 +19,16 @@ public class AttributeDB extends JsonDB<Attribute> {
         super(Attribute.class);
     }
 
+    @Override
+    public Module[] getCustomModule() {
+        return super.getCustomModule();
+    }
+
     @EventListener(GPPReceivedEvent.class)
     public void initElementModule(GPPReceivedEvent gppReceivedEvent) {
-        getFileEngine().registerModule(elementModule(gppReceivedEvent.getGPP().getPairing().getG1()));
+        getFileEngine().registerModule(
+                elementModule(gppReceivedEvent.getGPP().getPairing().getG1())
+        );
     }
 
     private Module elementModule(Field field) {

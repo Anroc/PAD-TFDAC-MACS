@@ -13,7 +13,7 @@ public class GlobalPublicParameterRestTest extends RestTestSuite {
 
     @Test
     public void getGPP() {
-        GlobalPublicParameterDTO gpp = sslRestTemplate.getForObject("/gpp", GlobalPublicParameterDTO.class);
+        GlobalPublicParameterDTO gpp = mutualAuthRestTemplate.getForObject("/gpp", GlobalPublicParameterDTO.class);
 
         assertThat(gpp.getCurveParameter()).isNotNull();
         CurveParameterDTO curveParameter = gpp.getCurveParameter();

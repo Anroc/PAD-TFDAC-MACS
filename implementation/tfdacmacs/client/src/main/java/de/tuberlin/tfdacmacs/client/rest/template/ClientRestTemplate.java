@@ -15,6 +15,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
+@SuppressWarnings("all")
 public abstract class ClientRestTemplate {
 
     private final RestTemplate restTemplate;
