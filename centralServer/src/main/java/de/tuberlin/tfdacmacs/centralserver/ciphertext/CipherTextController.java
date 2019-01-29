@@ -1,7 +1,7 @@
-package de.tuberlin.tfdacmacs.csp.ciphertext;
+package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 
-import de.tuberlin.tfdacmacs.csp.ciphertext.data.dto.CipherTextDTO;
-import de.tuberlin.tfdacmacs.csp.security.AuthenticationFacade;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Field;

@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.client.csp.client;
 import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
+import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import it.unisa.dia.gas.jpbc.Field;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class FileKeyClient {
 
     private final CSPClient cspClient;
+    private final CAClient caClient;
     private final GPPService gppService;
 
     public void bulkCreateCipherText(@NonNull List<CipherText> cipherTexts) {
@@ -30,7 +32,7 @@ public class FileKeyClient {
     }
 
     public void createCipherText(@NonNull CipherText cipherText) {
-        cspClient.createCipherText(CipherTextDTO.from(cipherText));
+        caClient.createCipherText(CipherTextDTO.from(cipherText));
     }
 
     public void createFile(@NonNull EncryptedFile file) {
@@ -50,7 +52,7 @@ public class FileKeyClient {
     }
 
     public List<CipherText> getCipherTexts(List<String> attributeIds) {
-        return cspClient.getCipherTexts(attributeIds)
+        return caClient.getCipherTexts(attributeIds)
                 .stream()
                 .map(ct -> ct.toCipherText(g1(), gt()))
                 .collect(Collectors.toList());

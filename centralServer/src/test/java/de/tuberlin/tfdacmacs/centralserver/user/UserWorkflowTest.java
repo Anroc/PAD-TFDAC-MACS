@@ -42,7 +42,7 @@ public class UserWorkflowTest extends RestTestSuite {
         userDB.insert(user);
 
         // 0. retrieve root CA
-        ResponseEntity<CertificateResponse> rootCa = restTemplate
+        ResponseEntity<CertificateResponse> rootCa = sslRestTemplate
                 .exchange("/certificates/root", HttpMethod.GET, HttpEntity.EMPTY, CertificateResponse.class);
         assertThat(rootCa.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         X509Certificate rootX509Certificate = KeyConverter.from(rootCa.getBody().getCertificate())
@@ -52,7 +52,7 @@ public class UserWorkflowTest extends RestTestSuite {
 
         // 1. user registers certificate
         CertificateRequest certificateRequest = certificateRequestTestFactory.create(email, keyPair);
-        ResponseEntity<CertificateResponse> certificateResponseEntity = restTemplate
+        ResponseEntity<CertificateResponse> certificateResponseEntity = sslRestTemplate
                 .exchange("/certificates", HttpMethod.POST, new HttpEntity(certificateRequest),  CertificateResponse.class);
         assertThat(certificateResponseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
         X509Certificate x509Certificate = KeyConverter.from(certificateResponseEntity.getBody().getCertificate())
@@ -62,7 +62,7 @@ public class UserWorkflowTest extends RestTestSuite {
 
         // 2. admin pulls users and sees new user
         mutalAuthenticationRestTemplate(AUTHORITY_KEYSTORE);
-        ResponseEntity<List<UserResponse>> response = sslRestTemplate
+        ResponseEntity<List<UserResponse>> response = mutualAuthRestTemplate
                 .exchange("/users", HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<List<UserResponse>>(){});
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         List<UserResponse> userResponseList = response.getBody();
@@ -74,7 +74,7 @@ public class UserWorkflowTest extends RestTestSuite {
         String certificateId = devices.get(0).getCertificateId();
 
         // 3. admin pulls certificate of device
-        ResponseEntity<CertificateResponse> currentCertificate = restTemplate
+        ResponseEntity<CertificateResponse> currentCertificate = sslRestTemplate
                 .exchange("/certificates/" + certificateId, HttpMethod.GET, HttpEntity.EMPTY, CertificateResponse.class);
         assertThat(currentCertificate.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         x509Certificate = KeyConverter.from(currentCertificate.getBody().getCertificate())

@@ -8,7 +8,6 @@ import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEven
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
-import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -114,9 +113,5 @@ public class EncryptCommandTest extends CommandTestSuite {
 
         verify(cspClient, times(0)).createCipherText(any(CipherTextDTO.class));
         verify(cspClient, times(0)).createFile(anyString(), any(MultiValueMap.class));
-    }
-
-    private Element randomElementG1() {
-        return gppTestFactory.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
     }
 }

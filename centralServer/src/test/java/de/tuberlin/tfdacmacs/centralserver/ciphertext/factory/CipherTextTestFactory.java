@@ -1,14 +1,16 @@
-package de.tuberlin.tfdacmacs.ciphertext.factory;
+package de.tuberlin.tfdacmacs.centralserver.ciphertext.factory;
 
 import com.google.common.collect.Sets;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.csp.ciphertext.data.CipherTextEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -24,12 +26,16 @@ public class CipherTextTestFactory {
     }
 
     public CipherTextEntity createRandom() {
+        return create("aa.tu-berlin.de.role:student");
+    }
+
+    public CipherTextEntity create(String... policy) {
         return new CipherTextEntity(
                 UUID.randomUUID().toString(),
                 globalPublicParameter.getPairing().getG1().newRandomElement(),
                 globalPublicParameter.getPairing().getG1().newRandomElement(),
                 globalPublicParameter.getPairing().getG1().newRandomElement(),
-                Sets.newHashSet("aa.tu-berlin.de.role:student"),
+                Arrays.stream(policy).collect(Collectors.toSet()),
                 UUID.randomUUID().toString(),
                 "encryptedMessage");
     }

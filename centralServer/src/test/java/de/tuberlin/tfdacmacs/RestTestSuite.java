@@ -4,12 +4,15 @@ import de.tuberlin.tfdacmacs.centralserver.attribute.db.PublicAttributeDB;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.db.CipherTextDB;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.centralserver.gpp.GlobalPublicParameterService;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.security.config.CredentialConfig;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.lib.attribute.factory.BasicsGPPTestFactory;
 import de.tuberlin.tfdacmacs.lib.certificate.util.SpringContextAwareCertificateUtils;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import org.apache.commons.codec.binary.Base64;
@@ -43,8 +46,8 @@ public abstract class RestTestSuite {
     protected static final String CLIENT_KEYSTORE = "classpath:ca-client-keystore.jks";
     protected static final String AUTHORITY_KEYSTORE = "classpath:ca-authority-keystore.jks";
 
-    protected TestRestTemplate restTemplate;
     protected TestRestTemplate sslRestTemplate;
+    protected TestRestTemplate mutualAuthRestTemplate;
 
     // configs
     @Autowired
@@ -67,6 +70,8 @@ public abstract class RestTestSuite {
     protected GlobalPublicParameterDB globalPublicParameterDB;
     @Autowired
     protected PublicAttributeDB publicAttributeDB;
+    @Autowired
+    protected CipherTextDB cipherTextDB;
 
     // utils
     @Autowired
@@ -75,10 +80,14 @@ public abstract class RestTestSuite {
     protected StringAsymmetricCryptEngine cryptEngine;
     @Autowired
     protected SpringContextAwareCertificateUtils certificateUtils;
+    @Autowired
+    protected BasicsGPPTestFactory gppTestFactory;
 
     // test factories
     @Autowired
     protected CertificateRequestTestFactory certificateRequestTestFactory;
+    @Autowired
+    protected CipherTextTestFactory cipherTextTestFactory;
 
     // additional
     @LocalServerPort
@@ -95,6 +104,7 @@ public abstract class RestTestSuite {
         globalPublicParameterDTODB.drop();
         attributeAuthorityDB.drop();
         publicAttributeDB.drop();
+        cipherTextDB.drop();
     }
 
     @PostConstruct
@@ -112,8 +122,8 @@ public abstract class RestTestSuite {
                     .build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
             HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-            restTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
-            ((HttpComponentsClientHttpRequestFactory) restTemplate.getRestTemplate().getRequestFactory()).setHttpClient(httpClient);
+            sslRestTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
+            ((HttpComponentsClientHttpRequestFactory) sslRestTemplate.getRestTemplate().getRequestFactory()).setHttpClient(httpClient);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -131,9 +141,9 @@ public abstract class RestTestSuite {
                     ).build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
             HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-            sslRestTemplate = new TestRestTemplate(
+            mutualAuthRestTemplate = new TestRestTemplate(
                     new RestTemplateBuilder().rootUri("https://localhost:" + localPort + "/"));
-            ((HttpComponentsClientHttpRequestFactory) sslRestTemplate.getRestTemplate().getRequestFactory())
+            ((HttpComponentsClientHttpRequestFactory) mutualAuthRestTemplate.getRestTemplate().getRequestFactory())
                     .setHttpClient(httpClient);
         } catch(Exception e) {
             throw new RuntimeException(e);
