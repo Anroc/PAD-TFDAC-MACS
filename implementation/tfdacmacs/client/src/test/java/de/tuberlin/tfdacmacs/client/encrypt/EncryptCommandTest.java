@@ -78,13 +78,13 @@ public class EncryptCommandTest extends CommandTestSuite {
                 "signature"
         )).when(caClient).getAuthority(authorityId);
 
-        doNothing().when(cspClient).createCipherText(any(CipherTextDTO.class));
+        doNothing().when(caClient).createCipherText(any(CipherTextDTO.class));
         doReturn(cspClient).when(cspClient).withHeaders(any(HttpHeaders.class));
         doNothing().when(cspClient).createFile(anyString(), any(MultiValueMap.class));
 
         encryptCommand.encrypt(FILE_NAME, null, policy);
 
-        verify(cspClient, times(2)).createCipherText(any(CipherTextDTO.class));
+        verify(caClient, times(2)).createCipherText(any(CipherTextDTO.class));
         verify(cspClient, times(1)).createFile(anyString(), any(MultiValueMap.class));
     }
 
@@ -111,7 +111,7 @@ public class EncryptCommandTest extends CommandTestSuite {
                 () -> encryptCommand.encrypt(FILE_NAME, null, hpiAttrId)
         );
 
-        verify(cspClient, times(0)).createCipherText(any(CipherTextDTO.class));
+        verify(caClient, times(0)).createCipherText(any(CipherTextDTO.class));
         verify(cspClient, times(0)).createFile(anyString(), any(MultiValueMap.class));
     }
 }

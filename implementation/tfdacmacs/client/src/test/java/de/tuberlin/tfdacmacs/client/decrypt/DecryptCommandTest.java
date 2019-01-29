@@ -21,7 +21,7 @@ public class DecryptCommandTest extends CommandTestSuite {
 
         doReturn(
                 Lists.newArrayList(CipherTextDTO.from(cipherTextTestFacotry.create(ctId, attributeId)))
-        ).when(cspClient).getCipherTexts(Lists.newArrayList(attributeId));
+        ).when(caClient).getCipherTexts(Lists.newArrayList(attributeId));
 
         evaluate("check");
 
