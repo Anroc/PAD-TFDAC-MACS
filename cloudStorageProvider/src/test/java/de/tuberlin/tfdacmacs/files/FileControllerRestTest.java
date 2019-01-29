@@ -132,5 +132,6 @@ public class FileControllerRestTest extends RestTestSuite {
                 .getForEntity("/files/" + fileInformation.getId() + "/information", FileInformationResponse.class);
         assertThat(responseEntity.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(responseEntity.getBody().getId()).isEqualTo(fileInformation.getId());
+        assertThat(responseEntity.getBody().getName()).isEqualTo(fileInformation.getOriginalName());
     }
 }

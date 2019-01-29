@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GlobalPublicParameterRestTest extends RestTestSuite {
 
     @Test
-    public void getGPP() {
+    public void getGlobalPublicParameter() {
         GlobalPublicParameterDTO gpp = mutualAuthRestTemplate.getForObject("/gpp", GlobalPublicParameterDTO.class);
 
         assertThat(gpp.getCurveParameter()).isNotNull();

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class FileKeyClient {
+public class CipherTextClient {
 
     private final CSPClient cspClient;
     private final CAClient caClient;

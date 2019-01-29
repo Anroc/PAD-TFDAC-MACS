@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.client.rest.template;
 
+import de.tuberlin.tfdacmacs.client.csp.data.dto.FileInformationResponse;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,24 @@ public class CspClientRestTemplate extends ClientRestTemplate implements CSPClie
                 HttpMethod.POST,
                 Void.class,
                 file
+        );
+    }
+
+    @Override
+    public byte[] getFile(String fileId) {
+        return request(String.format("/files/%s", fileId),
+                HttpMethod.GET,
+                byte[].class,
+                null
+        );
+    }
+
+    @Override
+    public FileInformationResponse getFileInformation(String fileId) {
+        return request(String.format("/files/%s/information", fileId),
+                HttpMethod.GET,
+                FileInformationResponse.class,
+                null
         );
     }
 }

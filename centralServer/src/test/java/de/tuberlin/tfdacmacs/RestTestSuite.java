@@ -11,6 +11,7 @@ import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.security.config.CredentialConfig;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.lib.attribute.factory.BasicsGPPTestFactory;
 import de.tuberlin.tfdacmacs.lib.certificate.util.SpringContextAwareCertificateUtils;
@@ -101,7 +102,6 @@ public abstract class RestTestSuite {
     public void cleanUp() {
         certificateDB.drop();
         userDB.drop();
-        globalPublicParameterDTODB.drop();
         attributeAuthorityDB.drop();
         publicAttributeDB.drop();
         cipherTextDB.drop();
@@ -111,6 +111,13 @@ public abstract class RestTestSuite {
     public void sslTestRestTemplate() {
         mutalAuthenticationRestTemplate(CLIENT_KEYSTORE);
         sslRestTemplate();
+
+        gppTestFactory.setGlobalPublicParameter(getGPP());
+        cipherTextTestFactory.setGlobalPublicParameter(getGPP());
+    }
+
+    public GlobalPublicParameter getGPP() {
+        return globalPublicParameterDB.findEntity().get();
     }
 
 
