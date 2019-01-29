@@ -1,23 +1,18 @@
 package de.tuberlin.tfdacmacs;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
-import de.tuberlin.tfdacmacs.csp.client.CAClient;
 import de.tuberlin.tfdacmacs.csp.files.FileConfiguration;
 import de.tuberlin.tfdacmacs.csp.files.FileController;
 import de.tuberlin.tfdacmacs.csp.files.db.FileInformationDB;
 import de.tuberlin.tfdacmacs.lib.attribute.factory.BasicsGPPTestFactory;
-import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.lib.gpp.events.GlobalPublicParameterChangedEvent;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -31,7 +26,6 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CloudStorageProviderApplication.class,
@@ -43,10 +37,6 @@ public abstract class RestTestSuite {
 
     protected TestRestTemplate sslRestTemplate;
     protected TestRestTemplate mutualAuthRestTemplate;
-
-    // Mock beans
-    @MockBean
-    protected CAClient caClient;
 
     // Controller
     @Autowired
@@ -80,15 +70,6 @@ public abstract class RestTestSuite {
     public void sslTestRestTemplate() {
         mutalAuthenticationRestTemplate(CLIENT_KEYSTORE);
         sslRestTemplate();
-    }
-
-    @Before
-    public void setupMocks() {
-        GlobalPublicParameterDTO globalPublicParameterDTO = gppTestFactory.createDTO();
-        doReturn(globalPublicParameterDTO).when(caClient).getGPP();
-        publisher.publishEvent(
-                new GlobalPublicParameterChangedEvent(globalPublicParameterDTO.toGlobalPublicParameter(pairingGenerator))
-        );
     }
 
     protected void sslRestTemplate() {
