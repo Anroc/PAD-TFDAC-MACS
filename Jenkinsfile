@@ -11,7 +11,6 @@ node {
 
         parallel documentation: {
             stage('pdflatex & bibtex') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 dir (DOCUMENTATION_DIR) {
                     sh('./make.sh')
                 }
@@ -21,7 +20,6 @@ node {
             }
         }, testClasses: {
         	stage('gradle testClasses') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     sh('./gradlew clean assemble testClasses')
@@ -36,7 +34,6 @@ node {
 
         parallel restTest: {
             stage('gradle attributeAuthority:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -47,7 +44,6 @@ node {
                 }
             }
             stage('gralde bootjar') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // echo pwd()
                 dir (SOURCE_DIR) {
                     try {
@@ -59,7 +55,6 @@ node {
             }
 
             stage('gradle centralServer:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -70,7 +65,6 @@ node {
                 }
             }
             stage('gralde bootjar') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // echo pwd()
                 dir (SOURCE_DIR) {
                     try {
@@ -82,7 +76,6 @@ node {
             }
 
             stage('gradle cloudStorageProvider:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -93,7 +86,6 @@ node {
                 }
             }
             stage('gralde bootjar') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // echo pwd()
                 dir (SOURCE_DIR) {
                     try {
@@ -107,7 +99,6 @@ node {
         },
         crypto: {
             stage('gradle crypto:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -120,7 +111,6 @@ node {
         },
         lib: {
             stage('gradle lib:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -133,7 +123,6 @@ node {
         },
         client: {
             stage('gradle client:test') {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                     try {
@@ -160,7 +149,6 @@ node {
             sh('/var/lib/jenkins/deploy/deploy.sh')
             echo "Redeployed"
 
-            echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
             // sh('printenv')
             dir (SOURCE_DIR) {
                 try {
@@ -181,7 +169,7 @@ node {
                 try {
                     sh('./gradlew client:integrationTest')
                 } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'client/build/test-results/test/*.xml'])
+                    step([$class: 'JUnitResultArchiver', testResults: 'client/build/test-results/integrationTest/*.xml'])
                 }
             }
         }
