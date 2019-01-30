@@ -43,8 +43,8 @@ public class DecryptionService {
                 components,
                 null);
 
+        fileDestination.toFile().mkdirs();
         Path filePath = fileDestination.resolve(encryptedFile.getFileName());
-        filePath.toFile().mkdirs();
 
         try {
             Files.write(filePath, plainTextFile);
