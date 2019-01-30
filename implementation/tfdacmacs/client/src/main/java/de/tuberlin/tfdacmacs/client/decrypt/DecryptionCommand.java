@@ -51,6 +51,6 @@ public class DecryptionCommand {
             throw new IllegalArgumentException("Given cipher text number is out of range. Did you forget to call 'check'?");
         }
 
-        return cipherTexts.get(ct);
+        return cipherTexts.get(ct - 1);
     }
 }
