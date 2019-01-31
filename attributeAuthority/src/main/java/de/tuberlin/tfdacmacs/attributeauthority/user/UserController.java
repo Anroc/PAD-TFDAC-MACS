@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}/devices/{deviceId}")
-    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    @PreAuthorize("hasAnyRole('ROLE_AUTHORITY', 'ROLE_USER')")
     public DeviceResponse getDevice(
             @PathVariable("email") String email,
             @PathVariable("deviceId") String deviceId) {

@@ -7,6 +7,8 @@ import de.tuberlin.tfdacmacs.crypto.pairing.PairingCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFCipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,10 +28,14 @@ public class EncryptionService {
     private final GPPService gppService;
     private final CSPService cspService;
 
-    public void encrypt(Path plainText, DNFAccessPolicy dnfAccessPolicy) {
+    public void encrypt(@NonNull Path plainText, @NonNull DNFAccessPolicy dnfAccessPolicy) {
+        encrypt(plainText, dnfAccessPolicy, null);
+    }
+
+    public void encrypt(@NonNull Path plainText, @NonNull DNFAccessPolicy dnfAccessPolicy, DataOwner dataOwner) {
         try {
             DNFCipherText dnfCipherText = pairingCryptEngine
-                    .encrypt(Files.readAllBytes(plainText), dnfAccessPolicy, gppService.getGPP(), null);
+                    .encrypt(Files.readAllBytes(plainText), dnfAccessPolicy, gppService.getGPP(), dataOwner);
 
             List<CipherText> cipherTexts = dnfCipherText.getCipherTexts();
             cspService.createCipherTexts(cipherTexts);
@@ -38,9 +44,5 @@ public class EncryptionService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    public void encrypt(Path plainText, DNFAccessPolicy dnfAccessPolicy, String[] uids) {
-        // TODO: implement
     }
 }
