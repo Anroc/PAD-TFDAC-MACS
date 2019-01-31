@@ -82,7 +82,7 @@ public class EncryptCommandTest extends CommandTestSuite {
         doReturn(cspClient).when(cspClient).withHeaders(any(HttpHeaders.class));
         doNothing().when(cspClient).createFile(anyString(), any(MultiValueMap.class));
 
-        encryptCommand.encrypt(FILE_NAME, null, policy);
+        encryptCommand.encrypt(FILE_NAME, false, policy);
 
         verify(caClient, times(2)).createCipherText(any(CipherTextDTO.class));
         verify(cspClient, times(1)).createFile(anyString(), any(MultiValueMap.class));
@@ -108,7 +108,7 @@ public class EncryptCommandTest extends CommandTestSuite {
                 .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
 
         Assertions.assertThatExceptionOfType(NotTrustedAuthorityException.class).isThrownBy(
-                () -> encryptCommand.encrypt(FILE_NAME, null, hpiAttrId)
+                () -> encryptCommand.encrypt(FILE_NAME, false, hpiAttrId)
         );
 
         verify(caClient, times(0)).createCipherText(any(CipherTextDTO.class));

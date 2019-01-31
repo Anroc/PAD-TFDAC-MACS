@@ -1,17 +1,14 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
 import it.unisa.dia.gas.jpbc.Element;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     public TwoFactorKey(@NonNull Element privateKey) {
         super(privateKey);
