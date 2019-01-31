@@ -51,7 +51,7 @@ public class IntegrationTest extends IntegrationTestSuite {
         evaluate("attributes update");
         assertThat(attributeDB.findAll()).isNotEmpty();
 
-        encryptCommand.encrypt(FILE_PATH, null, "(aa.tu-berlin.de.role:student)");
+        encryptCommand.encrypt(FILE_PATH, false, "(aa.tu-berlin.de.role:student)");
 
         resetStdStreams();
         evaluate("check");
