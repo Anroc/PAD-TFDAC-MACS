@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.gpp.data.dto;
+package de.tuberlin.tfdacmacs.client.gpp.client.dto;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import it.unisa.dia.gas.jpbc.Element;

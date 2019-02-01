@@ -1,13 +1,15 @@
 package de.tuberlin.tfdacmacs.client.rest.template;
 
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyCreationRequest;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +41,15 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
                 "/certificates/" + certificateId,
                 HttpMethod.GET,
                 CertificateResponse.class,
+                null
+        );
+    }
+
+    @Override
+    public UserResponse getUser(String userId) {
+        return request("/users/" + userId,
+                HttpMethod.GET,
+                UserResponse.class,
                 null
         );
     }
@@ -101,5 +112,10 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
                 new ParameterizedTypeReference<List<CipherTextDTO>>(){},
                 null
         );
+    }
+
+    @Override
+    public void createTwoFactorKey(String userId, String deviceId, TwoFactorKeyCreationRequest twoFactorKeyCreationRequest) {
+        request("/users/")
     }
 }

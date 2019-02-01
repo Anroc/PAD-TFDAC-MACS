@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.decrypt.client;
 
-import de.tuberlin.tfdacmacs.client.csp.data.dto.FileInformationResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.FileInformationResponse;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import lombok.NonNull;

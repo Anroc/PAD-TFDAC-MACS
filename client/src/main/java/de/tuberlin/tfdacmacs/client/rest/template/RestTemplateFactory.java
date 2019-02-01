@@ -56,19 +56,11 @@ public class RestTemplateFactory {
     }
 
     public void updateForMutualAuthentication(@NonNull String email) {
-        RestTemplate caRestTemplate = applicationContext
-                .getBean(RestTemplateFactory.CA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
-        RestTemplate cspRestTemplate = applicationContext
-                .getBean(RestTemplateFactory.CSP_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
-        RestTemplate aaRestTemplate = applicationContext
-                .getBean(RestTemplateFactory.AA_REST_TEMPLATE_BEAN_NAME, RestTemplate.class);
-
-        updateRestTemplate(email, caRestTemplate);
-        updateRestTemplate(email, cspRestTemplate);
-        updateRestTemplate(email, aaRestTemplate);
+        applicationContext.getBeansOfType(RestTemplate.class)
+                .values().forEach(restTemplate -> updateRestTemplate(email, restTemplate));
     }
 
-    private RestTemplate updateRestTemplate(@NonNull String email, RestTemplate restTemplate) {
+    public RestTemplate updateRestTemplate(@NonNull String email, @NonNull RestTemplate restTemplate) {
         try {
             HttpClient httpClient = buildHttpClient(clientConfig.getP12Certificate(), email);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
@@ -78,7 +70,7 @@ public class RestTemplateFactory {
         }
     }
 
-    private RestTemplate buildRestTemplate(String rootUrl, KeyStoreConfig p12Certificate) {
+    public RestTemplate buildRestTemplate(String rootUrl, KeyStoreConfig p12Certificate) {
         try {
             HttpClient httpClient = buildHttpClient(p12Certificate, null);
             RestTemplate restTemplate = plainRestTemplate(rootUrl);

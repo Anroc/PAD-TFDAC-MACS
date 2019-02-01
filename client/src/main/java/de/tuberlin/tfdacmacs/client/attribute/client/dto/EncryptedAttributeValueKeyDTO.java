@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.register.data.dto;
+package de.tuberlin.tfdacmacs.client.attribute.client.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateRequest {
+public class EncryptedAttributeValueKeyDTO {
 
     @NotBlank
-    private String certificateRequest;
+    private String attributeValueId;
+    @NotBlank
+    private String encryptedKey;
 }
-

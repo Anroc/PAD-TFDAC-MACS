@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.rest.template;
 
-import de.tuberlin.tfdacmacs.client.csp.data.dto.FileInformationResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.FileInformationResponse;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;

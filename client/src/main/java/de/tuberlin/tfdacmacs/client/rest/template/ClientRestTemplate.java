@@ -93,7 +93,7 @@ public abstract class ClientRestTemplate {
         return httpStatus == HttpStatus.PRECONDITION_FAILED;
     }
 
-    private void handleClientErrorException(String url, HttpMethod httpMethod, HttpClientErrorException e) {
+    public void handleClientErrorException(String url, HttpMethod httpMethod, HttpClientErrorException e) {
         if(! shouldRetry(e.getStatusCode())) {
             httpHeaders.remove(Thread.currentThread().getId());
             throw new InterServiceCallError(httpMethod, url, e.getStatusCode(), e);

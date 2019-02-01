@@ -1,13 +1,13 @@
 package de.tuberlin.tfdacmacs.client.attribute.client;
 
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.EncryptedAttributeValueKeyDTO;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
-import de.tuberlin.tfdacmacs.client.rest.SignatureVerifier;
+import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
@@ -38,7 +38,7 @@ public class AttributeClient {
     private final KeyPairService keyPairService;
     private final AsymmetricCryptEngine<?> asymmetricCryptEngine;
     private final StringSymmetricCryptEngine symmetricCryptEngine;
-    private final SignatureVerifier signatureVerifier;
+    private final SemanticValidator semanticValidator;
 
     private final GPPService gppService;
 
@@ -92,7 +92,7 @@ public class AttributeClient {
             PublicAttributeValueResponse attributeValueResponse = caClient.getAttributeValue(attributeName, attributeValue);
 
             String signatureContent = attributeValueResponse.getValue().toString() + ";" + attributeValueResponse.getPublicKey();
-            signatureVerifier.verifySignature(signatureContent, attributeValueResponse.getSignature(), authorityId);
+            semanticValidator.verifySignature(signatureContent, attributeValueResponse.getSignature(), authorityId);
 
             return Optional.of(new AttributeValueKey.Public(
                     ElementConverter.convert(attributeValueResponse.getPublicKey(), getG1()),

@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.client.gpp;
 
+import de.tuberlin.tfdacmacs.client.gpp.client.GPPClient;
 import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;

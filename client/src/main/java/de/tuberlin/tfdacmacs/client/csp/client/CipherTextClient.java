@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.csp.client;
 
-import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;

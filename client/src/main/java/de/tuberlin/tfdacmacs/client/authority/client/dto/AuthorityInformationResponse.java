@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.authority.data.dto;
+package de.tuberlin.tfdacmacs.client.authority.client.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
