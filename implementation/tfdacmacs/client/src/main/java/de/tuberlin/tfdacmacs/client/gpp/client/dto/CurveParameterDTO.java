@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.gpp.data.dto;
+package de.tuberlin.tfdacmacs.client.gpp.client.dto;
 
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;

@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class SignatureVerifier {
+public class SemanticValidator {
 
     private final Map<String, PublicKey> trustedPublicKeys = new HashMap<>();
     private final StringAsymmetricCryptEngine cryptEngine;
@@ -34,6 +34,10 @@ public class SignatureVerifier {
             throw new NotTrustedAuthorityException(authorityId);
         }
         return publicKey;
+    }
+
+    public boolean isTrustedAuthority(@NonNull String authorityId) {
+        return trustedPublicKeys.containsKey(authorityId);
     }
 
     public void verifySignature(@NonNull String content, @NonNull String signature, @NonNull String authorityId) {

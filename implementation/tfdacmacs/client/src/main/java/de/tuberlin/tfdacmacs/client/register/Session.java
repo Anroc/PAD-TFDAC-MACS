@@ -11,4 +11,6 @@ public interface Session {
     Certificate getCertificate();
 
     KeyPair getKeyPair();
+
+    boolean isActive();
 }

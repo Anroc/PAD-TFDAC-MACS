@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.client.decrypt;
 
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
-import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 

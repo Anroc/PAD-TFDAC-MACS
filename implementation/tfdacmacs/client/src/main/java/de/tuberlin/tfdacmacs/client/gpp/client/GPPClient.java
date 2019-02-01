@@ -1,6 +1,6 @@
-package de.tuberlin.tfdacmacs.client.gpp;
+package de.tuberlin.tfdacmacs.client.gpp.client;
 
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;

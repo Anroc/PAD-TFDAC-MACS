@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.rest;
 
-import de.tuberlin.tfdacmacs.client.csp.data.dto.FileInformationResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.FileInformationResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 

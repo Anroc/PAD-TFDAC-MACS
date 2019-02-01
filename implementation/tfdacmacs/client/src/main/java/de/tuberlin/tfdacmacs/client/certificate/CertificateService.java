@@ -1,22 +1,16 @@
 package de.tuberlin.tfdacmacs.client.certificate;
 
+import de.tuberlin.tfdacmacs.client.certificate.client.CertificateClient;
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.config.CertificateKeyStoreConfig;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
-import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
-import de.tuberlin.tfdacmacs.crypto.rsa.factory.CertificateRequestFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -31,12 +25,12 @@ public class CertificateService {
 
     private final KeyPairService keyPairService;
     private final CertificateUtils certificateUtils;
-    private final CAClient caClient;
-    private final CertificateRequestFactory certificateRequestFactory;
+
     private final ClientConfig clientConfig;
     private final CertificateDB certificateDB;
 
     private final RestTemplateFactory restTemplateFactory;
+    private final CertificateClient certificateClient;
 
     public Certificate login(@NonNull String email) {
         File file = getP12KeyStore(email);
@@ -63,33 +57,7 @@ public class CertificateService {
         return file;
     }
 
-    public Certificate certificateRequest(@NonNull String email) {
-        try {
-            PKCS10CertificationRequest pkcs10CertificationRequest = certificateRequestFactory
-                    .create(email, keyPairService.getKeyPair(email).toJavaKeyPair());
-            CertificateRequest certificateRequest = new CertificateRequest(
-                    KeyConverter.from(pkcs10CertificationRequest.getEncoded()).toBase64()
-            );
 
-            CertificateResponse certificateResponse = caClient.postCertificateRequest(certificateRequest);
-            log.info("received certificate with id [{}] for user [{}]", certificateResponse.getId(), email);
-
-            return createCertificate(email, certificateResponse);
-        } catch (OperatorCreationException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Certificate createCertificate(@NonNull String email, CertificateResponse certificateResponse) {
-        Certificate certificate = new Certificate(
-                certificateResponse.getId(),
-                email,
-                KeyConverter.from(certificateResponse.getCertificate()).toX509Certificate()
-        );
-
-        certificateDB.upsert(email, certificate);
-        return certificate;
-    }
 
     public void generateP12KeyStore(Certificate certificate) {
         String email = certificate.getEmail();
@@ -161,5 +129,9 @@ public class CertificateService {
             file.delete();
         }
         return file.toPath();
+    }
+
+    public Certificate certificateRequest(String email) {
+        return certificateClient.certificateRequest(email);
     }
 }

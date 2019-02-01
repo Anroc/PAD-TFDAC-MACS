@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    @PreAuthorize("hasAnyRole('ROLE_AUTHORITY', 'ROLE_USER')")
     public UserResponse getUser(@PathVariable("id") String userId) {
         String authorityId = authenticationFacade.getId();
         User user = userService.findUserByIdAndAuthorityId(userId, authorityId)

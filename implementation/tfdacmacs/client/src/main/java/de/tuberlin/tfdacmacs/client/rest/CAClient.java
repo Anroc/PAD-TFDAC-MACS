@@ -1,12 +1,14 @@
 package de.tuberlin.tfdacmacs.client.rest;
 
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateRequest;
-import de.tuberlin.tfdacmacs.client.register.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
+import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyCreationRequest;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ public interface CAClient {
     CertificateResponse postCertificateRequest(CertificateRequest certificateRequest);
     CertificateResponse getCertificate(String certificateId);
 
+    UserResponse getUser(String userId);
+
     AttributeAuthorityResponse getAuthority(String authorityId);
 
     DeviceResponse getAttributes(String userId, String deviceId);
@@ -24,4 +28,6 @@ public interface CAClient {
 
     void createCipherText(CipherTextDTO cipherTextDTO);
     List<CipherTextDTO> getCipherTexts(List<String> attributeIds);
+
+    void createTwoFactorKey(String userId, String deviceId, TwoFactorKeyCreationRequest twoFactorKeyCreationRequest);
 }

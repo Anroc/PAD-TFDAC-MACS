@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.gpp.data.dto;
+package de.tuberlin.tfdacmacs.client.gpp.client.dto;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;

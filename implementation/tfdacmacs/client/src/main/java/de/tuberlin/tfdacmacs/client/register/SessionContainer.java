@@ -47,6 +47,11 @@ public class SessionContainer implements Session {
         return this.keyPair;
     }
 
+    @Override
+    public boolean isActive() {
+        return email != null;
+    }
+
     private void checkIfPresent(Object value) {
         if(value == null) {
             throw new IllegalStateException("Session is not yet initialized.");

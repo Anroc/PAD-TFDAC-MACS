@@ -1,13 +1,13 @@
 package de.tuberlin.tfdacmacs.client.authority.client;
 
 import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AuthorityInformationResponse;
+import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.authority.client.dto.AuthorityInformationResponse;
 import de.tuberlin.tfdacmacs.client.authority.exception.CertificateManipulationException;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
-import de.tuberlin.tfdacmacs.client.rest.SignatureVerifier;
+import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
@@ -31,13 +31,13 @@ public class AuthorityClient {
     private final AAClient aaClient;
     private final GPPService gppService;
 
-    private final SignatureVerifier signatureVerifier;
+    private final SemanticValidator semanticValidator;
     private final CertificateUtils certificateUtils;
 
     public Optional<AuthorityKey.Public> findAuthorityKey(@NonNull String authorityId) {
         try {
             AttributeAuthorityResponse authority = caClient.getAuthority(authorityId);
-            signatureVerifier.verifySignature(authority.getPublicKey(), authority.getSignature(), authorityId);
+            semanticValidator.verifySignature(authority.getPublicKey(), authority.getSignature(), authorityId);
 
             return Optional.of(
                     new AuthorityKey.Public<>(

@@ -1,8 +1,8 @@
 package de.tuberlin.tfdacmacs.client.gpp.factory;
 
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.CurveParameterDTO;
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.GeneratorDTO;
-import de.tuberlin.tfdacmacs.client.gpp.data.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.CurveParameterDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GeneratorDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import it.unisa.dia.gas.jpbc.Element;

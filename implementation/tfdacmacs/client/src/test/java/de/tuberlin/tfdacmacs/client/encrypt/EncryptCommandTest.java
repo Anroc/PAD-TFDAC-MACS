@@ -1,12 +1,12 @@
 package de.tuberlin.tfdacmacs.client.encrypt;
 
 import de.tuberlin.tfdacmacs.CommandTestSuite;
-import de.tuberlin.tfdacmacs.client.attribute.data.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
-import de.tuberlin.tfdacmacs.client.authority.data.dto.AttributeAuthorityResponse;
+import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEvent;
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
-import de.tuberlin.tfdacmacs.client.csp.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
@@ -56,7 +56,7 @@ public class EncryptCommandTest extends CommandTestSuite {
                 .when(stringAsymmetricCryptEngine).isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
         X509Certificate certificate = mock(X509Certificate.class);
         doReturn(mock(PublicKey.class)).when(certificate).getPublicKey();
-        signatureVerifier.updateTrustedPublicKeys(
+        semanticValidator.updateTrustedPublicKeys(
                 new TrustedAuthorityUpdatedEvent(
                         new TrustedAuthority(authorityId, UUID.randomUUID().toString(), certificate)
                 )
