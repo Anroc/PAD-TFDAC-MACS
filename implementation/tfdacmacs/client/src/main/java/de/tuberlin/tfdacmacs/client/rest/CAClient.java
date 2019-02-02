@@ -3,11 +3,12 @@ package de.tuberlin.tfdacmacs.client.rest;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
-import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyCreationRequest;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 
 import java.util.List;
@@ -29,5 +30,5 @@ public interface CAClient {
     void createCipherText(CipherTextDTO cipherTextDTO);
     List<CipherTextDTO> getCipherTexts(List<String> attributeIds);
 
-    void createTwoFactorKey(String userId, String deviceId, TwoFactorKeyCreationRequest twoFactorKeyCreationRequest);
+    TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest);
 }

@@ -31,7 +31,7 @@ public class TwoFactorKeyController {
         EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(
                 twoFactorKeyRequest.getUserId(),
                 authenticationFacade.getId(),
-                twoFactorKeyRequest.getEncryptedTwoFactorKey());
+                twoFactorKeyRequest.getEncryptedTwoFactorKeys());
 
         twoFactorKeyService.insert(encryptedTwoFactorKey);
 
@@ -70,7 +70,7 @@ public class TwoFactorKeyController {
         }
 
         encryptedTwoFactorKey.setUserId(twoFactorKeyRequest.getUserId());
-        encryptedTwoFactorKey.setEncryptedKey(twoFactorKeyRequest.getEncryptedTwoFactorKey());
+        encryptedTwoFactorKey.setEncryptedTwoFactorKeys(twoFactorKeyRequest.getEncryptedTwoFactorKeys());
         twoFactorKeyService.update(encryptedTwoFactorKey);
 
         return TwoFactorKeyResponse.from(encryptedTwoFactorKey);

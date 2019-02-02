@@ -3,12 +3,13 @@ package de.tuberlin.tfdacmacs.client.rest.template;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
-import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
-import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyCreationRequest;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +116,13 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
     }
 
     @Override
-    public void createTwoFactorKey(String userId, String deviceId, TwoFactorKeyCreationRequest twoFactorKeyCreationRequest) {
-        request("/users/")
+    public TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest) {
+        return request(
+                "/two-factor-keys",
+                HttpMethod.POST,
+                TwoFactorKeyResponse.class,
+                twoFactorKeyRequest
+        );
     }
+
 }
