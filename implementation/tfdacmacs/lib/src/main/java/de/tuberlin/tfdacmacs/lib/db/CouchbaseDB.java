@@ -140,8 +140,12 @@ public abstract class CouchbaseDB<T extends Entity> {
      * Drop the whole database.
      */
     public void drop() {
-        ids.forEach(bucket::remove);
-        ids.clear();
+        try {
+            ids.forEach(bucket::remove);
+        } catch (DocumentDoesNotExistException e) {
+        } finally {
+            ids.clear();
+        }
     }
 }
 
