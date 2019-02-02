@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +15,6 @@ public class TwoFactorKeyRequest {
 
     @NotBlank
     private String userId;
-    @NotBlank
-    private String encryptedTwoFactorKey;
+    @NotNull
+    private Map<String, String> encryptedTwoFactorKeys;
 }

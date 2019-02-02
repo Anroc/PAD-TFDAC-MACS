@@ -1,6 +1,5 @@
-package de.tuberlin.tfdacmacs.centralserver.twofactorkey.data;
+package de.tuberlin.tfdacmacs.client.twofactor.client.dto;
 
-import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,15 +11,14 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EncryptedTwoFactorKey extends Entity {
+public class TwoFactorKeyResponse {
 
+    @NotBlank
+    private String id;
     @NotBlank
     private String userId;
-
     @NotBlank
-    private String dataOwnerId;
-
+    private String ownerId;
     @NotNull
     private Map<String, String> encryptedTwoFactorKeys;
-
 }

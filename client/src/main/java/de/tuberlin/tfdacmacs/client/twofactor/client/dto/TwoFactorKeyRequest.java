@@ -5,14 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TwoFactorKeyCreationRequest {
+@AllArgsConstructor
+public class TwoFactorKeyRequest {
 
     @NotBlank
-    private String dataOwnerId;
-    @NotBlank
-    private String encryptedTwoFactorKey;
+    private String userId;
+    @NotNull
+    private Map<String, String> encryptedTwoFactorKeys;
 }

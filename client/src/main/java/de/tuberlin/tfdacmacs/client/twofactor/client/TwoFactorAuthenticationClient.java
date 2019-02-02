@@ -4,11 +4,11 @@ import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.authority.exception.CertificateManipulationException;
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.client.register.Session;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.DeviceIdResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -26,6 +26,8 @@ import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -37,7 +39,6 @@ public class TwoFactorAuthenticationClient {
     private final SemanticValidator semanticValidator;
     private final CertificateUtils certificateUtils;
     private final StringAsymmetricCryptEngine cryptEngine;
-    private final Session session;
 
     public void uploadTwoFactorKey(@NonNull TwoFactorKey.Public twoFactoryKey) {
         String userId = twoFactoryKey.getUserId();
@@ -52,6 +53,9 @@ public class TwoFactorAuthenticationClient {
         }
 
         AAClient aaClient = getAAClient(aid);
+
+        Map<String, String> encryptedTwoFactorKeys = new HashMap<>();
+
         user.getDevices().stream()
                 .map(DeviceResponse::getCertificateId)
                 .forEach(deviceId -> aaClient.getDevice(userId, deviceId)
@@ -59,8 +63,16 @@ public class TwoFactorAuthenticationClient {
                             .map(this::getCertificate)
                             .map(X509Certificate::getPublicKey)
                             .map(publicKey -> encrypt(twoFactoryKey.getKey(), publicKey))
-                            .ifPresent(encryptedTwoFactorKey -> caClient.createTwoFactorKey(userId, deviceId, encryptedTwoFactorKey))
+                            .ifPresent(encryptedTwoFactorKey -> encryptedTwoFactorKeys.put(deviceId, encryptedTwoFactorKey))
                 );
+
+        TwoFactorKeyRequest twoFactorKeyRequest = new TwoFactorKeyRequest(
+                userId,
+                encryptedTwoFactorKeys
+        );
+
+        log.info("Uploading 2FA key for user {} and devices {}", userId, encryptedTwoFactorKeys.keySet());
+        caClient.createTwoFactorKey(twoFactorKeyRequest);
     }
 
     private X509Certificate getCertificate(String certificateId) {
