@@ -86,7 +86,7 @@ public class TwoFactorAuthenticationClient {
         return certificate;
     }
 
-    private AAClient getAAClient(String aid) {
+    public AAClient getAAClient(String aid) {
         return context.getBean(aid, AAClient.class);
     }
 

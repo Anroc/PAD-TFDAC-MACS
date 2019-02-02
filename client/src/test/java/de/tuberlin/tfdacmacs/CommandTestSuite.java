@@ -5,10 +5,10 @@ import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.config.StandardStreams;
 import de.tuberlin.tfdacmacs.client.db.CRUDOperations;
+import de.tuberlin.tfdacmacs.client.encrypt.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.gpp.events.GPPReceivedEvent;
 import de.tuberlin.tfdacmacs.client.gpp.factory.GPPDTOTestFactory;
-import de.tuberlin.tfdacmacs.client.encrypt.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.db.KeyPairDB;
 import de.tuberlin.tfdacmacs.client.register.Session;
@@ -17,6 +17,7 @@ import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
+import de.tuberlin.tfdacmacs.client.twofactor.client.TwoFactorAuthenticationClient;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -77,6 +78,8 @@ public abstract class CommandTestSuite {
 
     @SpyBean
     protected StringAsymmetricCryptEngine stringAsymmetricCryptEngine;
+    @SpyBean
+    protected TwoFactorAuthenticationClient twoFactorAuthenticationClient;
 
     @SpyBean
     protected RestTemplateFactory restTemplateFactory;
