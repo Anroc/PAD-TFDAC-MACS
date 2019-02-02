@@ -29,10 +29,6 @@ public class User extends Entity {
     @Valid
     private Set<Device> devices = new HashSet<>();
 
-    @NotNull
-    @Valid
-    private Set<EncryptedTwoFactorKey> twoFactorKeys = new HashSet<>();
-
     public User(@NonNull String id, @NotBlank String authorityId) {
         super(id);
         this.authorityId = authorityId;

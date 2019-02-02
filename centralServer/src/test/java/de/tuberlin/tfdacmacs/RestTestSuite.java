@@ -10,6 +10,7 @@ import de.tuberlin.tfdacmacs.centralserver.gpp.GlobalPublicParameterService;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDB;
 import de.tuberlin.tfdacmacs.centralserver.gpp.db.GlobalPublicParameterDTODB;
 import de.tuberlin.tfdacmacs.centralserver.security.config.CredentialConfig;
+import de.tuberlin.tfdacmacs.centralserver.twofactorkey.db.TwoFactorKeyDB;
 import de.tuberlin.tfdacmacs.centralserver.user.db.UserDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -73,6 +74,8 @@ public abstract class RestTestSuite {
     protected PublicAttributeDB publicAttributeDB;
     @Autowired
     protected CipherTextDB cipherTextDB;
+    @Autowired
+    protected TwoFactorKeyDB twoFactorKeyDB;
 
     // utils
     @Autowired
@@ -105,6 +108,7 @@ public abstract class RestTestSuite {
         attributeAuthorityDB.drop();
         publicAttributeDB.drop();
         cipherTextDB.drop();
+        twoFactorKeyDB.drop();
     }
 
     @PostConstruct
