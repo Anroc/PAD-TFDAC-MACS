@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.client.authority;
 
 import de.tuberlin.tfdacmacs.client.authority.client.AuthorityClient;
-import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
+import de.tuberlin.tfdacmacs.client.rest.session.events.SessionReadyEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ public class AuthorityEventListener {
     private final AuthorityClient client;
     private final AuthorityService authorityService;
 
-    @EventListener(SessionCreatedEvent.class)
+    @EventListener(SessionReadyEvent.class)
     public void retrieveTrustedAuthorities() {
         client.retrieveTrustedAuthorities()
                 .forEach(authorityService::upsert);
