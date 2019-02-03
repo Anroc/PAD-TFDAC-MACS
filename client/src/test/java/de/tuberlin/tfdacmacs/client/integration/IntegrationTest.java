@@ -1,6 +1,9 @@
 package de.tuberlin.tfdacmacs.client.integration;
 
+import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.client.encrypt.EncryptCommand;
+import de.tuberlin.tfdacmacs.client.integration.dto.AttributeValueRequest;
+import de.tuberlin.tfdacmacs.client.integration.dto.CreateUserRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
@@ -20,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class IntegrationTest extends IntegrationTestSuite {
 
-    private static final String email = "test@tu-berlin.de";
+    private static final String email = "bob@tu-berlin.de";
+    private static final String testUserEmail = "test@tu-berlin.de";
     private static final String FILE_NAME = "file.dat";
     private static final String FILE_DIR = "./";
     private static final String FILE_PATH = FILE_DIR + FILE_NAME;
@@ -38,6 +42,8 @@ public class IntegrationTest extends IntegrationTestSuite {
 
     @Test
     public void integrationTest() {
+        createUser();
+
         Thread thread = new Thread(
                 () -> {
                     sleep(10);
@@ -62,14 +68,36 @@ public class IntegrationTest extends IntegrationTestSuite {
                 .exists()
                 .hasBinaryContent(CONTENT);
 
+        evaluate(String.format("2fa enable %s", testUserEmail));
+
+    }
+
+    private void createUser() {
+        log.info("Creating new user {}", email);
+        HttpHeaders httpHeaders = basicAuthHeader();
+        RestTemplate restTemplate = sslRestTemplate(clientConfig.getAaRootUrl());
+
+        CreateUserRequest userCreationRequest = new CreateUserRequest(
+                email,
+                Sets.newHashSet(new AttributeValueRequest(
+                        "aa.tu-berlin.de.role",
+                        Sets.newHashSet("student")
+                ))
+        );
+
+        ResponseEntity<Object> exchange = restTemplate.exchange(
+                "/users",
+                HttpMethod.POST,
+                new HttpEntity<>(userCreationRequest, httpHeaders),
+                Object.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
     }
 
     private void approveDevice(String deviceId) {
         log.info("Approve device of user {} for device {}", email, deviceId);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeBase64String(
-                "admin:foobar".getBytes(
-                        Charset.forName(Charsets.US_ASCII.name()))));
+        HttpHeaders httpHeaders = basicAuthHeader();
 
         RestTemplate restTemplate = sslRestTemplate(clientConfig.getAaRootUrl());
 
@@ -81,6 +109,14 @@ public class IntegrationTest extends IntegrationTestSuite {
         );
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+    }
+
+    private HttpHeaders basicAuthHeader() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeBase64String(
+                "admin:foobar".getBytes(
+                        Charset.forName(Charsets.US_ASCII.name()))));
+        return httpHeaders;
     }
 
     public static void sleep(long seconds) {
