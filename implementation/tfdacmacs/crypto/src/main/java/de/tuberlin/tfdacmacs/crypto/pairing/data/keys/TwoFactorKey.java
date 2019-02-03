@@ -17,26 +17,26 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     public Set<TwoFactorKey.Public> getPublicKeyValues() {
         return super.publicKeys.entrySet()
                 .stream()
-                .map(entry -> new TwoFactorKey.Public<>(entry.getKey(), entry.getValue()))
+                .map(entry -> new TwoFactorKey.Public(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
     }
 
     public TwoFactorKey.Public getPublicKeyOfUser(@NonNull String userId) {
-        return new TwoFactorKey.Public<>(userId, super.publicKeys.get(userId));
+        return new TwoFactorKey.Public(userId, super.publicKeys.get(userId));
     }
 
     public TwoFactorKey.Private getPrivateKey() {
         return new Private(getKey());
     }
 
-    public static class Private<T> extends AsymmetricElementKey.Private<TwoFactorKey> {
+    public static class Private extends AsymmetricElementKey.Private<TwoFactorKey> {
         public Private(@NonNull Element key) {
             super(key);
         }
     }
 
     @Data
-    public static class Public<T> extends AsymmetricElementKey.Public<TwoFactorKey> {
+    public static class Public extends AsymmetricElementKey.Public<TwoFactorKey> {
 
         private final String userId;
 

@@ -68,7 +68,8 @@ public class IntegrationTest extends IntegrationTestSuite {
                 .exists()
                 .hasBinaryContent(CONTENT);
 
-        evaluate(String.format("2fa trust %s", testUserEmail));
+        evaluate(String.format("2fa trust %s", email));
+        evaluate("2fa update");
 
     }
 

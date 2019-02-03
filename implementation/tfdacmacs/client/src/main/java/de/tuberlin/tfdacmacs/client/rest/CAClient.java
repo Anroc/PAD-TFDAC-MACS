@@ -31,4 +31,6 @@ public interface CAClient {
     List<CipherTextDTO> getCipherTexts(List<String> attributeIds);
 
     TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest);
+    List<TwoFactorKeyResponse> getTwoFactorKeys(String email);
+
 }
