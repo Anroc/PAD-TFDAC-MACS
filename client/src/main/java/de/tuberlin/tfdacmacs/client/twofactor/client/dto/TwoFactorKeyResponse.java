@@ -20,5 +20,5 @@ public class TwoFactorKeyResponse {
     @NotBlank
     private String ownerId;
     @NotNull
-    private Map<String, String> encryptedTwoFactorKeys;
+    private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
 }

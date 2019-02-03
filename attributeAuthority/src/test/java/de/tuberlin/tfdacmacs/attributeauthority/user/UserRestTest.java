@@ -218,15 +218,34 @@ public class UserRestTest extends RestTestSuite {
     }
 
     @Test
-    public void requestDeviceAsUser_fails_forbidden() {
+    public void requestDeviceAsUser_passes()
+            throws CertificateException, CertIOException, OperatorCreationException {
+        String deviceId = UUID.randomUUID().toString();
+        String email ="someRnadom@email.de";
+        User user = new User(email);
+        user.setDevices(
+                Sets.newHashSet(new Certificate(deviceId, certificateTestFactory.createRootCertificate()))
+        );
+
+        userDB.insert(user);
+
+        doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
+                email,
+                UUID.randomUUID().toString(),
+                new HashSet<>()
+        )).when(caClient).getUser(email);
+
         ResponseEntity<de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse> exchange =
                 mutualAuthRestTemplate.exchange(
-                        String.format("/users/%s/devices/%s", email, "someId"),
+                        String.format("/users/%s/devices/%s", email, deviceId),
                         HttpMethod.GET,
                         HttpEntity.EMPTY,
                         de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse.class
                 );
-        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.FORBIDDEN);
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.DeviceResponse body = exchange.getBody();
+        assertThat(body.getId()).isEqualTo(deviceId);
     }
 
     @Test

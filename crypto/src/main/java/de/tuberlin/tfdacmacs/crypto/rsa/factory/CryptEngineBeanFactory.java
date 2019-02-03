@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class CryptEngineBeanFactory {
 
     @Bean
-    public StringAsymmetricCryptEngine create() {
+    public StringAsymmetricCryptEngine stringAsymmetricCryptEngine() {
         StringAsymmetricCryptEngine cryptEngine = new StringAsymmetricCryptEngine();
         cryptEngine.setAsymmetricCipherKeyPair(cryptEngine.generateKeyPair());
         return cryptEngine;

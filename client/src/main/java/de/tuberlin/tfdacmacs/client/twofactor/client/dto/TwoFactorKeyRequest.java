@@ -16,5 +16,5 @@ public class TwoFactorKeyRequest {
     @NotBlank
     private String userId;
     @NotNull
-    private Map<String, String> encryptedTwoFactorKeys;
+    private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
 }

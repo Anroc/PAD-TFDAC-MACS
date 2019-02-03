@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.certificate.db.modules;
+package de.tuberlin.tfdacmacs.client.db.modules;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,19 +8,20 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
+import java.security.PublicKey;
 
-public class X509Deserializer extends StdDeserializer<X509Certificate> {
+public class PublicKeyDeserializer extends StdDeserializer<PublicKey> {
 
-    public X509Deserializer() {
-        super(X509Certificate.class);
+    public PublicKeyDeserializer() {
+        super(PublicKey.class);
     }
 
     @Override
-    public X509Certificate deserialize(JsonParser jp, DeserializationContext ctxt)
+    public PublicKey deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
         String base64 = node.asText();
-        return KeyConverter.from(base64).toX509Certificate();
+        return KeyConverter.from(base64).toPublicKey();
     }
 }
+

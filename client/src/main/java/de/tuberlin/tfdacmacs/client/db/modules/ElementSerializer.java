@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.attribute.db.modules;
+package de.tuberlin.tfdacmacs.client.db.modules;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

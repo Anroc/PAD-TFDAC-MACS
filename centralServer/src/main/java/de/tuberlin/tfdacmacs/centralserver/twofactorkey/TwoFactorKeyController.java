@@ -28,10 +28,8 @@ public class TwoFactorKeyController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @ResponseStatus(HttpStatus.CREATED)
     public TwoFactorKeyResponse create(@Valid @RequestBody TwoFactorKeyRequest twoFactorKeyRequest) {
-        EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(
-                twoFactorKeyRequest.getUserId(),
-                authenticationFacade.getId(),
-                twoFactorKeyRequest.getEncryptedTwoFactorKeys());
+        EncryptedTwoFactorKey encryptedTwoFactorKey =
+                twoFactorKeyRequest.toEncryptedTwoFactorKey(authenticationFacade.getId());
 
         twoFactorKeyService.insert(encryptedTwoFactorKey);
 
@@ -69,8 +67,11 @@ public class TwoFactorKeyController {
             throw new ServiceException("Only the data owner is allowed to update this two factor key.", HttpStatus.FORBIDDEN);
         }
 
-        encryptedTwoFactorKey.setUserId(twoFactorKeyRequest.getUserId());
-        encryptedTwoFactorKey.setEncryptedTwoFactorKeys(twoFactorKeyRequest.getEncryptedTwoFactorKeys());
+        EncryptedTwoFactorKey updatedEncryptedTwoFactorKey =
+                twoFactorKeyRequest.toEncryptedTwoFactorKey(encryptedTwoFactorKey.getDataOwnerId());
+
+        encryptedTwoFactorKey.setUserId(updatedEncryptedTwoFactorKey.getUserId());
+        encryptedTwoFactorKey.setEncryptedTwoFactorKeys(updatedEncryptedTwoFactorKey.getEncryptedTwoFactorKeys());
         twoFactorKeyService.update(encryptedTwoFactorKey);
 
         return TwoFactorKeyResponse.from(encryptedTwoFactorKey);
