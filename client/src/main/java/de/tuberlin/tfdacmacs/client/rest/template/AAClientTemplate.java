@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.client.rest.template;
 
 import de.tuberlin.tfdacmacs.client.authority.client.dto.AuthorityInformationResponse;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
+import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.DeviceIdResponse;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import lombok.NonNull;

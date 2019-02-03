@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.twofactor;
 
-import de.tuberlin.tfdacmacs.client.register.Session;
+import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.client.twofactor.db.TwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;

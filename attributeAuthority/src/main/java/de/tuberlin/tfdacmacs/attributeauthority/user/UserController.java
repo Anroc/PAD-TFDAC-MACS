@@ -83,7 +83,7 @@ public class UserController {
             @PathVariable("email") String email,
             @PathVariable("deviceId") String deviceId) {
 
-        User user = userService.findUser(email).orElseThrow(
+        User user = userService.findUser(email, false).orElseThrow(
                 () -> new NotFoundException(email)
         );
 

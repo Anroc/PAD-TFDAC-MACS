@@ -6,7 +6,6 @@ import de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.keypair.config.CertificateKeyStoreConfig;
-import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,11 @@ public class CertificateService {
     private final ClientConfig clientConfig;
     private final CertificateDB certificateDB;
 
-    private final RestTemplateFactory restTemplateFactory;
     private final CertificateClient certificateClient;
 
     public Certificate login(@NonNull String email) {
         File file = getP12KeyStore(email);
         if(file.exists()) {
-            restTemplateFactory.updateForMutualAuthentication(email);
             return certificateDB.find(email).orElseThrow(
                     () -> new IllegalStateException(
                             String.format("P12 Certificate exist but certificate object in DB does not [%s]", email))
@@ -66,8 +63,6 @@ public class CertificateService {
         Path cert = toFile("crt", certificateUtils.pemFormat(certificate.getCertificate()), email);
 
         generateP12KeyStore(key, cert, email);
-
-        restTemplateFactory.updateForMutualAuthentication(email);
     }
 
     private File generateP12KeyStore(Path key, Path cert, String email) {

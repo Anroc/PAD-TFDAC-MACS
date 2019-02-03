@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.client.rest.template;
 
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 public abstract class ClientRestTemplate {
 
+    @Getter
     private final RestTemplate restTemplate;
     private final String serviceName;
     private volatile Map<Long, HttpHeaders> httpHeaders = new HashMap<>();

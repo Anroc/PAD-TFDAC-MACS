@@ -1,7 +1,9 @@
-package de.tuberlin.tfdacmacs.client.rest.template;
+package de.tuberlin.tfdacmacs.client.rest.factory;
 
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.keypair.config.KeyStoreConfig;
+import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
+import de.tuberlin.tfdacmacs.client.rest.template.ClientRestTemplate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.client.HttpClient;
@@ -12,6 +14,7 @@ import org.apache.http.ssl.SSLContexts;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -55,12 +58,16 @@ public class RestTemplateFactory {
         return buildRestTemplate(clientConfig.getAaRootUrl(), null);
     }
 
-    public void updateForMutualAuthentication(@NonNull String email) {
-        applicationContext.getBeansOfType(RestTemplate.class)
-                .values().forEach(restTemplate -> updateRestTemplate(email, restTemplate));
+    @EventListener(SessionCreatedEvent.class)
+    public void updateForMutualAuthentication(SessionCreatedEvent sessionCreatedEvent) {
+        applicationContext.getBeansOfType(ClientRestTemplate.class).values()
+                .forEach(clientRestTemplate -> updateRestTemplate(
+                        sessionCreatedEvent.getEmail(),
+                        clientRestTemplate.getRestTemplate())
+                );
     }
 
-    public RestTemplate updateRestTemplate(@NonNull String email, @NonNull RestTemplate restTemplate) {
+    protected RestTemplate updateRestTemplate(@NonNull String email, @NonNull RestTemplate restTemplate) {
         try {
             HttpClient httpClient = buildHttpClient(clientConfig.getP12Certificate(), email);
             ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setHttpClient(httpClient);
@@ -70,7 +77,7 @@ public class RestTemplateFactory {
         }
     }
 
-    public RestTemplate buildRestTemplate(String rootUrl, KeyStoreConfig p12Certificate) {
+    protected RestTemplate buildRestTemplate(String rootUrl, KeyStoreConfig p12Certificate) {
         try {
             HttpClient httpClient = buildHttpClient(p12Certificate, null);
             RestTemplate restTemplate = plainRestTemplate(rootUrl);
