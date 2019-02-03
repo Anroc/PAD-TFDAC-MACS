@@ -1,8 +1,9 @@
-package de.tuberlin.tfdacmacs.client.register;
+package de.tuberlin.tfdacmacs.client.rest.session;
 
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
+import de.tuberlin.tfdacmacs.client.rest.session.events.SessionEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +17,19 @@ public class SessionContainer implements Session {
     private KeyPair keyPair;
 
     @EventListener(SessionCreatedEvent.class)
-    public void updateSession(SessionCreatedEvent sessionCreatedEvent) {
+    public SessionEvent updateSession(SessionCreatedEvent sessionCreatedEvent) {
         this.email = sessionCreatedEvent.getEmail();
         this.certificate = sessionCreatedEvent.getCertificate();
         this.keyPair = sessionCreatedEvent.getKeyPair();
+        return new SessionEvent(this);
     }
 
     @EventListener(LogoutEvent.class)
-    public void clearSession() {
+    public SessionEvent clearSession() {
         this.email = null;
         this.certificate = null;
         this.keyPair = null;
+        return new SessionEvent(this);
     }
 
     @Override

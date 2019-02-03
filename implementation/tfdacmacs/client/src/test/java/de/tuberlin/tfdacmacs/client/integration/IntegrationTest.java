@@ -42,7 +42,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
     @Test
     public void integrationTest() {
-        createUser();
+//        createUser();
 
         Thread thread = new Thread(
                 () -> {

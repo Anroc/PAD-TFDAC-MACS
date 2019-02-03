@@ -38,8 +38,8 @@ public class RegisterCommand {
     public void register(String email) {
         Certificate certificate = certificateService.certificateRequest(email);
         certificateService.generateP12KeyStore(certificate);
-        attributeService.retrieveAttributesForUser(email, certificate.getId());
         publisher.publishEvent(new RegisteredEvent(email, certificate, keyPairService.getKeyPair(email)));
+        attributeService.retrieveAttributesForUser(email, certificate.getId());
         standardStreams.out(String.format("Successfully registered as user [%s]", email));
     }
 

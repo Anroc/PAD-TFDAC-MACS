@@ -107,7 +107,7 @@ public class RegisterCommandTest extends CommandTestSuite {
         assertThat(keyPairDB.find(EMAIL)).isPresent();
         assertThat(certificateDB.find(EMAIL)).isPresent();
 
-        verify(restTemplateFactory).updateForMutualAuthentication(EMAIL);
+        verify(restTemplateFactory).updateForMutualAuthentication(any(SessionCreatedEvent.class));
     }
 
     @Test

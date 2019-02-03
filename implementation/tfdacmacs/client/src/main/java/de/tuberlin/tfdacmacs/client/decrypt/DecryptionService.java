@@ -4,7 +4,7 @@ import de.tuberlin.tfdacmacs.client.attribute.AttributeService;
 import de.tuberlin.tfdacmacs.client.decrypt.client.DecryptionClient;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
-import de.tuberlin.tfdacmacs.client.register.Session;
+import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.UserAttributeSecretComponent;

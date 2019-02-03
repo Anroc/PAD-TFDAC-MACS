@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.client.attribute;
 
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.config.StandardStreams;
-import de.tuberlin.tfdacmacs.client.register.Session;
+import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;

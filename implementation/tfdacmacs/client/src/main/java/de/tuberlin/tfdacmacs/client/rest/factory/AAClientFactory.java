@@ -2,9 +2,8 @@ package de.tuberlin.tfdacmacs.client.rest.factory;
 
 import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEvent;
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
-import de.tuberlin.tfdacmacs.client.register.Session;
+import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.rest.template.AAClientTemplate;
-import de.tuberlin.tfdacmacs.client.rest.template.RestTemplateFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.event.EventListener;

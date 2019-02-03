@@ -38,7 +38,15 @@ public class UserService {
     private final AttributeValueKeyGenerator attributeValueKeyGenerator;
 
     public Optional<User> findUser(@NonNull String userId) {
-        return userDB.findEntity(userId).map(this::extendWithCAUser);
+        return findUser(userId, true);
+    }
+
+    public Optional<User> findUser(@NonNull String userId, boolean extendWithCa) {
+        Optional<User> user = userDB.findEntity(userId);
+        if(extendWithCa) {
+            return user.map(this::extendWithCAUser);
+        }
+        return user;
     }
 
     public boolean existUser(@NonNull String userId) {

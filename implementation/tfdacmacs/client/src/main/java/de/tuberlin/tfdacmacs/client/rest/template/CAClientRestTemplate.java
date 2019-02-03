@@ -8,6 +8,7 @@ import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
+import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;

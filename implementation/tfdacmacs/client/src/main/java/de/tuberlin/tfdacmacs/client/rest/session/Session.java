@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.register;
+package de.tuberlin.tfdacmacs.client.rest.session;
 
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 
