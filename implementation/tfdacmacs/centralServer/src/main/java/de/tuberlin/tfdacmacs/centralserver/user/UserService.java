@@ -32,8 +32,4 @@ public class UserService {
     public List<User> findUsersByAuthorityId(@NonNull String authorityId) {
         return userDB.findUsersByAuthorityId(authorityId);
     }
-
-    public Optional<User> findUserByIdAndAuthorityId(@NonNull String userId, @NonNull String authorityId) {
-        return userDB.findByIdAndAuthorityId(userId, authorityId);
-    }
 }

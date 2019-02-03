@@ -60,8 +60,7 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_AUTHORITY', 'ROLE_USER')")
     public UserResponse getUser(@PathVariable("id") String userId) {
-        String authorityId = authenticationFacade.getId();
-        User user = userService.findUserByIdAndAuthorityId(userId, authorityId)
+        User user = userService.findUser(userId)
                 .orElseThrow(
                         () -> new NotFoundException(userId)
                 );
