@@ -8,16 +8,19 @@ import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.DeviceIdResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.EncryptedTwoFactorDeviceKeyDTO;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +41,8 @@ public class TwoFactorAuthenticationClient {
     private final ApplicationContext context;
     private final SemanticValidator semanticValidator;
     private final CertificateUtils certificateUtils;
-    private final StringAsymmetricCryptEngine cryptEngine;
+    private final StringAsymmetricCryptEngine asymmetricCryptEngine;
+    private final StringSymmetricCryptEngine symmetricCryptEngine = new StringSymmetricCryptEngine();
 
     public void uploadTwoFactorKey(@NonNull TwoFactorKey.Public twoFactoryKey) {
         String userId = twoFactoryKey.getUserId();
@@ -54,7 +58,7 @@ public class TwoFactorAuthenticationClient {
 
         AAClient aaClient = getAAClient(aid);
 
-        Map<String, String> encryptedTwoFactorKeys = new HashMap<>();
+        Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys = new HashMap<>();
 
         user.getDevices().stream()
                 .map(DeviceResponse::getCertificateId)
@@ -62,7 +66,9 @@ public class TwoFactorAuthenticationClient {
                             .map(DeviceIdResponse::getId)
                             .map(this::getCertificate)
                             .map(X509Certificate::getPublicKey)
-                            .map(publicKey -> encrypt(twoFactoryKey.getKey(), publicKey))
+                            .map(publicKey -> new EncryptedTwoFactorDeviceKeyDTO(
+                                    encryptSymmetrically(twoFactoryKey.getKey()),
+                                    encryptAsymmetrically(publicKey)))
                             .ifPresent(encryptedTwoFactorKey -> encryptedTwoFactorKeys.put(deviceId, encryptedTwoFactorKey))
                 );
 
@@ -90,9 +96,19 @@ public class TwoFactorAuthenticationClient {
         return context.getBean(aid, AAClient.class);
     }
 
-    private String encrypt(Element element, PublicKey publicKey) {
+    private String encryptSymmetrically(Element element) {
         try {
-            return cryptEngine.encryptRaw(element.toBytes(), publicKey);
+            return Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(
+                    element.toBytes(),
+                    symmetricCryptEngine.getSymmetricCipherKey()));
+        } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String encryptAsymmetrically(PublicKey publicKey) {
+        try {
+            return asymmetricCryptEngine.encryptRaw(symmetricCryptEngine.getSymmetricCipherKey().getEncoded(), publicKey);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);
         }

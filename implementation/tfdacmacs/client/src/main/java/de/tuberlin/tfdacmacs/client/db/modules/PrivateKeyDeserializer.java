@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.keypair.db.modules;
+package de.tuberlin.tfdacmacs.client.db.modules;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

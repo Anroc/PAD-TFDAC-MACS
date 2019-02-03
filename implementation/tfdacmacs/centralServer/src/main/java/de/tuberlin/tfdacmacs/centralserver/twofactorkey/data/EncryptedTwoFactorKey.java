@@ -21,6 +21,6 @@ public class EncryptedTwoFactorKey extends Entity {
     private String dataOwnerId;
 
     @NotNull
-    private Map<String, String> encryptedTwoFactorKeys;
+    private Map<String, EncryptedTwoFactorDeviceKey> encryptedTwoFactorKeys;
 
 }

@@ -15,6 +15,7 @@ import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -25,6 +26,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -34,10 +36,17 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
     private final String currentEmail = "test@tu-berlin.de";
     private final String aid = "aa.tu-berlin.de";
 
-    private final String deviceId = UUID.randomUUID().toString();
+    private String deviceId;
+    private X509Certificate deviceCertificate;
+
+    @Before
+    public void setup() throws CertificateException, CertIOException, OperatorCreationException {
+        deviceCertificate = certificateTestFactory.createRootCertificate();
+        deviceId = certificateUtils.fingerprint(deviceCertificate);
+    }
 
     @Test
-    public void enable() throws CertificateException, CertIOException, OperatorCreationException {
+    public void enable() {
         X509Certificate certificate = mock(X509Certificate.class);
         doReturn(mock(PublicKey.class)).when(certificate).getPublicKey();
         semanticValidator.updateTrustedPublicKeys(
@@ -63,7 +72,6 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         doReturn(aaClient).when(twoFactorAuthenticationClient).getAAClient(aid);
         doReturn(Optional.of(new DeviceIdResponse(deviceId))).when(aaClient).getDevice(email, deviceId);
 
-        X509Certificate deviceCertificate = certificateTestFactory.createRootCertificate();
         doReturn(new CertificateResponse(
                 certificateUtils.fingerprint(deviceCertificate),
                 KeyConverter.from(deviceCertificate).toBase64()
@@ -77,9 +85,9 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         evaluate("2fa trust " + email);
 
         verify(caClient).createTwoFactorKey(captor.capture());
-
-        // TODO: assert capture
-
-
+        TwoFactorKeyRequest value = captor.getValue();
+        assertThat(value.getUserId()).isEqualTo(email);
+        assertThat(value.getEncryptedTwoFactorKeys())
+                .containsOnlyKeys(deviceId);
     }
 }

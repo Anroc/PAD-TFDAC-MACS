@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -21,14 +22,18 @@ public class TwoFactorKeyResponse {
     @NotBlank
     private String ownerId;
     @NotNull
-    private Map<String, String> encryptedTwoFactorKeys;
+    private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
 
     public static TwoFactorKeyResponse from(EncryptedTwoFactorKey encryptedTwoFactorKey) {
         return new TwoFactorKeyResponse(
                 encryptedTwoFactorKey.getId(),
                 encryptedTwoFactorKey.getUserId(),
                 encryptedTwoFactorKey.getDataOwnerId(),
-                encryptedTwoFactorKey.getEncryptedTwoFactorKeys()
+                encryptedTwoFactorKey.getEncryptedTwoFactorKeys().entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                entry -> entry.getKey(),
+                                entry -> EncryptedTwoFactorDeviceKeyDTO.from(entry.getValue())))
         );
     }
 }

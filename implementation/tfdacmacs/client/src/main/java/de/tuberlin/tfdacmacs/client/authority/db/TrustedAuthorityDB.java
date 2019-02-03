@@ -5,7 +5,7 @@ import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
 import de.tuberlin.tfdacmacs.client.db.JsonDB;
 import org.springframework.stereotype.Component;
 
-import static de.tuberlin.tfdacmacs.client.certificate.db.CertificateDB.x509Module;
+import static de.tuberlin.tfdacmacs.client.db.ModelFactory.x509Module;
 
 @Component
 public class TrustedAuthorityDB extends JsonDB<TrustedAuthority> {
