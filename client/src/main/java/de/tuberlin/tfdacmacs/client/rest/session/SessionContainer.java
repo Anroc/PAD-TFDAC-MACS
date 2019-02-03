@@ -1,13 +1,13 @@
 package de.tuberlin.tfdacmacs.client.rest.session;
 
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
+import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
-import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
-import de.tuberlin.tfdacmacs.client.rest.session.events.SessionEvent;
+import de.tuberlin.tfdacmacs.client.register.events.SessionInitializedEvent;
+import de.tuberlin.tfdacmacs.client.rest.session.events.SessionDestroyedEvent;
+import de.tuberlin.tfdacmacs.client.rest.session.events.SessionReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 
 @Component
 public class SessionContainer implements Session {
@@ -16,20 +16,20 @@ public class SessionContainer implements Session {
     private Certificate certificate;
     private KeyPair keyPair;
 
-    @EventListener(SessionCreatedEvent.class)
-    public SessionEvent updateSession(SessionCreatedEvent sessionCreatedEvent) {
-        this.email = sessionCreatedEvent.getEmail();
-        this.certificate = sessionCreatedEvent.getCertificate();
-        this.keyPair = sessionCreatedEvent.getKeyPair();
-        return new SessionEvent(this);
+    @EventListener(SessionInitializedEvent.class)
+    public SessionReadyEvent updateSession(SessionInitializedEvent sessionInitializedEvent) {
+        this.email = sessionInitializedEvent.getEmail();
+        this.certificate = sessionInitializedEvent.getCertificate();
+        this.keyPair = sessionInitializedEvent.getKeyPair();
+        return new SessionReadyEvent(this);
     }
 
     @EventListener(LogoutEvent.class)
-    public SessionEvent clearSession() {
+    public SessionDestroyedEvent clearSession() {
         this.email = null;
         this.certificate = null;
         this.keyPair = null;
-        return new SessionEvent(this);
+        return new SessionDestroyedEvent(this);
     }
 
     @Override

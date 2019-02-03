@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.client.rest.factory;
 
 import de.tuberlin.tfdacmacs.client.config.ClientConfig;
 import de.tuberlin.tfdacmacs.client.keypair.config.KeyStoreConfig;
-import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
+import de.tuberlin.tfdacmacs.client.register.events.SessionInitializedEvent;
 import de.tuberlin.tfdacmacs.client.rest.template.ClientRestTemplate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -58,11 +60,12 @@ public class RestTemplateFactory {
         return buildRestTemplate(clientConfig.getAaRootUrl(), null);
     }
 
-    @EventListener(SessionCreatedEvent.class)
-    public void updateForMutualAuthentication(SessionCreatedEvent sessionCreatedEvent) {
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @EventListener(SessionInitializedEvent.class)
+    public void updateForMutualAuthentication(SessionInitializedEvent sessionInitializedEvent) {
         applicationContext.getBeansOfType(ClientRestTemplate.class).values()
                 .forEach(clientRestTemplate -> updateRestTemplate(
-                        sessionCreatedEvent.getEmail(),
+                        sessionInitializedEvent.getEmail(),
                         clientRestTemplate.getRestTemplate())
                 );
     }

@@ -10,7 +10,7 @@ import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
-import de.tuberlin.tfdacmacs.client.register.events.SessionCreatedEvent;
+import de.tuberlin.tfdacmacs.client.register.events.SessionInitializedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
@@ -96,18 +96,18 @@ public class RegisterCommandTest extends CommandTestSuite {
         shell.evaluate(() -> "register " + EMAIL);
         testEventListener.stopRecodingEvents();
 
-        List<SessionCreatedEvent> eventOfType = testEventListener.findEventOfType(SessionCreatedEvent.class);
+        List<SessionInitializedEvent> eventOfType = testEventListener.findEventOfType(SessionInitializedEvent.class);
         assertThat(eventOfType).hasSize(1);
-        SessionCreatedEvent sessionCreatedEvent = eventOfType.get(0);
-        assertThat(sessionCreatedEvent.getEmail()).isEqualTo(EMAIL);
-        assertThat(sessionCreatedEvent.getCertificate().getCertificate()).isEqualTo(currentCertificate);
-        assertThat(sessionCreatedEvent.getCertificate().getId()).isEqualTo(certificateFingerprint);
-        assertThat(sessionCreatedEvent.getKeyPair()).isNotNull();
+        SessionInitializedEvent sessionInitializedEvent = eventOfType.get(0);
+        assertThat(sessionInitializedEvent.getEmail()).isEqualTo(EMAIL);
+        assertThat(sessionInitializedEvent.getCertificate().getCertificate()).isEqualTo(currentCertificate);
+        assertThat(sessionInitializedEvent.getCertificate().getId()).isEqualTo(certificateFingerprint);
+        assertThat(sessionInitializedEvent.getKeyPair()).isNotNull();
 
         assertThat(keyPairDB.find(EMAIL)).isPresent();
         assertThat(certificateDB.find(EMAIL)).isPresent();
 
-        verify(restTemplateFactory).updateForMutualAuthentication(any(SessionCreatedEvent.class));
+        verify(restTemplateFactory).updateForMutualAuthentication(any(SessionInitializedEvent.class));
     }
 
     @Test
