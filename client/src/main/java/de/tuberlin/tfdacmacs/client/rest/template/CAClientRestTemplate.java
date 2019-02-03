@@ -126,4 +126,14 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
         );
     }
 
+    @Override
+    public List<TwoFactorKeyResponse> getTwoFactorKeys(String email) {
+        return listRequest(
+                "/two-factor-keys",
+                HttpMethod.GET,
+                new ParameterizedTypeReference<List<TwoFactorKeyResponse>>() {},
+                null
+        );
+    }
+
 }

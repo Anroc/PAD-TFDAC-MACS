@@ -15,7 +15,7 @@ public class TwoFactorAuthenticationCommand {
     private final StandardStreams standardStreams;
 
     @ShellMethod(value = "Encrypt a file", key = "2fa trust")
-    public void enable(@ShellOption(help = "comma separated emails") String users) {
+    public void trust(@ShellOption(help = "comma separated emails") String users) {
         if(users.isEmpty()) {
             throw new IllegalArgumentException("users should be a comma separated list of user ids");
         }
@@ -26,5 +26,10 @@ public class TwoFactorAuthenticationCommand {
 
         standardStreams.out("UserIds:");
         twoFactorAuthentication.getTwoFactorKey().getPublicKeys().keySet().forEach(standardStreams::out);
+    }
+
+    @ShellMethod(value = "Download all two factor keys", key = "2fa update")
+    public void update() {
+        twoFactorAuthenticationService.update();
     }
 }

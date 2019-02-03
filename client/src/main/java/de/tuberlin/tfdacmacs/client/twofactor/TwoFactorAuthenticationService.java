@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.client.twofactor;
 
 import de.tuberlin.tfdacmacs.client.rest.session.Session;
+import de.tuberlin.tfdacmacs.client.twofactor.client.TwoFactorAuthenticationClient;
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.client.twofactor.db.TwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
@@ -18,8 +19,10 @@ public class TwoFactorAuthenticationService {
 
     private final TwoFactorAuthenticationDB twoFactorAuthenticationDB;
     private final Session session;
+    private final TwoFactorAuthenticationClient client;
 
     private final TwoFactorKeyManager twoFactorKeyManager;
+
 
     public DataOwner getDataOwner() {
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationDB.find(session.getEmail())
@@ -59,4 +62,7 @@ public class TwoFactorAuthenticationService {
         return twoFactorAuthentication;
     }
 
+    public void update() {
+        client.updateTwoFactorKeys();
+    }
 }
