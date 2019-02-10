@@ -27,6 +27,7 @@ public abstract class AsymmetricElementKey<T> {
     }
 
     @SuppressWarnings("unused")
+    @NoArgsConstructor
     public static class Public<T> extends Key {
         public Public(@NonNull Element key) {
             super(key);

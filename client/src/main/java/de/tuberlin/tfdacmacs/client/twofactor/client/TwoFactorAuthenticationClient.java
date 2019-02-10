@@ -76,8 +76,8 @@ public class TwoFactorAuthenticationClient {
                         .map(this::getCertificate)
                         .map(X509Certificate::getPublicKey)
                         .map(publicKey -> new EncryptedTwoFactorDeviceKeyDTO(
-                                encryptSymmetrically(twoFactoryKey.getKey(), symmetricCryptEngine),
-                                encryptAsymmetrically(publicKey, symmetricCryptEngine.getSymmetricCipherKey())))
+                                encryptAsymmetrically(publicKey, symmetricCryptEngine.getSymmetricCipherKey()),
+                                encryptSymmetrically(twoFactoryKey.getKey(), symmetricCryptEngine)))
                         .ifPresent(encryptedTwoFactorKey -> encryptedTwoFactorKeys.put(deviceId, encryptedTwoFactorKey))
                 );
 
@@ -140,7 +140,7 @@ public class TwoFactorAuthenticationClient {
         try {
             StringSymmetricCryptEngine cryptEngine = new StringSymmetricCryptEngine();
             byte[] bytes = asymmetricCryptEngine.decryptRaw(encryptedKey, privateKey);
-            cryptEngine.createKeyFromBytes(bytes);
+            cryptEngine.setSymmetricCipherKey(cryptEngine.createKeyFromBytes(bytes));
             return cryptEngine;
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);

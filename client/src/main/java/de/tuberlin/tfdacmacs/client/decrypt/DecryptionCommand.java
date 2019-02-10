@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.client.attribute.AttributeService;
 import de.tuberlin.tfdacmacs.client.config.StandardStreams;
 import de.tuberlin.tfdacmacs.client.csp.CSPService;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -24,15 +25,25 @@ public class DecryptionCommand {
 
     private final StandardStreams standardStreams;
 
+    @Getter
     private List<CipherText> cipherTexts = new ArrayList<>();
 
     @ShellMethod("Check for new files")
     public void check() {
         this.cipherTexts = cspService.checkForDecryptableFiles(attributeService.getAttributes());
-        standardStreams.out(String.format("%s:\t%s", "IDs", "Attributes"));
+        standardStreams.out(String.format(
+                " #\t\t%s:\t\t\t\t\t\t\t\t\t%s\t%s",
+                "IDs",
+                "2FA",
+                "Attributes"));
         for (int i = 0; i < cipherTexts.size(); i++) {
             CipherText ct = cipherTexts.get(i);
-            standardStreams.out(String.format("[%d]: %s:\t%s", i+1, ct.getId(), Arrays.toString(ct.getAccessPolicy().toArray())));
+            standardStreams.out(String.format(
+                    "[%d]:\t%s\t%s\t%s",
+                    i+1,
+                    ct.getId(),
+                    ct.isTwoFactorSecured() ? "yes" : "no",
+                    Arrays.toString(ct.getAccessPolicy().toArray())));
         }
     }
 

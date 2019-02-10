@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
+import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.TwoFactorContrainNotStatisfiedException;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
@@ -25,6 +26,11 @@ public class ABEDecryptor extends ABECrypto {
     public Element decrypt(@NonNull CipherText cipherText, @NonNull GlobalPublicParameter gpp,
             @NonNull String userId, @NonNull Set<UserAttributeSecretComponent> secrets,
             TwoFactorKey.Public twoFactorPublicKey) {
+        if(twoFactorPublicKey == null && cipherText.isTwoFactorSecured()) {
+            throw new TwoFactorContrainNotStatisfiedException(
+                    "Cipher text is two-factor secured but no 2FA decryption key was given.");
+        }
+
         secrets = findSatisfingSubSet(cipherText, secrets);
 
 
