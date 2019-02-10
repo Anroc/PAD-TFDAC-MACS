@@ -1,15 +1,19 @@
 package de.tuberlin.tfdacmacs.client.integration;
 
 import com.google.common.collect.Sets;
+import de.tuberlin.tfdacmacs.client.decrypt.DecryptionCommand;
 import de.tuberlin.tfdacmacs.client.encrypt.EncryptCommand;
 import de.tuberlin.tfdacmacs.client.integration.dto.AttributeValueRequest;
 import de.tuberlin.tfdacmacs.client.integration.dto.CreateUserRequest;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,8 +36,13 @@ public class IntegrationTest extends IntegrationTestSuite {
     private static final String DECRYPT_DIR = "./decrypted-files";
     private static final byte[] CONTENT = "hello World".getBytes();
 
+    @Value("${client.test.create-user}")
+    public boolean createUser = true;
+
     @Autowired
     private EncryptCommand encryptCommand;
+    @Autowired
+    private DecryptionCommand decryptionCommand;
 
     @Before
     public void setup() throws IOException {
@@ -41,8 +51,12 @@ public class IntegrationTest extends IntegrationTestSuite {
 
 
     @Test
-    public void integrationTest() {
-        createUser();
+    public void integrationTest() throws IOException {
+        if(createUser) {
+            createUser();
+        } else {
+            log.info("Not creating user since client.test.create-user={}", createUser);
+        }
 
         Thread thread = new Thread(
                 () -> {
@@ -68,9 +82,42 @@ public class IntegrationTest extends IntegrationTestSuite {
                 .exists()
                 .hasBinaryContent(CONTENT);
 
+        // --------------- 2 FA Test ------------------
+
+        FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
+        // trust myself so that i can use 2fa to decrypt the cipher text
         evaluate(String.format("2fa trust %s", email));
         evaluate("2fa update");
 
+        resetStdStreams();
+        evaluate("2fa list --issued");
+        assertThat(containsSubSequence(getOutContent(), email)).isTrue();
+        resetStdStreams();
+        evaluate("2fa list --granted");
+        assertThat(containsSubSequence(getOutContent(), email)).isTrue();
+
+        encryptCommand.encrypt(FILE_PATH, true, "(aa.tu-berlin.de.role:student)");
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "yes\t[aa.tu-berlin.de.role:student")).isTrue();
+
+        int numberOf2FACipherText = find2FACipherTextNumber();
+        evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
+        assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
+                .exists()
+                .hasBinaryContent(CONTENT);
+
+    }
+
+    private int find2FACipherTextNumber() {
+        List<CipherText> cipherTexts = decryptionCommand.getCipherTexts();
+        for (int i = 0; i < cipherTexts.size(); i++) {
+            if(cipherTexts.get(i).isTwoFactorSecured())
+                return i + 1;
+        }
+
+        throw new IllegalStateException("No cipher text with 2FA secure found.");
     }
 
     private void createUser() {

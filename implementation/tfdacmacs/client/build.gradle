@@ -42,6 +42,15 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
+clean.doFirst {
+    delete "${project.rootDir}/client/data-client/"
+    delete "${project.rootDir}/client/decrypted-files/"
+    delete "${project.rootDir}/client/p12/"
+    delete "${project.rootDir}/client/bob@tu-berlin.de.crt"
+    delete "${project.rootDir}/client/bob@tu-berlin.de.key"
+    delete "${project.rootDir}/client/bob@tu-berlin.de.p12"
+}
+
 test {
     exclude '**/integration/**'
 }

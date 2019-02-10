@@ -2,22 +2,28 @@ package de.tuberlin.tfdacmacs.client.twofactor;
 
 import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.twofactor.client.TwoFactorAuthenticationClient;
+import de.tuberlin.tfdacmacs.client.twofactor.data.PublicTwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
+import de.tuberlin.tfdacmacs.client.twofactor.db.PublicTwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.client.twofactor.db.TwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
 import it.unisa.dia.gas.jpbc.Element;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TwoFactorAuthenticationService {
 
     private final TwoFactorAuthenticationDB twoFactorAuthenticationDB;
+    private final PublicTwoFactorAuthenticationDB publicTwoFactorAuthenticationDB;
     private final Session session;
     private final TwoFactorAuthenticationClient client;
 
@@ -43,7 +49,7 @@ public class TwoFactorAuthenticationService {
 
     public TwoFactorAuthentication upsertTwoFactorAuthentication(String... userIds) {
         Optional<TwoFactorAuthentication> twoFactorAuthenticationOptional
-                = twoFactorAuthenticationDB.find(session.getEmail());
+                = findTwoFactorAuthentication();
 
         if(! twoFactorAuthenticationOptional.isPresent()) {
             return createNewTwoFactorAuthentication(userIds);
@@ -63,6 +69,22 @@ public class TwoFactorAuthenticationService {
     }
 
     public void update() {
-        client.updateTwoFactorKeys();
+        client.updateTwoFactorKeys().forEach(publicTwoFactorAuthentication ->
+                publicTwoFactorAuthenticationDB.upsert(
+                        publicTwoFactorAuthentication.getOwnerId(),
+                        publicTwoFactorAuthentication)
+        );
+    }
+
+    public List<PublicTwoFactorAuthentication> getAllPublicTwoFactorAuthentications() {
+        return publicTwoFactorAuthenticationDB.findAll().collect(Collectors.toList());
+    }
+
+    public Optional<PublicTwoFactorAuthentication> findPublicTwoFactorAuthentication(@NonNull String ownerId) {
+        return publicTwoFactorAuthenticationDB.find(ownerId);
+    }
+
+    public Optional<TwoFactorAuthentication> findTwoFactorAuthentication() {
+        return twoFactorAuthenticationDB.find(session.getEmail());
     }
 }

@@ -36,9 +36,10 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     }
 
     @Data
+    @NoArgsConstructor
     public static class Public extends AsymmetricElementKey.Public<TwoFactorKey> {
 
-        private final String userId;
+        private String userId;
 
         public Public(@NonNull String userId, @NonNull Element key) {
             super(key);
