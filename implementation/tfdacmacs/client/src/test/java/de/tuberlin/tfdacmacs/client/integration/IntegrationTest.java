@@ -36,8 +36,8 @@ public class IntegrationTest extends IntegrationTestSuite {
     private static final String DECRYPT_DIR = "./decrypted-files";
     private static final byte[] CONTENT = "hello World".getBytes();
 
-    @Value("${client.test.create-user}")
-    public boolean createUser = true;
+    @Value("${client.test.create-user:true}")
+    public boolean createUser;
 
     @Autowired
     private EncryptCommand encryptCommand;
