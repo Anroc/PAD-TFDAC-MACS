@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
+import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.TwoFactorContrainNotStatisfiedException;
 import org.assertj.core.util.Lists;
 import org.assertj.core.util.Sets;
 import org.junit.Before;
@@ -224,9 +225,9 @@ public class PairingCryptEngineTest extends UnitTestSuite {
         // decrypt
         LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        byte[] output = pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null);
-
-        assertNotSameElements(output, message);
+        assertThatExceptionOfType(TwoFactorContrainNotStatisfiedException.class).isThrownBy(
+                () -> pairingCryptEngine.decrypt(andCipherText.getFile().getData(), cipherText, gpp, userId, userAttributeSecretComponents, null)
+        );
     }
 
     @Test
