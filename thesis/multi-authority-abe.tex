@@ -57,6 +57,8 @@ headsepline, % Uncomment to get a line under the header
 \acsetup{first-style=short}
 \usepackage{amsmath}
 \usepackage[titletoc,toc,title]{appendix}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\scriptsize}
 
 
 \usepackage[textsize=footnotesize]{todonotes} % for todo notes
@@ -99,8 +101,8 @@ headsepline, % Uncomment to get a line under the header
 \keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
 \university{\href{https://tu-berlin.de}{Technical Unisersity Berlin}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
 \department{\href{https://dsi.tu-berlin.de}{Distributed Systems Infrastructure}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-\group{\href{https://dsi.tu-berlin.de}{Network security}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-\faculty{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{Faculty 4}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+\group{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{\textsc{Faculty} IV,}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+\faculty{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{\textsc{Faculty} IV}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
 
 \AtBeginDocument{
 \hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
@@ -202,7 +204,7 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-If a group of users want to share a ciphertext, they need to agree on a shared key. In order to ensure forward and backward secrecy, this shared key needs to be updated and distributed to every member everytime a user leaves or joins the group. Classical encryption methods encounter their limits, in which this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) will be analyzed to solve this issue for a secure cloud storage environment (Bdrive). Different ABE schemes will be compared for their applicability in Bdrive. Finally, the implementation of the resulting scheme will be evaluated for performance, scalability and security.
+Commonly a group of users want to share a ciphertext, they need to agree on a shared key. In order to ensure forward and backward secrecy, this shared key needs to be updated and distributed to every member everytime a user leaves or joins the group. Classical encryption methods encounter their limits, in which this approach is no longer feasible for a large number of users. In this work the field of attribute based encryption (ABE) have been analyzed to solve this issue for a secure cloud storage environment. Different ABE schemes haven been compared for their applicability in Bdrive. Finally, the implementation of the adapted scheme was evaluated for performance, scalability and security, showing that secure group communication using ABE can achieve sub-linear rekeying overhead. 
 \end{abstract}
 
 %----------------------------------------------------------------------------------------

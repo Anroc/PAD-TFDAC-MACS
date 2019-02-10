@@ -1,7 +1,6 @@
 \chapter{Requirements}
 \label{sec:requirements}
-\todo{Take social requirements into account?}
-The general (\\req{B}) requirements of this thesis will be summarized by two major points: 
+The general (\req{B}) requirements of this thesis will be summarized by two major points: 
 
 \begin{itemize}
 	\item[\req{B1}] \textbf{Performance:} Participating in the system should be possible with low-performance devices (such as smartphones). The overhead for the server on proxy decryption, attribute issuing and revocation should be reasonably low.  
@@ -10,7 +9,7 @@ The general (\\req{B}) requirements of this thesis will be summarized by two maj
 
 In addition, the core (\textbf{\textit{C*}}) security requirements in the context of an \ac{MA-ABE} scheme are the following:
 \begin{itemize}
-\item[\req{C1}] \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to archieve a higher level of decryption power. Collusion resistance need also be ensured also on revocation. 
+\item[\req{C1}] \textbf{Collusion resistance:} For two users it should not be possible to combine their attributes to achieve a higher level of decryption power. Collusion resistance need also be ensured also on revocation. 
 \item[\req{C2}] \textbf{Inter-Company Sharing:} Each company is only responsible for its own domain. This includes attribute and user administration, which translates to secret key generation and revocation. 
 \item[\req{C3}] \textbf{Central Authority:} The Central Authority (\ac{CA}) shall not have global decryption power. At most an Attribute Authority (\ac{AA}) can decrypt user files of its own domain.  
 \item[\req{C4}] \textbf{Secret Master key (if any):} Key recovery requires a secret and securely stored master key. It should solely function in the company domain and not globally. 
