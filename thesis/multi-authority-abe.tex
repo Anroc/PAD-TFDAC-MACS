@@ -57,6 +57,8 @@ headsepline, % Uncomment to get a line under the header
 \acsetup{first-style=short}
 \usepackage{amsmath}
 \usepackage[titletoc,toc,title]{appendix}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\scriptsize}
 
 
 \usepackage[textsize=footnotesize]{todonotes} % for todo notes
@@ -99,8 +101,8 @@ headsepline, % Uncomment to get a line under the header
 \keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
 \university{\href{https://tu-berlin.de}{Technical Unisersity Berlin}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
 \department{\href{https://dsi.tu-berlin.de}{Distributed Systems Infrastructure}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-\group{\href{https://dsi.tu-berlin.de}{Network security}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-\faculty{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{Faculty 4}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+\group{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{\textsc{Faculty} IV,}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+\faculty{\href{https://www.eecs.tu-berlin.de/menue/fakultaet_iv/?no_cache=1}{\textsc{Faculty} IV}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
 
 \AtBeginDocument{
 \hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title

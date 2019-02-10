@@ -1,14 +1,5 @@
 \chapter{Introduction}
 \label{sec:introduction}
-\todo{
-    * **Introduction**\\
-    * Ruff problem description\\
-    * How \ac{ABE} can solve this\\
-    * How \ac{ABE} works\\
-    * Short history summary of \ac{ABE}\\
-    * What is expected of this work\\
-    * What are the targets
-}
 In public-key cryptography each user is identified by his unique public and private key pair. Peer-to-peer communication works well with this scheme, but as soon as an encrypted content needs to be accessed by multiple participants, the data owner has to encrypt the content for each user explicitly. This results in many encrypted versions of the same  file, each secured by a different public key. Such schemes do not scale well in the secure cloud storage domain. Here often data owners want to share the same content with many other users at the same time.
 
 The point is reached where the classical public-key end-to-end encryption scheme does not scale anymore. To overcome this obstacle an encryption scheme need to be employed which has a constant number of access keys regardless of the number of participants.
@@ -22,13 +13,13 @@ With increasing transparency raised also the concern that it was not clear anymo
 \section{Background}
 \begin{figure*}[!ht]
 \centering
-    \includegraphics[width=0.8\linewidth]{img/bdrive1.png}\par 
+    \includegraphics[width=1\linewidth]{img/bdrive1.png}\par 
     \caption{Device uploads an encrypted file to the \ac{CSP}s and the file key and public key to Bdrive.}
     \label{fig:filekey}
 \end{figure*}
 \begin{figure*}[!ht]
 \centering
-    \includegraphics[width=0.8\linewidth]{img/bdrive2.png}\par
+    \includegraphics[width=1\linewidth]{img/bdrive2.png}\par
     \caption{Device A grants Device B access to the uploaded file by re-keying the file key}
     \label{fig:rekey}
 \end{figure*}
