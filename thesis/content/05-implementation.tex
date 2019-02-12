@@ -125,6 +125,8 @@ The CA is also the central service that provides all necessary information to th
   \item \textbf{Data owner} are specifications of users who can issue two-factor keys to other users. The so called \textit{Two-Factor Key} (\ac{2FA}-Key), adds an additional security layer to the cipher text. It restricts the access to the encrypted plain text to a even smaller select user group.  
 \end{itemize}
 
+\todo{Adaptations in system design: CA is certificate authority as well, CSP only saves encrypted keys but not cipher texts. User can not talk directly with each other.}
+
 \subsection{Setup}
 The setup summarizes the steps described in \cite{li2017two} such as: Setup, user registration, data owner registration, authority setup, key generation and authentication requests. 
 
@@ -155,6 +157,7 @@ The AA-Admin uploads the received certificate and the private key to the AA serv
 Figure \ref{fig:user-register} shows the user registration flow. Users are registered by the AA-Admin. He chooses a user identifier (UID) and attributes for the new user (1.).  The AA now checks if all attribute values are already known or if a new attribute value key pair needs to be created (2.). If new attribute values would have been created their public component would also be signed and published to the central server. The user specific attribute secret keys needs to be created (3.). They have the hash of the UID embedded so that on colluding with other users this hash would mesh and no successful decryption would be possible. Finally, the central server is notified for this new user. It just saves the user object for future reference.
 
 \subsubsection{Register a device}
+\label{sec:register-a-device}
 \begin{figure}[!h]
 \centering
     \includegraphics[width=\linewidth]{img/device_register.png}
@@ -204,33 +207,38 @@ In step 2. it is validated that the given attribute values and their authorities
 
 Step 6-9 retrieve the public attribute and authority keys needed for encryption under the given policy. For each request a signed ABE public keys are returned. In step 10. thous signatures are validated given the certificates of step 4. and the trusted authority subset validation of step 5. 
 
-Since all preconditions are fulfilled and all public keys are trusted, the device can proceed to encrypt the content under the given access policy (11.).  To do that, the device first chooses a random key  $K \in G_T$ that is encrypted using the adapted encryption technique of section \ref{sec:removing-the-fix-two-factor-constrain} to create a \textit{file key}. The random element key $K$ is converted into a unique byte array stream and used for symmetric \ac{AES} encryption of the plain text content. To relate file key and cipher text a new random file ID is chosen and attached to both payloads. In step 12. the file keys is updated to the central server to that it can be queried by other clients and the encrypted file is updated to the cloud storage provider (13.). 
+Since all preconditions are fulfilled and all public keys are trusted, the device can proceed to encrypt the content under the given access policy (11.).  To do that, the device first chooses a random key  $K \in G_T$ that is encrypted using the adapted encryption technique of section \ref{sec:removing-the-fix-two-factor-constrain} to create a \textit{file key}. The random element key $K$ is converted into a unique byte array stream and used for symmetric \ac{AES} encryption of the plain text content. To relate file key and cipher text a new random file ID is chosen and attached to both payloads. In step 12. the cipher text is uploaded to the central server to that it can be queried by other clients. A cipher text, as described by TF-DAC-MACS \cite{li2017two}, is composed of an encrypted part (in the paper it is called $C1$, $C2$ and $C3$), the data owner Id, which is only present if two-factor authentication is used (see section \ref{sec:encryption-utilizing-two-factor-keys}), an conjunctive access policy (set of attribute value IDs) and the file ID which references the actuall encrypted content. This last one is uploaded and stored permanentally on the cloud storage provider (13.).  
 
 As mentioned in section \ref{sec:extension-to-dnf-policy} an extension to DNF policy is introduced. To support also OR clauses, the client creates different versions of the file key, each encrypted under a different access policy. As can be seen in figure ref{fig:tfdacmacs-encrypt} the example access policy is composed of two attribute values combined with a disjunction. The client would produce one file key under the policy "(aa.tu-berlin.de.role:student)" and an other for the policy "(aa.tu-berlin.de.role:professor)". Each file keys need to be created using the same key element $K$ so that when decrypted respectively both of them result in the same key that can be used to decipher the encrypted file. As already mentioned, this comes with a performance trade-off in storage and computing power. Cipher text update and cipher text length scales now with a linear overhead for each disjunction, rather then constant as in the original scheme. 
 
-\subsubsection{Two-Factor Keys}
-\todo{write me}
+\subsubsection{Encryption Utilizing Two-Factor Keys}
+\label{sec:encryption-utilizing-two-factor-keys}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=1\linewidth]{img/encryption_2FA.png}
+    \caption{Encryption preperation using two-factor authentication}
+    \label{fig:tfdacmacs-encrypt-2fa}
+\end{figure}
 
-% \todo{todo}
-% In the final setup, users can issue each other two factor keys so called \textit{authentication keys}. This authentication keys introduce a new layer of security where users can decide who exactly can decipher their plain text. In some cases this may be needed since access policies in ABE describe always a group of user and the exact members of this group remains hidden from the data owner.
- 
-% An example flow to receive the 2FA-Key would look like this: If Bob wants to get an authentication key from Alice he sends an authentication request to the CA addressing Alice and containing his certificate. Alice gets notified about the request, checks the validity of the certificate and creates the authentication key for Bob. She  uses the public key embedded in Bobs certificate to encrypt the private authentication key and uploads it to the CA. Bob downloads the encrypted key and decrypts it. In the later manner, Bob can use this authentication key to authenticate against the cipher text created by Alice. 
+In order to also secure the cipher text utilizing two-factor keys, additional preparation need to be done.  As displayed in figure \ref{fig:tfdacmacs-encrypt-2fa}, first a new two-factor master key is created (1.). This one is kept secret on the device. It will be used later to issue more two-factor authentication keys to other users or revoke two-factor authentication keys. 
 
-% The previous steps are summarized in the figure \ref{fig:tfdacmacs-setup}.
+For each user that shall receive a two-factor key, the device creates a user specific two-factor authentication secret key (2.). To prevent collusion it is made unique for each user using the hash of the user id as a uniqueness source. Before uploading this keys to the central server, the device needs to encrypt them for each user respectively.  To do so, it is checked that each user that shall receive a two-factor authentication key has an authority that is an element in the trusted ID set. For each user this check returns success, the central service is asked for the certificates of each device of this user (3 and 4).
+
+Since the central server can not be trusted to return tampered certificates the device needs to request each administrating AA of each user to double check the retrieved certificates (5.). Here the AA validates that the presented certificate fingerprint is valid and the requested device is active. For each device this check returns success the respective user secret keys are encrypted using the public key embedded in the validated certificate (7.). Thous are uploaded to the central server where they can be downloaded by each respective recipient. 
+
 
 \subsection{Decryption}
-\todo{write me}
 
-% \begin{figure}[!t]
-% \centering
-%     \includegraphics[width=0.7\linewidth]{img/TF-DAC-MACS-overview-decrypt.png}
-%     \caption{Decryption phase}
-%     \label{fig:tfdacmacs-decryption}
-% \end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=1.0\linewidth]{img/decryption.png}
+    \caption{Decryption phase}
+    \label{fig:tfdacmacs-decryption}
+\end{figure}
 
-% On decryption first the ciphertext will be downloaded from the server. If Bob has a matching super set of attributes and the needed 2FA-Key he can recover the file key $m$ and transform it again to a bit-stream (figure \ref{fig:tfdacmacs-decryption})
+Compared to encryption, decryption is rather straight forward. As figure \ref{fig:tfdacmacs-decryption} shows, periodically the device checks if new satisfyable cipher texts are present at the central server. This is done by sending all attribute value IDs for that the devices owns a private ABE key in a query to the central server (1.). It on the other hand checks if any cipher text can be satisfied by a subset of this given attribute set. This can be done by selecting all cipher texts and checking their respective access policies if all elements of this policy are a true subset of the given attribute value IDs from the device. All cipher text that satisfy this constrains are returned (2.).
 
-% Next, he downloads the encrypted file from the CSP and decrypts it with the recovered file key.
+The device proceeds to extract the file ID from the given cipher text and request this encrypted file from the CSP (3. and 4.). \todo{make integrity checks? Maybe make the file Id to the hash of the file content}. Locally, the cipher text is now decrypted using the user specific ABE private keys issued on device register (see section \ref{sec:register-a-device}) (5.). After the file key is recovered it can be used for symmetric  AES decryption of the encrypted file (6.). 
 
 \subsection{Revoke attribute}
 \todo{write me}
