@@ -9,7 +9,6 @@ public interface CSPClient {
     CSPClient withHeaders(HttpHeaders headers);
 
     void createFile(String id, MultiValueMap<String, Object> file);
-
     byte[] getFile(String fileId);
 
     FileInformationResponse getFileInformation(String fileId);

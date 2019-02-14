@@ -70,6 +70,7 @@ public class AttributeValueKeyGenerator {
         Element userIdHash = hashGenerator.g1Hash(gpp, userId);
         // H(uid)**(y' - y)
         return new UserAttributeValueUpdateKey(
+                userId,
                 userIdHash.powZn(newAttributePrivateKey.getKey().duplicate().sub(revokedAttributePrivateKey.getKey()))
         );
     }

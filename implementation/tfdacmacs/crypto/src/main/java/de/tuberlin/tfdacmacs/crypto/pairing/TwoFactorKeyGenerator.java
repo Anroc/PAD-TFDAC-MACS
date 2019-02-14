@@ -45,7 +45,7 @@ public class TwoFactorKeyGenerator {
                 newKey.getKey().duplicate().sub(revokedKey.getKey().duplicate())
         );
 
-        return new TwoFactorUpdateKey(updateKey);
+        return new TwoFactorUpdateKey(uid, updateKey);
     }
 
     public CipherText2FAUpdateKey generateCipherTextUpdateKey(@NonNull TwoFactorKey.Private revokedKey,

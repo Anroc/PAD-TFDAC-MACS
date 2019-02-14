@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,16 @@ public class CipherTextClient {
                 .stream()
                 .map(ct -> ct.toCipherText(g1(), gt()))
                 .collect(Collectors.toList());
+    }
+
+    public List<CipherText> getCipherTexts(String ownerId) {
+        return caClient.getCipherTexts(ownerId)
+                .stream()
+                .map(ct -> ct.toCipherText(g1(), gt()))
+                .collect(Collectors.toList());
+    }
+
+    public void updateCipherText(List<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
 
     }
 
@@ -66,4 +77,6 @@ public class CipherTextClient {
     private Field gt() {
         return gppService.getGPP().getPairing().getGT();
     }
+
+
 }

@@ -12,7 +12,6 @@ public class CipherText2FAUpdateKey extends UpdateKey {
     private final String oid;
 
     public CipherText2FAUpdateKey(@NonNull Element updateKey, @NonNull String attributeValueId, @NonNull String oid) {
-
         super(updateKey);
         this.attributeValueId = attributeValueId;
         this.oid = oid;

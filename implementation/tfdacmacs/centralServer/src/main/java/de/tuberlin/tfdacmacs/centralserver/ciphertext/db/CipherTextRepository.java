@@ -18,4 +18,9 @@ public interface CipherTextRepository extends CouchbaseRepository<CipherTextEnti
             + "WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity' "
             + "AND EVERY p IN accessPolicy SATISFIES p IN $1 END")
     Stream<CipherTextEntity> findAllByPolicyContaining(JsonArray from);
+
+    @Query("#{#n1ql.selectEntity} "
+            + "WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity' "
+            + "AND ownerId = $1")
+    Stream<CipherTextEntity> findAllByOwnerId(String ownerId);
 }

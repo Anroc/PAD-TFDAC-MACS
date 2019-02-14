@@ -29,6 +29,8 @@ public interface CAClient {
 
     void createCipherText(CipherTextDTO cipherTextDTO);
     List<CipherTextDTO> getCipherTexts(List<String> attributeIds);
+    List<CipherTextDTO> getCipherTexts(String ownerId);
+
 
     TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest);
     List<TwoFactorKeyResponse> getTwoFactorKeys(String email);

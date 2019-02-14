@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.crypto.pairing;
 import de.tuberlin.tfdacmacs.crypto.pairing.aes.AESDecryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.aes.AESEncryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.*;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherTextAttributeUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import it.unisa.dia.gas.jpbc.Element;
@@ -82,5 +83,13 @@ public class PairingCryptEngine {
             @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey,
             @NonNull GlobalPublicParameter gpp) {
         return abeEncrypt.update(gpp, cipherText, andAccessPolicy, cipherTextAttributeUpdateKey);
+    }
+
+    public CipherText update(
+            @NonNull CipherText cipherText,
+            @NonNull AndAccessPolicy andAccessPolicy,
+            @NonNull Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys,
+            @NonNull GlobalPublicParameter gpp) {
+        return abeEncrypt.update(gpp, cipherText, andAccessPolicy, cipherText2FAUpdateKeys);
     }
 }

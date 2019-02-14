@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.lib.attributes.data;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.ElementKey;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.Data;
@@ -30,5 +31,9 @@ public class PublicAttributeValue<T> extends ElementKey implements AttributeValu
     @Override
     public Element getPublicKeyComponent() {
         return getKey();
+    }
+
+    public AttributeValue.Public toAttributeValuePublicKey(@NonNull String attributeValueId) {
+        return new AttributeValueKey.Public(getKey(), attributeValueId);
     }
 }
