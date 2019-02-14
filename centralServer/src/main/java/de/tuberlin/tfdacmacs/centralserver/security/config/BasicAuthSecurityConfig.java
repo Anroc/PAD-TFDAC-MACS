@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.security.config;
 
+import de.tuberlin.tfdacmacs.centralserver.security.data.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,7 @@ public class BasicAuthSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser(credentialConfig.getUsername()).password(passwordEncoder().encode(credentialConfig.getPassword()))
                 .roles("ADMIN")
-                .authorities("ROLE_ADMIN");
+                .authorities(Role.ADMIN.getRoleName());
     }
 
 

@@ -19,18 +19,21 @@ public class TwoFactorAuthenticationCommand {
     private final TwoFactorAuthenticationService twoFactorAuthenticationService;
     private final StandardStreams standardStreams;
 
-    @ShellMethod(value = "Encrypt a file", key = "2fa trust")
+    @ShellMethod(value = "Trust a user", key = "2fa trust")
     public void trust(@ShellOption(help = "comma separated emails") String users) {
-        if(users.isEmpty()) {
-            throw new IllegalArgumentException("users should be a comma separated list of user ids");
-        }
-
-        String[] userIds = users.split(",");
+        String[] userIds = extractUserIds(users);
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationService
-                .upsertTwoFactorAuthentication(userIds);
+                .trust(userIds);
 
         standardStreams.out("UserIds:");
         twoFactorAuthentication.getTwoFactorKey().getPublicKeys().keySet().forEach(standardStreams::out);
+    }
+
+    @ShellMethod(value = "Distrust users", key = "2fa distrust")
+    public void distrust(@ShellOption(help = "comma seperated emails") String users) {
+        String[] userIds = extractUserIds(users);
+        TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationService
+                .trust(userIds);
     }
 
     @ShellMethod(value = "Download/Update all secret two factor keys", key = "2fa update")
@@ -62,6 +65,14 @@ public class TwoFactorAuthenticationCommand {
                     .map(PublicTwoFactorAuthentication::getOwnerId)
                     .forEach(standardStreams::out);
         }
+    }
+
+    private String[] extractUserIds(String users) {
+        if(users.isEmpty()) {
+            throw new IllegalArgumentException("users should be a comma separated list of user ids");
+        }
+
+        return users.split(",");
     }
 
 }

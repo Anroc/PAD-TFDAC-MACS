@@ -117,6 +117,16 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
     }
 
     @Override
+    public List<CipherTextDTO> getCipherTexts(String ownerId) {
+        return listRequest(
+                String.format("/ciphertexts?ownerId=%s", ownerId),
+                HttpMethod.GET,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
+                null
+        );
+    }
+
+    @Override
     public TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest) {
         return request(
                 "/two-factor-keys",

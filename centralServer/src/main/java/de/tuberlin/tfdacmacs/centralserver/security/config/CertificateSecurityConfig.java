@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.security.config;
 
 import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
+import de.tuberlin.tfdacmacs.centralserver.security.data.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -47,10 +48,10 @@ public class CertificateSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public UserDetailsService userDetailsService() {
         return commonName -> {
-            String role = "ROLE_USER";
+            String role = Role.USER.getRoleName();
 
             if(attributeAuthorityService.exist(commonName)) {
-                role = "ROLE_AUTHORITY";
+                role = Role.AUTHORITY.getRoleName();
             }
 
             log.info("Certificate authentication of [{}] role [{}]", commonName, role);

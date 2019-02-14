@@ -12,10 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +44,7 @@ public class TwoFactorAuthenticationService {
         return twoFactorAuthentication;
     }
 
-    public TwoFactorAuthentication upsertTwoFactorAuthentication(String... userIds) {
+    public TwoFactorAuthentication trust(String... userIds) {
         Optional<TwoFactorAuthentication> twoFactorAuthenticationOptional
                 = findTwoFactorAuthentication();
 
@@ -63,6 +60,25 @@ public class TwoFactorAuthenticationService {
                 .forEach(userId -> twoFactorKeyManager.generatePublicKeyForUser(
                         twoFactorAuthentication.getTwoFactorKey(),
                         userId));
+
+        twoFactorAuthenticationDB.update(twoFactorAuthentication.getOwnerId(), twoFactorAuthentication);
+        return twoFactorAuthentication;
+    }
+
+    public TwoFactorAuthentication distrust(String... userIds) {
+        TwoFactorAuthentication twoFactorAuthentication = findTwoFactorAuthentication()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Can not distrust users that I don't trust in the first place."
+                ));
+
+        List<String> retrainedUserIds = Arrays.asList(userIds);
+
+        Map<String, Element> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
+        Set<String> revokedUserIds = publicKeys.keySet();
+        revokedUserIds.removeAll(retrainedUserIds);
+        retrainedUserIds.forEach(publicKeys::remove);
+
+        twoFactorAuthentication = twoFactorKeyManager.update(twoFactorAuthentication);
 
         twoFactorAuthenticationDB.update(twoFactorAuthentication.getOwnerId(), twoFactorAuthentication);
         return twoFactorAuthentication;

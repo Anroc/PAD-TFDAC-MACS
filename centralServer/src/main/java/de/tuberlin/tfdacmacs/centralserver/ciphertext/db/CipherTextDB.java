@@ -27,4 +27,8 @@ public class CipherTextDB extends CouchbaseDB<CipherTextEntity> {
     public List<CipherTextEntity> findAllByPolicyContaining(List<String> attributeIds) {
         return repository.findAllByPolicyContaining(JsonArray.from(attributeIds)).collect(Collectors.toList());
     }
+
+    public List<CipherTextEntity> findAllByOwnerId(String ownerId) {
+        return repository.findAllByOwnerId(ownerId).collect(Collectors.toList());
+    }
 }

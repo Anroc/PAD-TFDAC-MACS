@@ -1,9 +1,9 @@
 package de.tuberlin.tfdacmacs.client.attribute.client;
 
-import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.EncryptedAttributeValueKeyDTO;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
+import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;
 import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
@@ -11,6 +11,7 @@ import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.util.AttributeValueId;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import it.unisa.dia.gas.jpbc.Element;
@@ -79,20 +80,13 @@ public class AttributeClient {
     }
 
     public Optional<AttributeValueKey.Public> findAttributePublicKey(@NonNull String attributeValueId) {
-        String[] split = attributeValueId.split(":");
-        if(split.length != 2 || ! split[0].contains(".")) {
-            throw new IllegalArgumentException("Expected attribute value id in the form <aid>.<name>:<value> but was: " + attributeValueId);
-        }
-
-        String attributeValue = split[1];
-        String attributeName = split[0];
-        String authorityId = attributeName.substring(0, attributeName.lastIndexOf('.'));
+        AttributeValueId attrValueId =  new AttributeValueId(attributeValueId);
 
         try {
-            PublicAttributeValueResponse attributeValueResponse = caClient.getAttributeValue(attributeName, attributeValue);
+            PublicAttributeValueResponse attributeValueResponse = caClient.getAttributeValue(attrValueId.getAttributeId(), attrValueId.getValue());
 
             String signatureContent = attributeValueResponse.getValue().toString() + ";" + attributeValueResponse.getPublicKey();
-            semanticValidator.verifySignature(signatureContent, attributeValueResponse.getSignature(), authorityId);
+            semanticValidator.verifySignature(signatureContent, attributeValueResponse.getSignature(), attrValueId.getAuthorityId());
 
             return Optional.of(new AttributeValueKey.Public(
                     ElementConverter.convert(attributeValueResponse.getPublicKey(), getG1()),

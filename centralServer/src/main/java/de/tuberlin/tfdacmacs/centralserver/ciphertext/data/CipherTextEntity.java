@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.centralserver.ciphertext.data;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.*;
@@ -40,4 +41,22 @@ public class CipherTextEntity extends Entity {
 
     @NotBlank
     private String fileId;
+
+    public CipherText toCipherText() {
+        return new CipherText(
+                getC1(), getC2(), getC3(), getAccessPolicy(), getOwnerId(), getFileId()
+        );
+    }
+
+    public static CipherTextEntity from(@NonNull String id, @NonNull CipherText cipherText) {
+        return new CipherTextEntity(
+                id,
+                cipherText.getC1(),
+                cipherText.getC2(),
+                cipherText.getC3(),
+                cipherText.getAccessPolicy(),
+                cipherText.getOwnerId(),
+                cipherText.getFileId()
+        );
+    }
 }
