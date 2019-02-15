@@ -23,7 +23,7 @@ public class TwoFactorKeyService {
         return twoFactorKeyDB.findEntity(id);
     }
 
-    public Stream<EncryptedTwoFactorKey> findByUserId(@NonNull String userId) {
+    public Stream<EncryptedTwoFactorKey> findByUserIdOrOwnerId(@NonNull String userId) {
         return twoFactorKeyDB.findByUserIdOrOwnerId(userId);
     }
 

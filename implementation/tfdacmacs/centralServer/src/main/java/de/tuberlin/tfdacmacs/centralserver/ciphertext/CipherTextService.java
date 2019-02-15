@@ -51,13 +51,14 @@ public class CipherTextService {
         return findAllByOwnerId(ownerId)
                 .stream()
                 .map(cipherTextEntity -> {
-                    CipherText cipherText = cipherTextEntity.toCipherText();
-                    pairingCryptEngine.update(
-                        cipherText,
-                        accessPolicyUtils.buildAccessPolicy(cipherText.getAccessPolicy()),
-                        cipherText2FAUpdateKeys,
-                        gpp);
+                    CipherText cipherText = pairingCryptEngine.update(
+                            cipherTextEntity.toCipherText(),
+                            accessPolicyUtils.buildAccessPolicy(cipherTextEntity.getAccessPolicy()),
+                            cipherText2FAUpdateKeys,
+                            gpp);
                     return CipherTextEntity.from(cipherTextEntity.getId(), cipherText);
-                }).collect(Collectors.toList());
+                })
+                .peek(cipherTextDB::update)
+                .collect(Collectors.toList());
     }
 }

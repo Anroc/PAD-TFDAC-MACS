@@ -4,8 +4,13 @@ import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.EncryptedTwoFactorKey;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyResponse;
+import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorUpdateKeyRequest;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
+import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
+import it.unisa.dia.gas.jpbc.Field;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +28,7 @@ public class TwoFactorKeyController {
 
     private final TwoFactorKeyService twoFactorKeyService;
     private final AuthenticationFacade authenticationFacade;
+    private final GlobalPublicParameterProvider globalPublicParameterProvider;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -39,7 +45,7 @@ public class TwoFactorKeyController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public List<TwoFactorKeyResponse> getAll() {
-        return twoFactorKeyService.findByUserId(authenticationFacade.getId())
+        return twoFactorKeyService.findByUserIdOrOwnerId(authenticationFacade.getId())
                 .map(TwoFactorKeyResponse::from)
                 .collect(Collectors.toList());
     }
@@ -59,7 +65,7 @@ public class TwoFactorKeyController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TwoFactorKeyResponse update(@NotBlank @PathVariable("id") String id, @Valid @RequestBody TwoFactorKeyRequest twoFactorKeyRequest) {
+    public TwoFactorKeyResponse update(@NotBlank @PathVariable("id") String id, @Valid @RequestBody TwoFactorUpdateKeyRequest twoFactorUpdateKeyRequest) {
         EncryptedTwoFactorKey encryptedTwoFactorKey = twoFactorKeyService.findTwoFactorKey(id)
                 .orElseThrow(() -> new NotFoundException(id));
 
@@ -67,11 +73,14 @@ public class TwoFactorKeyController {
             throw new ServiceException("Only the data owner is allowed to update this two factor key.", HttpStatus.FORBIDDEN);
         }
 
-        EncryptedTwoFactorKey updatedEncryptedTwoFactorKey =
-                twoFactorKeyRequest.toEncryptedTwoFactorKey(encryptedTwoFactorKey.getDataOwnerId());
+        Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
 
-        encryptedTwoFactorKey.setUserId(updatedEncryptedTwoFactorKey.getUserId());
-        encryptedTwoFactorKey.setEncryptedTwoFactorKeys(updatedEncryptedTwoFactorKey.getEncryptedTwoFactorKeys());
+        encryptedTwoFactorKey.getTwoFactorUpdateKeys().add(
+                new TwoFactorUpdateKey(
+                            encryptedTwoFactorKey.getUserId(),
+                            ElementConverter.convert(twoFactorUpdateKeyRequest.getUpdateKey(), g1)
+                )
+        );
         twoFactorKeyService.update(encryptedTwoFactorKey);
 
         return TwoFactorKeyResponse.from(encryptedTwoFactorKey);
