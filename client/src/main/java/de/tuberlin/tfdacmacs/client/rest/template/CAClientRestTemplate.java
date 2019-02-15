@@ -6,11 +6,13 @@ import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityRespo
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorUpdateKeyRequest;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +129,16 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
     }
 
     @Override
+    public List<CipherTextDTO> putCipherTextUpdates2FA(TwoFactorCipherTextUpdateRequest twoFactorCipherTextUpdateRequest) {
+        return listRequest(
+                "/ciphertexts/update/2fa",
+                HttpMethod.PUT,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
+                twoFactorCipherTextUpdateRequest
+        );
+    }
+
+    @Override
     public TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest) {
         return request(
                 "/two-factor-keys",
@@ -137,7 +149,7 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
     }
 
     @Override
-    public List<TwoFactorKeyResponse> getTwoFactorKeys(String email) {
+    public List<TwoFactorKeyResponse> getTwoFactorKeys() {
         return listRequest(
                 "/two-factor-keys",
                 HttpMethod.GET,
@@ -146,4 +158,13 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
         );
     }
 
+    @Override
+    public TwoFactorKeyResponse putTwoFactorUpdateKey(String id, TwoFactorUpdateKeyRequest twoFactorUpdateKeyRequest) {
+        return request(
+                String.format("/two-factor-keys/%s", id),
+                HttpMethod.PUT,
+                TwoFactorKeyResponse.class,
+                twoFactorUpdateKeyRequest
+        );
+    }
 }

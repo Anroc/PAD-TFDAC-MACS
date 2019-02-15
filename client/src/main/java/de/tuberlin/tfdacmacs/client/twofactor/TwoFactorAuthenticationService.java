@@ -85,7 +85,7 @@ public class TwoFactorAuthenticationService {
     }
 
     public void update() {
-        client.updateTwoFactorKeys().forEach(publicTwoFactorAuthentication ->
+        client.getTwoFactorKeys().forEach(publicTwoFactorAuthentication ->
                 publicTwoFactorAuthenticationDB.upsert(
                         publicTwoFactorAuthentication.getOwnerId(),
                         publicTwoFactorAuthentication)

@@ -13,12 +13,14 @@ import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.PublicTwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.certificate.CertificateUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,7 @@ public class TwoFactorAuthenticationClient {
     private final StringAsymmetricCryptEngine asymmetricCryptEngine;
     private final GPPService gppService;
 
-    public void uploadTwoFactorKey(@NonNull TwoFactorKey.Public twoFactoryKey) {
+    public String uploadTwoFactorKey(@NonNull TwoFactorKey.Public twoFactoryKey) {
         String userId = twoFactoryKey.getUserId();
 
         UserResponse user = caClient.getUser(userId);
@@ -87,7 +89,8 @@ public class TwoFactorAuthenticationClient {
         );
 
         log.info("Uploading 2FA key for user {} and devices {}", userId, encryptedTwoFactorKeys.keySet());
-        caClient.createTwoFactorKey(twoFactorKeyRequest);
+        TwoFactorKeyResponse twoFactorKey = caClient.createTwoFactorKey(twoFactorKeyRequest);
+        return twoFactorKey.getId();
     }
 
     private X509Certificate getCertificate(String certificateId) {
@@ -121,11 +124,15 @@ public class TwoFactorAuthenticationClient {
                     symmetricCryptEngine.decryptRaw(
                             Base64.decodeBase64(cipher),
                             symmetricCryptEngine.getSymmetricCipherKey()),
-                    gppService.getGPP().getPairing().getG1()
+                    getG1()
             );
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Field getG1() {
+        return gppService.getGPP().getPairing().getG1();
     }
 
     private String encryptAsymmetrically(PublicKey publicKey, Key symmetricKey) {
@@ -147,8 +154,8 @@ public class TwoFactorAuthenticationClient {
         }
     }
 
-    public List<PublicTwoFactorAuthentication> updateTwoFactorKeys() {
-        List<TwoFactorKeyResponse> twoFactorKeys = caClient.getTwoFactorKeys(session.getEmail());
+    public List<PublicTwoFactorAuthentication> getTwoFactorKeys() {
+        List<TwoFactorKeyResponse> twoFactorKeys = caClient.getTwoFactorKeys();
         return twoFactorKeys.stream()
                 .filter(twoFactorKeyResponse -> twoFactorKeyResponse.getUserId().equals(session.getEmail()))
                 .map(twoFactorKeyResponse -> {
@@ -161,18 +168,51 @@ public class TwoFactorAuthenticationClient {
                                         session.getKeyPair().getPrivateKey()
                                 );
 
+                                TwoFactorKey.Public tfPublic = new TwoFactorKey.Public(
+                                        session.getEmail(),
+                                        decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
+                                                cryptEngine)
+                                );
+
+                                // apply all updates
+                                twoFactorKeyResponse.getUpdates().forEach(updateBase64Key ->
+                                        tfPublic.update(new TwoFactorUpdateKey(
+                                                twoFactorKeyResponse.getUserId(),
+                                                ElementConverter.convert(updateBase64Key, getG1())))
+                                );
+
                                 return new PublicTwoFactorAuthentication(
                                         twoFactorKeyResponse.getOwnerId(),
                                         twoFactorKeyResponse.getUserId(),
-                                        new TwoFactorKey.Public(
-                                                session.getEmail(),
-                                                decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
-                                                        cryptEngine)
-                                        )
+                                        tfPublic
+
                                 );
                             });
                 }).filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    public void updateTwoFactorKeys(List<TwoFactorUpdateKey> user2FAUpdateKeys) {
+        List<TwoFactorKeyResponse> twoFactorKeys = caClient.getTwoFactorKeys()
+                .stream()
+                .filter(response -> response.getOwnerId().equals(session.getEmail()))
+                .collect(Collectors.toList());
+        user2FAUpdateKeys.stream()
+                .forEach(user2FAUpdateKey -> {
+                    String twoFactorId = getIdForUserId(user2FAUpdateKey.getUserId(), twoFactorKeys);
+                    caClient.putTwoFactorUpdateKey(
+                            twoFactorId,
+                            new TwoFactorUpdateKeyRequest(
+                                    ElementConverter.convert(user2FAUpdateKey.getUpdateKey())
+                            ));
+                });
+    }
+
+    private String getIdForUserId(String userId, List<TwoFactorKeyResponse> twoFactorKeyResponses) {
+        return twoFactorKeyResponses.stream().filter(twoFactorKeyResponse -> twoFactorKeyResponse.getUserId().equals(userId))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("Could not find 2FA response object for user " + userId))
+                .getId();
     }
 }

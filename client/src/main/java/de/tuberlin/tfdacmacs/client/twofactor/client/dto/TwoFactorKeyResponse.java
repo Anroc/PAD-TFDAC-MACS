@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -21,4 +22,6 @@ public class TwoFactorKeyResponse {
     private String ownerId;
     @NotNull
     private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
+    @NotNull
+    private List<String> updates;
 }
