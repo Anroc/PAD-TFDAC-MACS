@@ -45,7 +45,9 @@ public class TwoFactorKeyManager {
         return twoFactorClient.uploadTwoFactorKey(publicKeyOfUser);
     }
 
-    public TwoFactorAuthentication update(TwoFactorAuthentication twoFactorAuthentication) {
+    public TwoFactorAuthentication update(
+            @NonNull TwoFactorAuthentication twoFactorAuthentication,
+            @NonNull Set<String> revokedUserIds) {
         TwoFactorKey.Private revokedMasterKey = twoFactorAuthentication.getTwoFactorKey().getPrivateKey();
 
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gppService.getGPP());
@@ -59,6 +61,7 @@ public class TwoFactorKeyManager {
 
         twoFactorClient.updateTwoFactorKeys(user2FAUpdateKeys);
         cipherTextClient.updateCipherText(twoFactorAuthentication.getOwnerId(), cipherText2FAUpdateKeys);
+        twoFactorClient.deleteTwoFactorKeys(revokedUserIds);
 
         return calculateLocalUpdate(twoFactorAuthentication, user2FAUpdateKeys);
     }

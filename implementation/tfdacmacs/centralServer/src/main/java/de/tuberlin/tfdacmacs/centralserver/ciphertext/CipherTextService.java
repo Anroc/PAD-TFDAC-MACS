@@ -9,6 +9,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CipherTextService {
@@ -51,11 +53,17 @@ public class CipherTextService {
         return findAllByOwnerId(ownerId)
                 .stream()
                 .map(cipherTextEntity -> {
+                    log.info("Updating cipher text [{}] of data owner [{}] and access policy {}...",
+                            cipherTextEntity.getId(),
+                            cipherTextEntity.getOwnerId(),
+                            cipherTextEntity.getAccessPolicy());
                     CipherText cipherText = pairingCryptEngine.update(
                             cipherTextEntity.toCipherText(),
                             accessPolicyUtils.buildAccessPolicy(cipherTextEntity.getAccessPolicy()),
                             cipherText2FAUpdateKeys,
                             gpp);
+                    log.info("Finished cipher text update [{}] ",
+                            cipherTextEntity.getId());
                     return CipherTextEntity.from(cipherTextEntity.getId(), cipherText);
                 })
                 .peek(cipherTextDB::update)

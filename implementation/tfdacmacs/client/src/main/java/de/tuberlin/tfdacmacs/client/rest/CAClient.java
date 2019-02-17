@@ -37,5 +37,6 @@ public interface CAClient {
     TwoFactorKeyResponse createTwoFactorKey(TwoFactorKeyRequest twoFactorKeyRequest);
     List<TwoFactorKeyResponse> getTwoFactorKeys();
     TwoFactorKeyResponse putTwoFactorUpdateKey(String id, TwoFactorUpdateKeyRequest twoFactorUpdateKeyRequest);
+    void deleteTwoFactorKey(String id);
 
 }

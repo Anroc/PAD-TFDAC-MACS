@@ -167,4 +167,14 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
                 twoFactorUpdateKeyRequest
         );
     }
+
+    @Override
+    public void deleteTwoFactorKey(String id) {
+        request(
+                String.format("/two-factor-keys/%s", id),
+                HttpMethod.DELETE,
+                TwoFactorKeyResponse.class,
+                null
+        );
+    }
 }

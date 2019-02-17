@@ -20,7 +20,7 @@ public class DecryptCommandTest extends CommandTestSuite {
         attributeDB.upsert(attributeId, new Attribute(attributeId, randomElementG1()));
 
         doReturn(
-                Lists.newArrayList(CipherTextDTO.from(cipherTextTestFacotry.create(ctId, attributeId)))
+                Lists.newArrayList(CipherTextDTO.from(cipherTextTestFacotry.create(ctId, null, attributeId)))
         ).when(caClient).getCipherTexts(Lists.newArrayList(attributeId));
 
         evaluate("check");
