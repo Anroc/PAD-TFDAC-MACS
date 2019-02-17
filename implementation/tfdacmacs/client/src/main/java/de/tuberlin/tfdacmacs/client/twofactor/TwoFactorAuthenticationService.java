@@ -10,11 +10,13 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TwoFactorAuthenticationService {
@@ -86,7 +88,18 @@ public class TwoFactorAuthenticationService {
     }
 
     public void update() {
-        client.getTwoFactorKeys().forEach(publicTwoFactorAuthentication ->
+        List<PublicTwoFactorAuthentication> updatedTwoFactorKeys = client.getTwoFactorKeys();
+        Set<String> revokedTwoFactorKeyIds = publicTwoFactorAuthenticationDB.findAll()
+                .map(PublicTwoFactorAuthentication::getOwnerId)
+                .collect(Collectors.toSet());
+        Set<String> updatedTwoFactorKeyIds = updatedTwoFactorKeys.stream().map(PublicTwoFactorAuthentication::getOwnerId)
+                .collect(Collectors.toSet());
+
+        revokedTwoFactorKeyIds.removeAll(updatedTwoFactorKeyIds);
+        log.info("Following 2FA keys were revoked from us: {}", revokedTwoFactorKeyIds);
+
+        revokedTwoFactorKeyIds.forEach(publicTwoFactorAuthenticationDB::delete);
+        updatedTwoFactorKeys.forEach(publicTwoFactorAuthentication ->
                 publicTwoFactorAuthenticationDB.upsert(
                         publicTwoFactorAuthentication.getOwnerId(),
                         publicTwoFactorAuthentication)

@@ -79,10 +79,28 @@ public class IntegrationTest extends IntegrationTestSuite {
         FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
         encryptDecrypt_with_2FA_trustedMyselfAndBob();
 
-        // --------------- 2 FA Test ------------------
         FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
         revoke2FA_passes_andUpdatesCT();
 
+        revoke2FA_passes_onRevokingMySelf();
+
+    }
+
+    private void revoke2FA_passes_onRevokingMySelf() {
+        evaluate(String.format("2fa distrust %s", email));
+        evaluate("2fa update");
+
+        resetStdStreams();
+        evaluate("2fa list --issued");
+        assertThat(containsSubSequence(getOutContent(), email)).isFalse();
+        assertThat(containsSubSequence(getOutContent(), testUserEmail)).isFalse();
+        resetStdStreams();
+        evaluate("2fa list --granted");
+        assertThat(containsSubSequence(getOutContent(), email)).isFalse();
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isFalse();
     }
 
     private void revoke2FA_passes_andUpdatesCT() {
@@ -99,7 +117,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes\t[aa.tu-berlin.de.role:student")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isTrue();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
@@ -138,7 +156,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes\t[aa.tu-berlin.de.role:student")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isTrue();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));

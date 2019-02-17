@@ -32,7 +32,7 @@ public class DecryptionCommand {
     public void check() {
         this.cipherTexts = cspService.checkForDecryptableFiles(attributeService.getAttributes());
         standardStreams.out(String.format(
-                " #\t\t%s:\t\t\t\t\t\t\t\t\t%s\t%s",
+                " #\t\t%s:\t\t\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t%s",
                 "IDs",
                 "2FA",
                 "Attributes"));
@@ -42,7 +42,7 @@ public class DecryptionCommand {
                     "[%d]:\t%s\t%s\t%s",
                     i+1,
                     ct.getId(),
-                    ct.isTwoFactorSecured() ? "yes" : "no",
+                    ct.isTwoFactorSecured() ? "yes (by " + ct.getOwnerId() + ")" : "no\t\t\t\t\t\t",
                     Arrays.toString(ct.getAccessPolicy().toArray())));
         }
     }
