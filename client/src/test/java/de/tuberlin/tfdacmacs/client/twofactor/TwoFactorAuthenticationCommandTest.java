@@ -1,17 +1,22 @@
 package de.tuberlin.tfdacmacs.client.twofactor;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceState;
+import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
 import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEvent;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.DeviceIdResponse;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
+import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.util.AttributeValueId;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -22,9 +27,7 @@ import org.mockito.ArgumentCaptor;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +49,7 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
     }
 
     @Test
-    public void enable() {
+    public void trust() {
         X509Certificate certificate = mock(X509Certificate.class);
         doReturn(mock(PublicKey.class)).when(certificate).getPublicKey();
         semanticValidator.updateTrustedPublicKeys(
@@ -89,5 +92,80 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         assertThat(value.getUserId()).isEqualTo(email);
         assertThat(value.getEncryptedTwoFactorKeys())
                 .containsOnlyKeys(deviceId);
+    }
+
+    @Test
+    public void distrust() {
+        TwoFactorKey twoFactorKey = new TwoFactorKey(
+                randomElementG1()
+        );
+        twoFactorKey.putPublicKey(email, randomElementG1());
+        twoFactorKey.putPublicKey(currentEmail, randomElementG1());
+
+        TwoFactorAuthentication twoFactorAuthentication = new TwoFactorAuthentication(currentEmail, twoFactorKey);
+        twoFactorAuthenticationDB.insert(twoFactorAuthentication.getOwnerId(), twoFactorAuthentication);
+
+        AttributeValueId attributeValueId = new AttributeValueId("aa.tu-berlin.de.role:student");
+
+        TwoFactorKeyResponse twoFactorKeyResponse = new TwoFactorKeyResponse(
+                UUID.randomUUID().toString(),
+                email,
+                currentEmail,
+                new HashMap<>(),
+                new ArrayList<>()
+        );
+
+        TwoFactorKeyResponse twoFactorKeyResponseSelf = new TwoFactorKeyResponse(
+                UUID.randomUUID().toString(),
+                currentEmail,
+                currentEmail,
+                new HashMap<>(),
+                new ArrayList<>()
+        );
+
+        ArrayList<Object> ctList = Lists.newArrayList(
+                CipherTextDTO.from(cipherTextTestFacotry
+                        .create(UUID.randomUUID().toString(), currentEmail, attributeValueId.getAttributeValueId())));
+
+                doReturn(currentEmail).when(session).getEmail();
+        doReturn(ctList).when(caClient).getCipherTexts(currentEmail);
+        doReturn(new PublicAttributeValueResponse(
+                ElementConverter.convert(randomElementG1()),
+                "student",
+                "someSignature"
+        )).when(caClient).getAttributeValue(attributeValueId.getAttributeId(), attributeValueId.getValue());
+
+        X509Certificate certificate = mock(X509Certificate.class);
+        PublicKey pubKey = mock(PublicKey.class);
+        doReturn(pubKey).when(certificate).getPublicKey();
+        semanticValidator.updateTrustedPublicKeys(
+                new TrustedAuthorityUpdatedEvent(
+                        new TrustedAuthority(
+                                aid,
+                                UUID.randomUUID().toString(),
+                                certificate
+                        )
+                )
+        );
+        doReturn(true).when(stringAsymmetricCryptEngine)
+                .isSignatureAuthentic(anyString(), anyString(), any(PublicKey.class));
+        doReturn(
+                Lists.newArrayList(twoFactorKeyResponse, twoFactorKeyResponseSelf)
+        ).when(caClient).getTwoFactorKeys();
+        doReturn(twoFactorKeyResponse).when(caClient)
+                .putTwoFactorUpdateKey(
+                        eq(twoFactorKeyResponse.getId()),
+                        any(TwoFactorUpdateKeyRequest.class)
+                );
+        doReturn(ctList).when(caClient).putCipherTextUpdates2FA(any(TwoFactorCipherTextUpdateRequest.class));
+        doNothing().when(caClient).deleteTwoFactorKey(twoFactorKeyResponse.getId());
+
+        evaluate("2fa distrust " + email);
+
+        verify(caClient, times(1)).putCipherTextUpdates2FA(any(TwoFactorCipherTextUpdateRequest.class));
+        verify(caClient, times(1)).putTwoFactorUpdateKey(eq(twoFactorKeyResponseSelf.getId()),
+                any(TwoFactorUpdateKeyRequest.class));
+        verify(caClient, times(1)).deleteTwoFactorKey(twoFactorKeyResponse.getId());
+
     }
 }

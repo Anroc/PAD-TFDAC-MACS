@@ -71,14 +71,15 @@ public class TwoFactorAuthenticationService {
                         "Can not distrust users that I don't trust in the first place."
                 ));
 
-        List<String> retrainedUserIds = Arrays.asList(userIds);
+        Set<String> revokedUserIds = new HashSet<>(Arrays.asList(userIds));
 
         Map<String, Element> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
-        Set<String> revokedUserIds = publicKeys.keySet();
-        revokedUserIds.removeAll(retrainedUserIds);
-        retrainedUserIds.forEach(publicKeys::remove);
+        Set<String> retrainedUserIds = new HashSet<>(publicKeys.keySet());
+        revokedUserIds.retainAll(retrainedUserIds);
+        retrainedUserIds.removeAll(revokedUserIds);
+        revokedUserIds.forEach(publicKeys::remove);
 
-        twoFactorAuthentication = twoFactorKeyManager.update(twoFactorAuthentication);
+        twoFactorAuthentication = twoFactorKeyManager.update(twoFactorAuthentication, revokedUserIds);
 
         twoFactorAuthenticationDB.update(twoFactorAuthentication.getOwnerId(), twoFactorAuthentication);
         return twoFactorAuthentication;

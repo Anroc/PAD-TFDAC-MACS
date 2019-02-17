@@ -25,6 +25,10 @@ public class TwoFactorAuthenticationCommand {
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationService
                 .trust(userIds);
 
+        printTrustedUsers(twoFactorAuthentication);
+    }
+
+    private void printTrustedUsers(TwoFactorAuthentication twoFactorAuthentication) {
         standardStreams.out("UserIds:");
         twoFactorAuthentication.getTwoFactorKey().getPublicKeys().keySet().forEach(standardStreams::out);
     }
@@ -33,7 +37,8 @@ public class TwoFactorAuthenticationCommand {
     public void distrust(@ShellOption(help = "comma seperated emails") String users) {
         String[] userIds = extractUserIds(users);
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationService
-                .trust(userIds);
+                .distrust(userIds);
+        printTrustedUsers(twoFactorAuthentication);
     }
 
     @ShellMethod(value = "Download/Update all secret two factor keys", key = "2fa update")
@@ -59,7 +64,7 @@ public class TwoFactorAuthenticationCommand {
         }
 
         if(all || granted) {
-            standardStreams.out("Granted Two-Factor authentications from:");
+            standardStreams.out("Granted Two-Factor authentications from users:");
             twoFactorAuthenticationService.getAllPublicTwoFactorAuthentications()
                     .stream()
                     .map(PublicTwoFactorAuthentication::getOwnerId)

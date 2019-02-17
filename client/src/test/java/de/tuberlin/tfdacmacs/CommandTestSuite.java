@@ -18,6 +18,7 @@ import de.tuberlin.tfdacmacs.client.rest.CSPClient;
 import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.client.twofactor.client.TwoFactorAuthenticationClient;
+import de.tuberlin.tfdacmacs.client.twofactor.db.TwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.crypto.GPPTestFactory;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -89,6 +90,8 @@ public abstract class CommandTestSuite {
     protected CertificateDB certificateDB;
     @Autowired
     protected KeyPairDB keyPairDB;
+    @Autowired
+    protected TwoFactorAuthenticationDB twoFactorAuthenticationDB;
 
     @Autowired
     protected GPPDTOTestFactory gppdtoTestFactory;

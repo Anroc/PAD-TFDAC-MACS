@@ -20,17 +20,17 @@ public class CipherTextTestFactory {
     }
 
     public CipherText create() {
-        return create(UUID.randomUUID().toString());
+        return create(UUID.randomUUID().toString(), null);
     }
 
-    public CipherText create(String id, String... policy) {
+    public CipherText create(String id, String ownerId, String... policy) {
         return new CipherText(
                 id,
                 gt.newRandomElement(),
                 g1.newRandomElement(),
                 g1.newRandomElement(),
                 Arrays.stream(policy).collect(Collectors.toSet()),
-                null,
+                ownerId,
                 UUID.randomUUID().toString()
         );
     }

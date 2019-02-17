@@ -35,10 +35,7 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -104,7 +101,7 @@ public class TwoFactorAuthenticationClient {
         return certificate;
     }
 
-    public AAClient getAAClient(String aid) {
+    public AAClient getAAClient(@NonNull String aid) {
         return context.getBean(aid, AAClient.class);
     }
 
@@ -193,11 +190,8 @@ public class TwoFactorAuthenticationClient {
                 .collect(Collectors.toList());
     }
 
-    public void updateTwoFactorKeys(List<TwoFactorUpdateKey> user2FAUpdateKeys) {
-        List<TwoFactorKeyResponse> twoFactorKeys = caClient.getTwoFactorKeys()
-                .stream()
-                .filter(response -> response.getOwnerId().equals(session.getEmail()))
-                .collect(Collectors.toList());
+    public void updateTwoFactorKeys(@NonNull List<TwoFactorUpdateKey> user2FAUpdateKeys) {
+        List<TwoFactorKeyResponse> twoFactorKeys = getTwoFactorKeyResponsesByOwnerId();
         user2FAUpdateKeys.stream()
                 .forEach(user2FAUpdateKey -> {
                     String twoFactorId = getIdForUserId(user2FAUpdateKey.getUserId(), twoFactorKeys);
@@ -207,6 +201,22 @@ public class TwoFactorAuthenticationClient {
                                     ElementConverter.convert(user2FAUpdateKey.getUpdateKey())
                             ));
                 });
+    }
+
+    public void deleteTwoFactorKeys(@NonNull Set<String> revokedUserIds) {
+        List<TwoFactorKeyResponse> twoFactorKeys = getTwoFactorKeyResponsesByOwnerId();
+        revokedUserIds.stream()
+                .forEach(revokedUserId -> {
+                    String twoFactorId = getIdForUserId(revokedUserId, twoFactorKeys);
+                    caClient.deleteTwoFactorKey(twoFactorId);
+                });
+    }
+
+    private List<TwoFactorKeyResponse> getTwoFactorKeyResponsesByOwnerId() {
+        return caClient.getTwoFactorKeys()
+                .stream()
+                .filter(response -> response.getOwnerId().equals(session.getEmail()))
+                .collect(Collectors.toList());
     }
 
     private String getIdForUserId(String userId, List<TwoFactorKeyResponse> twoFactorKeyResponses) {

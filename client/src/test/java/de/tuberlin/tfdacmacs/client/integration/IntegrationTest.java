@@ -71,6 +71,43 @@ public class IntegrationTest extends IntegrationTestSuite {
         evaluate("attributes update");
         assertThat(attributeDB.findAll()).isNotEmpty();
 
+        encryptDecrypt_without_2FA();
+
+        // --------------- 2 FA Test ------------------
+
+        FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
+        encryptDecrypt_with_2FA_trustedMyselfAndBob();
+
+        // --------------- 2 FA Test ------------------
+        FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
+        revoke2FA_passes_andUpdatesCT();
+
+    }
+
+    private void revoke2FA_passes_andUpdatesCT() {
+        evaluate(String.format("2fa distrust %s", testUserEmail));
+        evaluate("2fa update");
+
+        resetStdStreams();
+        evaluate("2fa list --issued");
+        assertThat(containsSubSequence(getOutContent(), email)).isTrue();
+        assertThat(containsSubSequence(getOutContent(), testUserEmail)).isFalse();
+        resetStdStreams();
+        evaluate("2fa list --granted");
+        assertThat(containsSubSequence(getOutContent(), email)).isTrue();
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "yes\t[aa.tu-berlin.de.role:student")).isTrue();
+
+        int numberOf2FACipherText = find2FACipherTextNumber();
+        evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
+        assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
+                .exists()
+                .hasBinaryContent(CONTENT);
+    }
+
+    private void encryptDecrypt_without_2FA() {
         encryptCommand.encrypt(FILE_PATH, false, "(aa.tu-berlin.de.role:student)");
 
         resetStdStreams();
@@ -81,17 +118,17 @@ public class IntegrationTest extends IntegrationTestSuite {
         assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
                 .exists()
                 .hasBinaryContent(CONTENT);
+    }
 
-        // --------------- 2 FA Test ------------------
-
-        FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
+    private void encryptDecrypt_with_2FA_trustedMyselfAndBob() {
         // trust myself so that i can use 2fa to decrypt the cipher text
-        evaluate(String.format("2fa trust %s", email));
+        evaluate(String.format("2fa trust %s,%s", email, testUserEmail));
         evaluate("2fa update");
 
         resetStdStreams();
         evaluate("2fa list --issued");
         assertThat(containsSubSequence(getOutContent(), email)).isTrue();
+        assertThat(containsSubSequence(getOutContent(), testUserEmail)).isTrue();
         resetStdStreams();
         evaluate("2fa list --granted");
         assertThat(containsSubSequence(getOutContent(), email)).isTrue();
@@ -107,7 +144,6 @@ public class IntegrationTest extends IntegrationTestSuite {
         assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
                 .exists()
                 .hasBinaryContent(CONTENT);
-
     }
 
     private int find2FACipherTextNumber() {
