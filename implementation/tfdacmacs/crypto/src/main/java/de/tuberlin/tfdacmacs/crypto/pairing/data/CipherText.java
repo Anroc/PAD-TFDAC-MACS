@@ -23,23 +23,7 @@ public class CipherText {
     private final String fileId;
 
     public CipherText(Element c1, Element c2, Element c3, Set<String> accessPolicy, String ownerId, String fileId) {
-        this.id = UUID.randomUUID().toString();
-        this.c1 = c1;
-        this.c2 = c2;
-        this.c3 = c3;
-        this.accessPolicy = accessPolicy;
-        this.ownerId = ownerId;
-        this.fileId = fileId;
-    }
-
-    public CipherText(Element c1, Element c2, Element c3, Set<String> accessPolicy, String fileId) {
-        this.id  = UUID.randomUUID().toString();
-        this.c1 = c1.getImmutable();
-        this.c2 = c2.getImmutable();
-        this.c3 = c3.getImmutable();
-        this.accessPolicy = accessPolicy;
-        this.ownerId = null;
-        this.fileId = fileId;
+        this(UUID.randomUUID().toString(), c1, c2, c3, accessPolicy, ownerId, fileId);
     }
 
     public boolean isTwoFactorSecured() {

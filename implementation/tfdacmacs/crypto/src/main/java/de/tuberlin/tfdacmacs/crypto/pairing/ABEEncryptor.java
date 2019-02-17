@@ -72,7 +72,7 @@ public class ABEEncryptor extends ABECrypto {
                         .powZn(r))
                 .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
 
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId());
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getFileId());
     }
 
     public CipherText update(
@@ -111,7 +111,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC3 = cipherText.getC3().duplicate()
                 .mul(subSet2FaUpdateKeys.stream().reduce((a,b) -> a.duplicate().mul(b)).get())
                 .mul(mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements()).powZn(r));
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId());
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getFileId());
     }
 
     private Element updateC1(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy, Element r) {

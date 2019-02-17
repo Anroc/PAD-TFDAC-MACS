@@ -66,6 +66,7 @@ public class IntegrationTest extends IntegrationTestSuite {
         );
 
         thread.start();
+        log.info("Starting register of user {}", email);
         evaluate(String.format("register %s", email));
 
         evaluate("attributes update");
