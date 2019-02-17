@@ -2,11 +2,13 @@ package de.tuberlin.tfdacmacs.crypto.pairing.data;
 
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import java.util.Set;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class CipherTextDescription extends CipherText {
 
     private final Element key;

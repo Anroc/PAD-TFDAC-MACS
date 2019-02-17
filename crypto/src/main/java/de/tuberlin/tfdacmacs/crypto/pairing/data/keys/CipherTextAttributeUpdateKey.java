@@ -15,9 +15,10 @@ public class CipherTextAttributeUpdateKey extends UpdateKey {
     public CipherTextAttributeUpdateKey(
             @NonNull Element updateKey,
             @NonNull String attributeValueId,
-            @NonNull AttributeValueKey.Public newAttributeValuePublicKey) {
+            @NonNull AttributeValueKey.Public newAttributeValuePublicKey,
+            int targetVersion) {
 
-        super(updateKey);
+        super(updateKey, targetVersion);
         this.attributeValueId = attributeValueId;
         this.newAttributeValuePublicKey = newAttributeValuePublicKey;
     }
