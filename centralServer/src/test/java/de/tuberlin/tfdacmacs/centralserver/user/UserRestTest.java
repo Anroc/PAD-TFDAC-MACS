@@ -7,10 +7,7 @@ import de.tuberlin.tfdacmacs.centralserver.user.data.Device;
 import de.tuberlin.tfdacmacs.centralserver.user.data.EncryptedAttributeValueKey;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
@@ -126,5 +123,25 @@ public class UserRestTest extends RestTestSuite {
                 .findFirst().get();
         assertThat(encryptedAttributeValueKeyDTO.getAttributeValueId()).isEqualTo(attributeValueId);
         assertThat(encryptedAttributeValueKeyDTO.getEncryptedKey()).isEqualTo(attributeEncryptedValue);
+    }
+
+    @Test
+    public void update2FAPublicKey_passes() {
+        User user = new User(email, aid);
+        userDB.insert(user);
+
+        TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
+                "asd",
+                "das"
+        );
+
+        ResponseEntity<UserResponse> response = mutualAuthRestTemplate
+                .exchange(String.format("/users/%s/twoFactorPublicKey", email),
+                        HttpMethod.PUT,
+                        new HttpEntity<>(twoFactorPublicKeyDTO),
+                        UserResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        assertThat(response.getBody().getTwoFactorPublicKey()).isNotNull().isEqualTo(twoFactorPublicKeyDTO);
     }
 }

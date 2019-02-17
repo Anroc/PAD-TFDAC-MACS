@@ -22,7 +22,7 @@ public class UserResponse {
 
     @Valid
     @Nullable
-    private TwoFactorPublicKeyDTO twoFactorPublicKeyDTO;
+    private TwoFactorPublicKeyDTO twoFactorPublicKey;
 
     @Valid
     @NotNull

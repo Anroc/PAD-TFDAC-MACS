@@ -8,10 +8,7 @@ import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorUpdateKeyRequest;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 
 import java.util.List;
 
@@ -23,6 +20,7 @@ public interface CAClient {
     CertificateResponse getCertificate(String certificateId);
 
     UserResponse getUser(String userId);
+    UserResponse updateTwoFactorPublicKey(String email, TwoFactorPublicKeyDTO twoFactorPublicKeyDTO);
 
     AttributeAuthorityResponse getAuthority(String authorityId);
 

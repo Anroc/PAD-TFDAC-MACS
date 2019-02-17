@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.lib.user.data.dto;
+package de.tuberlin.tfdacmacs.centralserver.user.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,14 +9,11 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TwoFactorPublicKeyDTO  {
+public class TwoFactorPublicKey {
 
     @NotBlank
     private String twoFactorAuthenticationPublicKey;
 
     @NotBlank
-    // userId + twoFactorAuthencationPublicKey
     private String signature;
-
-
 }

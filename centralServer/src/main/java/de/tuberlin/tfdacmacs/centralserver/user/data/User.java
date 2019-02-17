@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,6 +25,10 @@ public class User extends Entity {
 
     @NotBlank
     private String authorityId;
+
+    @Valid
+    @Nullable
+    private TwoFactorPublicKey twoFactorPublicKey;
 
     @NotNull
     @Valid
