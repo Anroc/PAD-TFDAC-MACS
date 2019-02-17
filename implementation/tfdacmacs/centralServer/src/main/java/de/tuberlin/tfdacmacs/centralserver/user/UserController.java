@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.centralserver.authority.AttributeAuthorityService;
 import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.centralserver.user.data.Device;
 import de.tuberlin.tfdacmacs.centralserver.user.data.EncryptedAttributeValueKey;
+import de.tuberlin.tfdacmacs.centralserver.user.data.TwoFactorPublicKey;
 import de.tuberlin.tfdacmacs.centralserver.user.data.User;
 import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesExistException;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -92,6 +94,28 @@ public class UserController {
         return toDeviceResponse(device);
     }
 
+    @PutMapping("/{userId}/twoFactorPublicKey")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public UserResponse update2FAPublicKey(
+            @PathVariable("userId") String userId,
+            @Valid @RequestBody TwoFactorPublicKeyDTO twoFactorPublicKeyDTO) {
+        User user = userService.findUser(userId).orElseThrow(
+                () -> new NotFoundException(userId)
+        );
+
+        if(! user.getId().equals(authenticationFacade.getId())) {
+            throw new ServiceException("This is not you.", HttpStatus.FORBIDDEN);
+        }
+
+        user.setTwoFactorPublicKey(
+                new TwoFactorPublicKey(
+                        twoFactorPublicKeyDTO.getTwoFactorAuthenticationPublicKey(),
+                        twoFactorPublicKeyDTO.getSignature()));
+
+        userService.updateUser(user);
+        return toUserResponse(user);
+    }
+
     @PutMapping("/{userId}/devices/{deviceId}")
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
     public DeviceResponse updateDevice(
@@ -125,9 +149,16 @@ public class UserController {
     }
 
     private UserResponse toUserResponse(User user) {
+        Optional<TwoFactorPublicKey> twoFactorPublicKeyOptional = Optional.ofNullable(user.getTwoFactorPublicKey());
+
         return new UserResponse(
                 user.getId(),
                 user.getAuthorityId(),
+                twoFactorPublicKeyOptional.map(twoFactorPublicKey ->
+                        new TwoFactorPublicKeyDTO(
+                                twoFactorPublicKey.getTwoFactorAuthenticationPublicKey(),
+                                twoFactorPublicKey.getSignature()
+                        )).orElse(null),
                 user.getDevices().stream().map(this::toDeviceResponse).collect(Collectors.toSet())
         );
     }

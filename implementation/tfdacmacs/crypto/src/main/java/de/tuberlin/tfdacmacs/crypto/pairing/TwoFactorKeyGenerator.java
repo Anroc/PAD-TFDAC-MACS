@@ -1,10 +1,7 @@
 package de.tuberlin.tfdacmacs.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -56,5 +53,13 @@ public class TwoFactorKeyGenerator {
                 newKey.getKey().duplicate().sub(revokedKey.getKey().duplicate())
         );
         return new CipherText2FAUpdateKey(updateKey,  attributeValuePublicKey.getAttributeValueId(), oid);
+    }
+
+    public AsymmetricElementKey.Public generatePublicKey(
+            @NonNull GlobalPublicParameter gpp,
+            @NonNull TwoFactorKey.Private masterKey) {
+
+        Element publicKey = gpp.getG().getImmutable().powZn(masterKey.getKey());
+        return new AsymmetricElementKey.Public(publicKey);
     }
 }

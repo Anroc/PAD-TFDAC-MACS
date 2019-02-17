@@ -10,10 +10,7 @@ import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequ
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyRequest;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorKeyResponse;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.TwoFactorUpdateKeyRequest;
-import de.tuberlin.tfdacmacs.client.twofactor.client.dto.UserResponse;
+import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,6 +52,15 @@ public class CAClientRestTemplate extends ClientRestTemplate implements CAClient
                 HttpMethod.GET,
                 UserResponse.class,
                 null
+        );
+    }
+
+    @Override
+    public UserResponse updateTwoFactorPublicKey(String userId, TwoFactorPublicKeyDTO twoFactorPublicKeyDTO) {
+        return request("/users/" + userId + "/twoFactorPublicKey",
+                HttpMethod.PUT,
+                UserResponse.class,
+                twoFactorPublicKeyDTO
         );
     }
 

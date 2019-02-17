@@ -33,7 +33,14 @@ public class TwoFactorKeyManager {
     public TwoFactorKey generate(String... userIds) {
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gppService.getGPP());
         Arrays.stream(userIds).forEach(userId -> generatePublicKeyForUser(twoFactorKey, userId));
+        update2FAPublicKey(twoFactorKey);
         return twoFactorKey;
+    }
+
+    private void update2FAPublicKey(TwoFactorKey twoFactorKey) {
+        twoFactorClient.updateUserForTwoFactorPublicKey(
+                twoFactorKeyGenerator.generatePublicKey(gppService.getGPP(), twoFactorKey.getPrivateKey())
+        );
     }
 
     public String generatePublicKeyForUser(@NonNull TwoFactorKey twoFactorKey, @NonNull String userId) {
@@ -59,6 +66,7 @@ public class TwoFactorKeyManager {
         List<CipherText2FAUpdateKey> cipherText2FAUpdateKeys =
                 generateCipherTextUpdateKeys(twoFactorAuthentication, revokedMasterKey);
 
+        update2FAPublicKey(twoFactorKey);
         twoFactorClient.updateTwoFactorKeys(user2FAUpdateKeys);
         cipherTextClient.updateCipherText(twoFactorAuthentication.getOwnerId(), cipherText2FAUpdateKeys);
         twoFactorClient.deleteTwoFactorKeys(revokedUserIds);

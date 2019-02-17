@@ -12,6 +12,7 @@ import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.PublicTwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AsymmetricElementKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -224,5 +225,25 @@ public class TwoFactorAuthenticationClient {
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("Could not find 2FA response object for user " + userId))
                 .getId();
+    }
+
+    public void updateUserForTwoFactorPublicKey(@NonNull AsymmetricElementKey.Public twoFactorPublicKey) {
+        String encodedPublicKey = ElementConverter.convert(twoFactorPublicKey.getKey());
+
+        try {
+            String signature = asymmetricCryptEngine.sign(
+                    session.getEmail() + ";" + encodedPublicKey,
+                    session.getKeyPair().getPrivateKey()
+            );
+
+            TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
+                    encodedPublicKey,
+                    signature
+            );
+
+            caClient.updateTwoFactorPublicKey(session.getEmail(), twoFactorPublicKeyDTO);
+        } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

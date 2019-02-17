@@ -11,6 +11,7 @@ import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEven
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequest;
+import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
@@ -62,7 +63,9 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
                 )
         );
 
+        doReturn(new UserResponse()).when(caClient).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
         doReturn(currentEmail).when(session).getEmail();
+        doReturn(KeyPair.from(stringAsymmetricCryptEngine.getAsymmetricCipherKeyPair())).when(session).getKeyPair();
         doReturn(new UserResponse(
                 email,
                 aid,
@@ -88,6 +91,7 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         evaluate("2fa trust " + email);
 
         verify(caClient).createTwoFactorKey(captor.capture());
+        verify(caClient, times(1)).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
         TwoFactorKeyRequest value = captor.getValue();
         assertThat(value.getUserId()).isEqualTo(email);
         assertThat(value.getEncryptedTwoFactorKeys())
@@ -127,7 +131,9 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
                 CipherTextDTO.from(cipherTextTestFacotry
                         .create(UUID.randomUUID().toString(), currentEmail, attributeValueId.getAttributeValueId())));
 
-                doReturn(currentEmail).when(session).getEmail();
+        doReturn(new UserResponse()).when(caClient).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
+        doReturn(currentEmail).when(session).getEmail();
+        doReturn(KeyPair.from(stringAsymmetricCryptEngine.getAsymmetricCipherKeyPair())).when(session).getKeyPair();
         doReturn(ctList).when(caClient).getCipherTexts(currentEmail);
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
@@ -162,6 +168,7 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
 
         evaluate("2fa distrust " + email);
 
+        verify(caClient, times(1)).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
         verify(caClient, times(1)).putCipherTextUpdates2FA(any(TwoFactorCipherTextUpdateRequest.class));
         verify(caClient, times(1)).putTwoFactorUpdateKey(eq(twoFactorKeyResponseSelf.getId()),
                 any(TwoFactorUpdateKeyRequest.class));
