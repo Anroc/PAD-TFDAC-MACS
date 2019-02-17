@@ -44,13 +44,13 @@ public class CipherTextEntity extends Entity {
 
     public CipherText toCipherText() {
         return new CipherText(
-                getC1(), getC2(), getC3(), getAccessPolicy(), getOwnerId(), getFileId()
+                getId(), getC1(), getC2(), getC3(), getAccessPolicy(), getOwnerId(), getFileId()
         );
     }
 
-    public static CipherTextEntity from(@NonNull String id, @NonNull CipherText cipherText) {
+    public static CipherTextEntity from(@NonNull CipherText cipherText) {
         return new CipherTextEntity(
-                id,
+                cipherText.getId(),
                 cipherText.getC1(),
                 cipherText.getC2(),
                 cipherText.getC3(),

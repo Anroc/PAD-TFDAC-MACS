@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.jpbc.FieldOver;
 import it.unisa.dia.gas.plaf.jpbc.field.z.ZrElement;
 import it.unisa.dia.gas.plaf.jpbc.pbc.PBCField;
 import it.unisa.dia.gas.plaf.jpbc.pbc.field.PBCG1Field;
@@ -32,6 +33,10 @@ public class CouchbaseElementConverters {
         public String convert(Element value) {
             PBCFieldType fieldType = PBCFieldType.UNKNOWN;
             Field field = value.getField();
+            if(value instanceof FieldOver) {
+                field = ((FieldOver) value).getTargetField();
+            }
+
             if(field instanceof PBCField) {
                 if(field instanceof PBCG1Field) {
                     fieldType = PBCFieldType.G1;

@@ -3,7 +3,6 @@ package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.db.CipherTextDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingCryptEngine;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
@@ -52,20 +51,18 @@ public class CipherTextService {
 
         return findAllByOwnerId(ownerId)
                 .stream()
-                .map(cipherTextEntity -> {
-                    log.info("Updating cipher text [{}] of data owner [{}] and access policy {}...",
-                            cipherTextEntity.getId(),
-                            cipherTextEntity.getOwnerId(),
-                            cipherTextEntity.getAccessPolicy());
-                    CipherText cipherText = pairingCryptEngine.update(
-                            cipherTextEntity.toCipherText(),
-                            accessPolicyUtils.buildAccessPolicy(cipherTextEntity.getAccessPolicy()),
-                            cipherText2FAUpdateKeys,
-                            gpp);
-                    log.info("Finished cipher text update [{}] ",
-                            cipherTextEntity.getId());
-                    return CipherTextEntity.from(cipherTextEntity.getId(), cipherText);
-                })
+                .map(CipherTextEntity::toCipherText)
+                .peek(cipherText -> log.info("Updating cipher text [{}] of data owner [{}] and access policy {}...",
+                        cipherText.getId(),
+                        cipherText.getOwnerId(),
+                        cipherText.getAccessPolicy()))
+                .map(cipherText -> pairingCryptEngine.update(
+                        cipherText,
+                        accessPolicyUtils.buildAccessPolicy(cipherText.getAccessPolicy()),
+                        cipherText2FAUpdateKeys,
+                        gpp))
+                .peek(cipherText -> log.info("Finished cipher text update [{}] ", cipherText.getId()))
+                .map(CipherTextEntity::from)
                 .peek(cipherTextDB::update)
                 .collect(Collectors.toList());
     }

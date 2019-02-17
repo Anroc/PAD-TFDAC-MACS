@@ -17,11 +17,6 @@ public class CipherTextDescription extends CipherText {
         this.key = key.getImmutable();
     }
 
-    public CipherTextDescription(Element c1, Element c2, Element c3, Set<String> accessPolicy, Element key) {
-        super(c1, c2, c3, accessPolicy, null);
-        this.key = key.getImmutable();
-    }
-
     public CipherText bindTo(@NonNull File file) {
         return new CipherText(getC1(), getC2(), getC3(), getAccessPolicy(), getOwnerId(), file.getId());
     }
