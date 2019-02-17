@@ -180,6 +180,10 @@ public abstract class CommandTestSuite {
         return stream.stream().anyMatch(predicate);
     }
 
+    public Element randomElementZr() {
+        return gppTestFactory.getGlobalPublicParameter().getPairing().getZr().newRandomElement();
+    }
+
     public Element randomElementG1() {
         return gppTestFactory.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
     }

@@ -107,8 +107,8 @@ public class TwoFactorKeyManager {
             String userId) {
         return twoFactorKeyGenerator.generateUpdateKey(
                 gppService.getGPP(),
-                masterKey,
                 revokedMasterKey,
+                masterKey,
                 userId
         );
     }
