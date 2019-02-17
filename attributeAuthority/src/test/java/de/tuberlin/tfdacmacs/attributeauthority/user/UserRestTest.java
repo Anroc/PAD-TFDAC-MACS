@@ -83,6 +83,7 @@ public class UserRestTest extends RestTestSuite {
         de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse userResponse = new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
                 email,
                 attributeAuthorityConfig.getId(),
+                null,
                 Sets.newHashSet(
                         new DeviceResponse(userCertificateResponse.getId(), DeviceState.WAITING_FOR_APPROVAL, null, Sets.newHashSet())
                 )
@@ -232,6 +233,7 @@ public class UserRestTest extends RestTestSuite {
         doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
                 email,
                 UUID.randomUUID().toString(),
+                null,
                 new HashSet<>()
         )).when(caClient).getUser(email);
 
@@ -271,6 +273,7 @@ public class UserRestTest extends RestTestSuite {
         doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
                 email,
                 UUID.randomUUID().toString(),
+                null,
                 new HashSet<>()
         )).when(caClient).getUser(email);
 
@@ -311,6 +314,7 @@ public class UserRestTest extends RestTestSuite {
         doReturn(new de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse(
                 email,
                 UUID.randomUUID().toString(),
+                null,
                 new HashSet<>()
         )).when(caClient).getUser(email);
 

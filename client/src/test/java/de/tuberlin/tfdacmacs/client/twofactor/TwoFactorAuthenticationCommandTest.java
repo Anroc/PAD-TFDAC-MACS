@@ -69,6 +69,7 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         doReturn(new UserResponse(
                 email,
                 aid,
+                null,
                 Sets.newHashSet(new DeviceResponse(
                     deviceId, DeviceState.ACTIVE, UUID.randomUUID().toString(), new HashSet<>()
                 ))
