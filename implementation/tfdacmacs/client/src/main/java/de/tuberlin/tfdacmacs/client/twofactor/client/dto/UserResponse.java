@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -19,6 +21,11 @@ public class UserResponse {
     @NotBlank
     private String authorityId;
 
+    @Valid
+    @Nullable
+    private TwoFactorPublicKeyDTO twoFactorPublicKey;
+
+    @Valid
     @NotNull
     private Set<DeviceResponse> devices;
 }
