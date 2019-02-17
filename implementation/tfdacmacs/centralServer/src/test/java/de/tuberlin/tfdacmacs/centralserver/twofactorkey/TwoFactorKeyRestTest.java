@@ -6,6 +6,9 @@ import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.EncryptedTwoFactorK
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.EncryptedTwoFactorDeviceKeyDTO;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyRequest;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyResponse;
+import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorUpdateKeyRequest;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -69,19 +73,22 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         EncryptedTwoFactorKey encryptedTwoFactorKey1 = new EncryptedTwoFactorKey(
                 email,
                 UUID.randomUUID().toString(),
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         EncryptedTwoFactorKey encryptedTwoFactorKey2 = new EncryptedTwoFactorKey(
                 UUID.randomUUID().toString(),
                 email,
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         EncryptedTwoFactorKey encryptedTwoFactorKey3 = new EncryptedTwoFactorKey(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         twoFactorKeyDB.insert(encryptedTwoFactorKey1);
@@ -101,7 +108,8 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(
                 email,
                 UUID.randomUUID().toString(),
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         twoFactorKeyDB.insert(encryptedTwoFactorKey);
@@ -129,31 +137,27 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
 
     @Test
     public void update() {
-        final Map<String, EncryptedTwoFactorDeviceKeyDTO> newEncryptedKeys = Maps.newHashMap(
-                UUID.randomUUID().toString(), new EncryptedTwoFactorDeviceKeyDTO(
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString()
-                )
-        );
         final String userId = UUID.randomUUID().toString();
+        final Element updateKey = getGPP().getPairing().getG1().newRandomElement();
+        final String enodedUpdateKey = ElementConverter.convert(updateKey);
 
         EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(
                 userId,
                 email,
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         twoFactorKeyDB.insert(encryptedTwoFactorKey);
 
-        TwoFactorKeyRequest twoFactorKeyRequest = new TwoFactorKeyRequest(
-                userId,
-                newEncryptedKeys
+        TwoFactorUpdateKeyRequest twoFactorUpdateKeyRequest = new TwoFactorUpdateKeyRequest(
+                enodedUpdateKey
         );
 
         ResponseEntity<TwoFactorKeyResponse> exchange = mutualAuthRestTemplate
                 .exchange("/two-factor-keys/" + encryptedTwoFactorKey.getId(),
                         HttpMethod.PUT,
-                        new HttpEntity<>(twoFactorKeyRequest),
+                        new HttpEntity<>(twoFactorUpdateKeyRequest),
                         TwoFactorKeyResponse.class);
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
@@ -161,10 +165,9 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         assertThat(body.getId()).isEqualTo(encryptedTwoFactorKey.getId());
         assertThat(body.getUserId()).isEqualTo(encryptedTwoFactorKey.getUserId());
         assertThat(body.getOwnerId()).isEqualTo(encryptedTwoFactorKey.getDataOwnerId());
-        assertThat(body.getEncryptedTwoFactorKeys()).isEqualTo(newEncryptedKeys);
-
-        assertThat(getDeviceKeysAsDTO(twoFactorKeyDB.findEntity(encryptedTwoFactorKey.getId()).get()))
-                .isEqualTo(newEncryptedKeys);
+        Map<String, EncryptedTwoFactorDeviceKeyDTO> collect = getDeviceKeysAsDTO(encryptedTwoFactorKey);
+        assertThat(body.getEncryptedTwoFactorKeys()).isEqualTo(collect);
+        assertThat(body.getUpdates()).hasSize(1).containsOnly(enodedUpdateKey);
     }
 
     @Test
@@ -172,7 +175,8 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(
                 UUID.randomUUID().toString(),
                 email,
-                encryptedTwoFactorDeviceKeys
+                encryptedTwoFactorDeviceKeys,
+                new ArrayList<>()
         );
 
         twoFactorKeyDB.insert(encryptedTwoFactorKey);
