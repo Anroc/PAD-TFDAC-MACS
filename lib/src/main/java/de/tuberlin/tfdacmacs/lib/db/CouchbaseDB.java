@@ -126,14 +126,20 @@ public abstract class CouchbaseDB<T extends Entity> {
      * @return the removed entity or {@link Optional#empty()} if no entity with the id was found
      */
     public Optional<T> remove(@NonNull String id) {
-        Optional<T> entity = findEntity(id);
-        if(entity.isPresent()) {
-            repository.delete(entity.get());
-            ids.remove(id);
-            return entity;
-        } else {
-            return Optional.empty();
-        }
+        return findEntity(id).map(this::remove);
+    }
+
+    /**
+     * Removes the given entity from the database.
+     *
+     * @param entity the entity preserved in the database
+     * @return the entity
+     */
+    public T remove(@NonNull T entity) {
+        publishAll(entity);
+        repository.delete(entity);
+        ids.remove(entity.getId());
+        return entity;
     }
 
     /**

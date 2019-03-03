@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.events.AttributeCreatedEvent;
 import de.tuberlin.tfdacmacs.lib.attributes.data.events.AttributeValueCreatedEvent;
+import de.tuberlin.tfdacmacs.lib.attributes.data.events.AttributeValueUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,11 @@ public class AttributeClient {
         );
 
         caClient.createAttributeValue(attributeValueCreatedEvent.getSource().getId(), attributeValueCreationRequest);
+    }
+
+    @EventListener
+    public void handleAttributeValueUpdatedEvent(AttributeValueUpdatedEvent attributeValueUpdatedEvent) {
+        attributeValueUpdatedEvent.getNewAttributeValue()
     }
 
     private String sign(AttributeValueComponent value) {

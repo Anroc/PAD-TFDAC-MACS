@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -109,5 +110,14 @@ public class UserService {
         user = user.approve(deviceId);
         userDB.update(user);
         return user;
+    }
+
+    public void deleteUser(@NonNull User user) {
+        user.delete();
+        userDB.remove(user);
+    }
+
+    public List<User> findUsersByAttributeIdAndValue(@NonNull String attributeId, @NonNull String value) {
+        return userDB.findUsersByAttributeIdAndValue(attributeId, value).collect(Collectors.toList());
     }
 }

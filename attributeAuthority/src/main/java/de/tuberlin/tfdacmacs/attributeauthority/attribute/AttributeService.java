@@ -3,12 +3,13 @@ package de.tuberlin.tfdacmacs.attributeauthority.attribute;
 import de.tuberlin.tfdacmacs.attributeauthority.attribute.db.AttributeDB;
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.attributeauthority.gpp.GPPProvider;
-import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
-import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
-import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueUpdateKey;
+import de.tuberlin.tfdacmacs.lib.attributes.data.Attribute;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeValue;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class AttributeService {
         GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
 
         Set<AttributeValue> attrValues = values.stream()
-                .map(value -> generateAttributeKeys(value, AttributeValue.generateId(config.getId(), name, value), gpp))
+                .map(value -> generateAttributeKey(value, AttributeValue.generateId(config.getId(), name, value), gpp))
                 .collect(Collectors.toSet());
 
         Attribute attribute = Attribute.createAttribute(config.getId(), name, attrValues, type);
@@ -59,7 +60,7 @@ public class AttributeService {
         }
 
         log.info("Generating new attribute key for value {} of attribute {}.", value, attribute.getId());
-        AttributeValue<T> newAttributeValue = generateAttributeKeys(value, AttributeValue.generateId(attribute, value), gpp);
+        AttributeValue<T> newAttributeValue = generateAttributeKey(value, AttributeValue.generateId(attribute, value), gpp);
         attribute.addValue(newAttributeValue);
         attributeDB.update(attribute);
         return newAttributeValue;
@@ -73,12 +74,49 @@ public class AttributeService {
      * @param <T> the type of the attribute
      * @return the computed {@link AttributeValue}
      */
-    private <T> AttributeValue<T> generateAttributeKeys(
+    private <T> AttributeValue<T> generateAttributeKey(
             @NonNull T value,
             @NonNull String attributeValueId,
             @NonNull GlobalPublicParameter gpp) {
+        return generateAttributeKey(value, attributeValueId, gpp, 0L);
+    }
 
+    private <T> AttributeValue<T> generateAttributeKey(
+            @NonNull T value,
+            @NonNull String attributeValueId,
+            @NonNull GlobalPublicParameter gpp,
+            long version) {
         AttributeValueKey key = attributeValueKeyGenerator.generate(gpp, attributeValueId);
-        return new AttributeValue(value, key);
+        return new AttributeValue(value, key, version);
+    }
+
+    public void revoke(@NonNull Attribute attribute, @NonNull String attributeValueId) {
+        GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
+
+        AttributeValue attributeValue = attribute.findAttributeValue(attributeValueId)
+                .orElseThrow(() -> new IllegalStateException("Could not find attribute value with id: " + attributeValueId));
+
+        AttributeValue newAttributeValue = generateAttributeKey(
+                attributeValue.getValue(),
+                attributeValue.getAttributeValueId(),
+                gpp,
+                attributeValue.getVersion()
+        ).incrementVersion();
+
+        attribute.updateValue(newAttributeValue);
+        attributeDB.update(attribute);
+    }
+
+    public UserAttributeValueUpdateKey generateUpdateKey(
+            @NonNull String userId,
+            @NonNull AttributeValue revokedAttributeValue,
+            @NonNull AttributeValue newAttributeValue) {
+        GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
+
+        return attributeValueKeyGenerator.generateUserUpdateKey(
+                gpp,
+                userId,
+                revokedAttributeValue.getPrivateKey(),
+                newAttributeValue.getPrivateKey());
     }
 }
