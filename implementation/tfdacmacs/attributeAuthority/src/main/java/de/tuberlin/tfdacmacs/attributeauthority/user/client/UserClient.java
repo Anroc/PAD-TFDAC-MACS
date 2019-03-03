@@ -64,4 +64,6 @@ public class UserClient {
         newCertIds.removeAll(knownCertIds);
         return newCertIds;
     }
+
+    public void updateUserSecretKey()
 }

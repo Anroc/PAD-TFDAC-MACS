@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.DeviceApprovedEvent;
+import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserDeletedEvent;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,5 +49,9 @@ public class User extends Entity {
 
     private Optional<Certificate> find(Set<Certificate> certificates, String id) {
         return certificates.stream().filter(certificate -> certificate.getId().equals(id)).findFirst();
+    }
+
+    public void delete() {
+        registerDomainEvent(new UserDeletedEvent(this));
     }
 }

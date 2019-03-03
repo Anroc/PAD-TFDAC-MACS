@@ -10,11 +10,15 @@ public interface AttributeValueComponent<T> extends SignatureBody {
 
     Element getPublicKeyComponent();
 
+    long getVersion();
+
     @Override
     default String buildSignatureBody() {
         return new StringBuilder(getValue().toString())
                 .append(SignatureBody.DEFAULT_VALUE_SEPERATOR)
                 .append(ElementConverter.convert(getPublicKeyComponent()))
+                .append(SignatureBody.DEFAULT_VALUE_SEPERATOR)
+                .append(getVersion())
                 .toString();
     }
 }

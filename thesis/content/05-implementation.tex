@@ -282,4 +282,36 @@ TF-DAC-MACS takes as an input for encryption a message $M \in G_T$. Since there 
 
 The algorithm first chooses a random $M \in G_T$ and outputs $M$ together with the constructed cipher text. $M$ is then hashed into a byte buffer using \ac{SHA}-256. In the next step we will encrypt our arbitrary data using \ac{AES} and as the key the previous computed hash. 
 
-On decryption first $M$ is reconstructed using the ABE decryption technique and then hashing $M$ again to reconstruct our AES secret key. 
+On decryption first $M$ is reconstructed using the ABE decryption technique and then hashing $M$ again to reconstruct our AES secret key.
+
+
+\subsection{Distributed infrastructure and parallism}
+
+There are two updates in TF-DAC-MACS: The attribute revokation update and the two-factor key update. If an administrator removes a user from the system all attributes of this user need to be renewed. To make user that also the cipher texts are decryptable by this new attributes it must be updated as well. For that the AA issues an update key which is used by the CSP to calculate the new updated version of the cipher text. 
+
+On the other hand there is the two-factor revokation. Here a user wants to revoke the two factor key access from a specific user. To do so he issues update keys to each non-revoked user and an cipher text udate key to the CSP to also update the resepctive cipher texts.
+
+While this both operations are by design assoiative, they depend on transactional execution of each operation. But this constrain can not be provided in a distributed intfrastructure. 
+
+For an two-factor revokation all relevant attribute public keys are needed. If at the same time this public values are updated by an AA a malfunctioning two-factor update key will be calculated. For example assume the following execution order:
+
+\begin{enumerate}
+\item The Data Owner downloads the attribute public key in version 1 and computes the update key 2FA-Update
+\item AA issues Attribute Public Keys in Version 2 and uploads this one to the CA and computes Update Key ATTR-update
+\item AA sends ATTR-update Key to the CSP which also triggeres the update process for all cipher texts which are encrypted using this given attribute 
+\item In parallel Data Owner sends 2FA-update Key to the Cloud Storage Provider (CSP) which starts the update process of all 2FA Ciphertexts that are secured using the old two-factor key
+\item Ciritical is now this step where the CSP updates a cipher text using 2FA-update which is already updated using ATTR-update rendering the ciphertext unusable
+\end{enumerate}
+
+\begin{equation}
+C''_3 = 
+\left(\prod_{v_{aid_{t},j} \in W, v_{aid_{t},j} \neq v_{aid_{i},j}} g^{y'_{aid_i,j}} \right)^{(s+\beta+r')}
+\cdot 
+\underbrace{
+    \left(g^{y'_{aid_i,j}}\right)^{(s + \alpha + r')} 
+    \cdot 
+    \left(g^{y_{aid_i,j}}\right)^{(\beta - \alpha)} 
+}_\text{due to of different basis exponents can not be aggregated} 
+\label{eq:wrong-update}
+\end{equation}
+In equation \ref{eq:wrong-update}, $g^{y'_{aid_i,j}}$ refernces the revoked attribute and $\left(g^{y_{aid_i,j}}\right)^{(\beta - \alpha)}$ the two factor update key $UAU_{aid_i,j}$ for this revoked attribute. In that case the data owner used the old attribute public key $g^{y_{aid_i,j}}$ to compute $UAU_{aid_i,j}$.

@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.attributeauthority.user;
 
+import de.tuberlin.tfdacmacs.attributeauthority.attribute.AttributeService;
 import de.tuberlin.tfdacmacs.attributeauthority.user.client.UserClient;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
@@ -10,6 +11,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
+import de.tuberlin.tfdacmacs.lib.attributes.data.events.AttributeValueUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Base64;
@@ -22,6 +24,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +36,7 @@ public class UserEventListener {
 
     private final UserClient userClient;
     private final UserService userService;
+    private final AttributeService attributeService;
 
     private final AsymmetricCryptEngine<?> asymmetricCryptEngine = new StringAsymmetricCryptEngine();
     private final SymmetricCryptEngine<?> symmetricCryptEngine = new StringSymmetricCryptEngine();
@@ -89,5 +93,20 @@ public class UserEventListener {
                             }
                         }
                 ));
+    }
+
+    @EventListener
+    public void handleAttributeValueUpdatedEvent(AttributeValueUpdatedEvent attributeValueUpdatedEvent) {
+        String attributeId = attributeValueUpdatedEvent.getSource().getId();
+        String value = attributeValueUpdatedEvent.getNewAttributeValue().getValue().toString();
+
+        userService.findUsersByAttributeIdAndValue(attributeId, value)
+                .stream()
+                .map(User::getId)
+                .map(userId -> attributeService.generateUpdateKey(
+                        userId,
+                        attributeValueUpdatedEvent.getRevokedAttributeValue(),
+                        attributeValueUpdatedEvent.getNewAttributeValue()))
+                .forEach(userClient.);
     }
 }

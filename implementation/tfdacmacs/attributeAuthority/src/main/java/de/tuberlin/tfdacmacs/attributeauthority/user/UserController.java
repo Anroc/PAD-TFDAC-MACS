@@ -65,6 +65,18 @@ public class UserController {
         return UserResponse.from(user);
     }
 
+    @DeleteMapping("/{email}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public UserResponse deleteUser(@PathVariable("email") String email) {
+        User user = userService.findUser(email).orElseThrow(
+                () -> new NotFoundException(email)
+        );
+
+        userService.deleteUser(user);
+        return UserResponse.from(user);
+    }
+
+
     @PutMapping("/{email}/approve/{deviceId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UserResponse approve(@PathVariable("email") String email, @PathVariable("deviceId") String deviceId) {

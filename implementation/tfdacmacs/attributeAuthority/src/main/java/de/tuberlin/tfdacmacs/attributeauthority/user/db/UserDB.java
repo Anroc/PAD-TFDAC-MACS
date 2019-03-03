@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 public class UserDB extends CouchbaseDB<User> {
@@ -27,5 +28,9 @@ public class UserDB extends CouchbaseDB<User> {
     @Override
     public boolean exist(@NonNull String id) {
         return findEntity(id).isPresent();
+    }
+
+    public Stream<User> findUsersByAttributeIdAndValue(@NonNull String attributeId, @NonNull String value) {
+        return repository.findUsersByAttributeIdAndValue(attributeId, value);
     }
 }
