@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -19,12 +20,16 @@ public class PublicAttributeValue<T> extends ElementKey implements AttributeValu
     @NotBlank
     private T value;
 
+    @Min(0)
+    private long version;
+
     @NotBlank
     private String signature;
 
-    public PublicAttributeValue(@NotNull @NonNull Element key, @NonNull T value, @NonNull String signature) {
+    public PublicAttributeValue(@NotNull @NonNull Element key, @NonNull T value, long version, @NonNull String signature) {
         super(key);
         this.value = value;
+        this.version = version;
         this.signature = signature;
     }
 

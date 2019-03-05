@@ -116,6 +116,25 @@ public class UserController {
         return toUserResponse(user);
     }
 
+    @PutMapping("/{userId}/attribute-update-key")
+    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    public UserResponse updateAttributeKey(
+            @PathVariable("userId") String userId,
+            @Valid @RequestBody AttributeValueUpdateKeyDTO attributeValueUpdateKeyDTO) {
+        User user = userService.findUser(userId).orElseThrow(
+                () -> new NotFoundException(userId)
+        );
+
+        if(! user.getAuthorityId().equals(authenticationFacade.getId())) {
+            throw new ServiceException("Wrong authority.", HttpStatus.FORBIDDEN);
+        }
+
+        user.addAttributeValueUpdateKey(attributeValueUpdateKeyDTO);
+
+        userService.updateUser(user);
+        return toUserResponse(user);
+    }
+
     @PutMapping("/{userId}/devices/{deviceId}")
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
     public DeviceResponse updateDevice(
@@ -159,6 +178,7 @@ public class UserController {
                                 twoFactorPublicKey.getTwoFactorAuthenticationPublicKey(),
                                 twoFactorPublicKey.getSignature()
                         )).orElse(null),
+                user.getAttributeValueUpdateKeys(),
                 user.getDevices().stream().map(this::toDeviceResponse).collect(Collectors.toSet())
         );
     }

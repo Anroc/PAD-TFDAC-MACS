@@ -43,7 +43,18 @@ public class AttributeClient {
 
     @EventListener
     public void handleAttributeValueUpdatedEvent(AttributeValueUpdatedEvent attributeValueUpdatedEvent) {
-        attributeValueUpdatedEvent.getNewAttributeValue()
+        AttributeValueComponent value = attributeValueUpdatedEvent.getNewAttributeValue();
+
+        AttributeValueCreationRequest attributeValueCreationRequest = AttributeValueCreationRequest.from(
+                value,
+                sign(value)
+        );
+
+        caClient.updateAttributeValue(
+                attributeValueUpdatedEvent.getSource().getId(),
+                attributeValueUpdatedEvent.getNewAttributeValue().getValue().toString(),
+                attributeValueCreationRequest
+        );
     }
 
     private String sign(AttributeValueComponent value) {

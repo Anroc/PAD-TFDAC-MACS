@@ -3,7 +3,10 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.client;
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.client.CertificateClient;
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
+import de.tuberlin.tfdacmacs.attributeauthority.client.ContentSigner;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueUpdateKey;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
 import lombok.NonNull;
@@ -22,6 +25,7 @@ public class UserClient {
 
     private final CAClient caClient;
     private final CertificateClient certificateClient;
+    private final ContentSigner contentSigner;
 
     public void createUserForCA(@NonNull User user) {
         log.info("Requesting user creation on CA site.");
@@ -65,5 +69,28 @@ public class UserClient {
         return newCertIds;
     }
 
-    public void updateUserSecretKey()
+    public void updateUserSecretKey(
+            @NonNull UserAttributeValueUpdateKey updateKey,
+            @NonNull String attributeValueId,
+            long targetVersion,
+            long newVersion) {
+        String userId = updateKey.getUserId();
+
+        AttributeValueUpdateKeyDTO attributeValueUpdateKeyDTO = new AttributeValueUpdateKeyDTO(
+                ElementConverter.convert(updateKey.getUpdateKey()),
+                attributeValueId,
+                targetVersion,
+                newVersion,
+                null
+        );
+
+        attributeValueUpdateKeyDTO.setSignature(
+                attributeValueUpdateKeyDTO.signature()
+                    .pack(attributeValueUpdateKeyDTO.buildSignatureBody())
+                    .pack(userId)
+                    .finalize(contentSigner::sign)
+        );
+
+        caClient.updateAttributeValueUpdateKey(userId, attributeValueUpdateKeyDTO);
+    }
 }
