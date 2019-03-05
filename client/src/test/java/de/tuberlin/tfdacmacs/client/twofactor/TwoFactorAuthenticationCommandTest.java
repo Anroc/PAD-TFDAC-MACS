@@ -3,8 +3,8 @@ package de.tuberlin.tfdacmacs.client.twofactor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceState;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceState;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.data.TrustedAuthority;
 import de.tuberlin.tfdacmacs.client.authority.events.TrustedAuthorityUpdatedEvent;
@@ -15,6 +15,8 @@ import de.tuberlin.tfdacmacs.client.keypair.data.KeyPair;
 import de.tuberlin.tfdacmacs.client.rest.AAClient;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
+import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
+import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.AttributeValueId;
@@ -63,12 +65,14 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
                 )
         );
 
-        doReturn(new UserResponse()).when(caClient).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
+        doReturn(new UserResponse()).when(caClient).updateTwoFactorPublicKey(eq(currentEmail), any(
+                TwoFactorPublicKeyDTO.class));
         doReturn(currentEmail).when(session).getEmail();
         doReturn(KeyPair.from(stringAsymmetricCryptEngine.getAsymmetricCipherKeyPair())).when(session).getKeyPair();
         doReturn(new UserResponse(
                 email,
                 aid,
+                null,
                 null,
                 Sets.newHashSet(new DeviceResponse(
                     deviceId, DeviceState.ACTIVE, UUID.randomUUID().toString(), new HashSet<>()

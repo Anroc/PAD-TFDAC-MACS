@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.attribute.client.dto;
+package de.tuberlin.tfdacmacs.client.user.client.dto;
 
 public enum DeviceState {
 

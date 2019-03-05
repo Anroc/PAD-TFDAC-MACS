@@ -1,7 +1,7 @@
 package de.tuberlin.tfdacmacs.client.attribute.client;
 
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.EncryptedAttributeValueKeyDTO;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.EncryptedAttributeValueKeyDTO;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.gpp.GPPService;

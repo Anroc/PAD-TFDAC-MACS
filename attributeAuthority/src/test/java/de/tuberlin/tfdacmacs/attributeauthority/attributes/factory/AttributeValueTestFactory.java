@@ -22,7 +22,8 @@ public class AttributeValueTestFactory {
                     pairing.getZr().newRandomElement(),
                     pairing.getG1().newRandomElement(),
                         "test.value:testValue"
-                )
+                ),
+                0L
         );
     }
 }
