@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.user.data;
 
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.DeviceApprovedEvent;
+import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserAttributeValueRevokedEvent;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserDeletedEvent;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import lombok.Data;
@@ -53,5 +54,11 @@ public class User extends Entity {
 
     public void delete() {
         registerDomainEvent(new UserDeletedEvent(this));
+    }
+
+    public void deleteAttributeValue(@NonNull UserAttributeKey userAttributeKey) {
+        if (attributes.remove(userAttributeKey)) {
+           registerDomainEvent(new UserAttributeValueRevokedEvent(this, userAttributeKey));
+        }
     }
 }

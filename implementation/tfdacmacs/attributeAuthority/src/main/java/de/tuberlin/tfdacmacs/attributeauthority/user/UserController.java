@@ -76,6 +76,20 @@ public class UserController {
         return UserResponse.from(user);
     }
 
+    @DeleteMapping("{email}/attributes/{attributeId}/values/{valueId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public UserResponse deleteAttributeValue(
+            @PathVariable("email") String email,
+            @PathVariable("attributeId") String attributeId,
+            @PathVariable("valueId") String valueId) {
+        User user = userService.findUser(email).orElseThrow(
+                () -> new NotFoundException(email)
+        );
+
+        userService.deleteAttributeValueFromUser(user, attributeId, valueId);
+        return UserResponse.from(user);
+    }
+
 
     @PutMapping("/{email}/approve/{deviceId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
