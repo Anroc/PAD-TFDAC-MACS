@@ -1,6 +1,5 @@
-package de.tuberlin.tfdacmacs.client.twofactor.client.dto;
+package de.tuberlin.tfdacmacs.client.user.client.dto;
 
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -24,6 +24,10 @@ public class UserResponse {
     @Valid
     @Nullable
     private TwoFactorPublicKeyDTO twoFactorPublicKey;
+
+    @Valid
+    @Nullable
+    private Map<String, Map<Long, AttributeValueUpdateKeyDTO>> attributeValueUpdateKeys;
 
     @Valid
     @NotNull

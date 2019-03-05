@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.rest;
 
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
@@ -9,6 +9,8 @@ import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
+import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
+import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 
 import java.util.List;
 

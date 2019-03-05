@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.rest.template;
 
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.client.authority.client.dto.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateRequest;
@@ -11,6 +11,8 @@ import de.tuberlin.tfdacmacs.client.gpp.client.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.factory.RestTemplateFactory;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
+import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
+import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

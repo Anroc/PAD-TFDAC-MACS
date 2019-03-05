@@ -37,6 +37,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         this.publicAttributeValue = new PublicAttributeValue(
                 gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement(),
                 "test",
+                0L,
                 "testSignature"
         );
         this.publicAttribute = AbstractAttribute.createPublicAttribute(
@@ -121,7 +122,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         String value = "otherTest";
 
         AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
-            value, ElementConverter.convert(originalPublicKey), "testSignature"
+            value, ElementConverter.convert(originalPublicKey), 0L, "testSignature"
         );
         ResponseEntity<PublicAttributeValueResponse> exchange =
                 mutualAuthRestTemplate.exchange(

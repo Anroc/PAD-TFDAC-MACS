@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.client.twofactor.client.dto;
+package de.tuberlin.tfdacmacs.client.user.client.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

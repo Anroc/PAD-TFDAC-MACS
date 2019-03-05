@@ -1,6 +1,6 @@
 package de.tuberlin.tfdacmacs.client.twofactor.client;
 
-import de.tuberlin.tfdacmacs.client.attribute.client.dto.DeviceResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.authority.exception.CertificateManipulationException;
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
@@ -11,6 +11,8 @@ import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.PublicTwoFactorAuthentication;
+import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
+import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AsymmetricElementKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
