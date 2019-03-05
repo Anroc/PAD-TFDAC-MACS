@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "key")
 public class UserAttributeKey<T> {
 
     @NotBlank

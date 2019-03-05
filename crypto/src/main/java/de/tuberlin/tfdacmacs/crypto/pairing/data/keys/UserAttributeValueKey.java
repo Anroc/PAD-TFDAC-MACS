@@ -1,8 +1,10 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
 import it.unisa.dia.gas.jpbc.Element;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+@EqualsAndHashCode(callSuper = true)
 public class UserAttributeValueKey extends ElementKey {
     public UserAttributeValueKey(@NonNull Element key) {
         super(key);

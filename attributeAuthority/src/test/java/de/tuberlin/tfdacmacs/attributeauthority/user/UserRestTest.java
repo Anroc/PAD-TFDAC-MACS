@@ -7,10 +7,12 @@ import de.tuberlin.tfdacmacs.attributeauthority.attribute.data.dto.AttributeCrea
 import de.tuberlin.tfdacmacs.attributeauthority.authority.data.TrustedAuthority;
 import de.tuberlin.tfdacmacs.attributeauthority.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
+import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.AttributeValueResponse;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.CreateUserRequest;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
@@ -18,6 +20,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.AttributeValueUpdateKeyDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.EncryptedAttributeValueKeyDTO;
@@ -27,7 +30,10 @@ import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -42,8 +48,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class UserRestTest extends RestTestSuite {
 
@@ -181,7 +186,48 @@ public class UserRestTest extends RestTestSuite {
     }
 
     @Test
-    public void approveUser() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+    public void deleteAttributeValueFromUser_passes() {
+
+        String otherUserId = UUID.randomUUID().toString();
+        User otherUser = new User(otherUserId);
+        otherUser.setAttributes(
+                Sets.newHashSet(new UserAttributeKey(
+                        attributeId,
+                        "student",
+                        new UserAttributeValueKey(globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement())
+                ))
+        );
+
+        doReturn(null).when(caClient).updateAttributeValueUpdateKey(eq(otherUserId), any(AttributeValueUpdateKeyDTO.class));
+
+        userDB.insert(otherUser);
+        createUser_passes_onExistingAttributeValue();
+
+        ResponseEntity<UserResponse> exchange = sslRestTemplate.exchange(
+                String.format("/users/%s/attributes/%s/values/%s", email, attributeId, "student"),
+                HttpMethod.DELETE,
+                new HttpEntity<>(basicAuth()),
+                UserResponse.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        UserResponse body = exchange.getBody();
+        assertThat(body.getAttributes()).hasSize(0);
+
+        ArgumentCaptor<AttributeValueUpdateKeyDTO> argumentCaptor = ArgumentCaptor.forClass(AttributeValueUpdateKeyDTO.class);
+        verify(caClient, times(1)).updateAttributeValueUpdateKey(eq(otherUserId), argumentCaptor.capture());
+
+        AttributeValueUpdateKeyDTO value = argumentCaptor.getValue();
+        assertThat(value.getTargetVersion()).isEqualTo(0L);
+        assertThat(value.getUpdateVersion()).isEqualTo(1L);
+        assertThat(value.getAttributeValueId()).isEqualTo(attributeId + ":student");
+        assertThat(value.getUpdateKey()).isNotBlank();
+
+
+    }
+
+    @Test
+    public void approveUser_passes() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         getAttributeKeys();
 
         ResponseEntity<UserResponse> exchange = sslRestTemplate.exchange(

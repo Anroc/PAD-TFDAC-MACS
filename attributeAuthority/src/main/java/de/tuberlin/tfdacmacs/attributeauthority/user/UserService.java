@@ -120,4 +120,19 @@ public class UserService {
     public List<User> findUsersByAttributeIdAndValue(@NonNull String attributeId, @NonNull String value) {
         return userDB.findUsersByAttributeIdAndValue(attributeId, value).collect(Collectors.toList());
     }
+
+    public User deleteAttributeValueFromUser(@NonNull User user, @NonNull String attributeId, @NonNull String valueId) {
+        Optional<UserAttributeKey> userAttributeKeyOptional = user.getAttributes().stream()
+                .filter(userAttributeKey -> userAttributeKey.getAttributeId().equals(attributeId))
+                .filter(userAttributeKey -> userAttributeKey.getValue().toString().equals(valueId))
+                .findAny();
+
+        if(userAttributeKeyOptional.isPresent()) {
+            user.deleteAttributeValue(userAttributeKeyOptional.get());
+            userDB.update(user);
+        }
+
+        return user;
+
+    }
 }

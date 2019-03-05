@@ -3,8 +3,10 @@ package de.tuberlin.tfdacmacs.lib.db;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.error.DocumentAlreadyExistsException;
 import com.couchbase.client.java.error.DocumentDoesNotExistException;
+import com.google.common.collect.ImmutableList;
 import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesExistException;
 import de.tuberlin.tfdacmacs.lib.db.exception.EntityDoesNotExistException;
+import de.tuberlin.tfdacmacs.lib.events.DomainEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +17,10 @@ import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.data.couchbase.repository.CouchbaseRepository;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 @Slf4j
@@ -60,18 +64,12 @@ public abstract class CouchbaseDB<T extends Entity> {
      */
     public String insert(@NonNull T entity) throws EntityDoesExistException {
         try {
-            publishAll(entity);
-            template.insert(entity);
+            call(entity, template::insert);
             ids.add(entity.getId());
             return entity.getId();
         } catch (DocumentAlreadyExistsException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does exist!", entity.getId()), e);
         }
-    }
-
-    private void publishAll(T entity) {
-        entity.getEvents().forEach(publisher::publishEvent);
-        entity.getEvents().clear();
     }
 
     /**
@@ -84,8 +82,7 @@ public abstract class CouchbaseDB<T extends Entity> {
      */
     public String update(@NonNull T entity) throws EntityDoesNotExistException {
         try {
-            publishAll(entity);
-            template.update(entity);
+            call(entity, template::update);
             return entity.getId();
         } catch (DocumentDoesNotExistException e) {
             throw new EntityDoesExistException(String.format("Entity with id [%s] does not exist!", entity.getId()), e);
@@ -136,8 +133,7 @@ public abstract class CouchbaseDB<T extends Entity> {
      * @return the entity
      */
     public T remove(@NonNull T entity) {
-        publishAll(entity);
-        repository.delete(entity);
+        call(entity, repository::delete);
         ids.remove(entity.getId());
         return entity;
     }
@@ -152,6 +148,13 @@ public abstract class CouchbaseDB<T extends Entity> {
         } finally {
             ids.clear();
         }
+    }
+
+    public void call(T entity, Consumer<T> dbCall) {
+        List<DomainEvent> events = ImmutableList.copyOf(entity.getEvents());
+        entity.getEvents().clear();
+        dbCall.accept(entity);
+        entity.getEvents().forEach(publisher::publishEvent);
     }
 }
 
