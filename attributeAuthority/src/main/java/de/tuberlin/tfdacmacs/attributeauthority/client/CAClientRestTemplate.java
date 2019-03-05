@@ -4,17 +4,14 @@ import de.tuberlin.tfdacmacs.attributeauthority.client.error.InterServiceCallErr
 import de.tuberlin.tfdacmacs.attributeauthority.config.AttributeAuthorityConfig;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
-import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueResponse;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceUpdateRequest;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserCreationRequest;
-import de.tuberlin.tfdacmacs.lib.user.data.dto.UserResponse;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
@@ -118,6 +115,11 @@ public class CAClientRestTemplate implements CAClient {
     }
 
     @Override
+    public UserResponse updateAttributeValueUpdateKey(String userId, AttributeValueUpdateKeyDTO attributeValueUpdateKeyDTO) {
+        return request(String.format("/users/%s/attribute-update-key", userId), HttpMethod.PUT, UserResponse.class, attributeValueUpdateKeyDTO);
+    }
+
+    @Override
     public DeviceResponse updateDevice(String userId, String deviceId, DeviceUpdateRequest deviceUpdateRequest) {
         return request(String.format("/users/%s/devices/%s", userId, deviceId), HttpMethod.PUT, DeviceResponse.class, deviceUpdateRequest);
     }
@@ -143,14 +145,13 @@ public class CAClientRestTemplate implements CAClient {
     }
 
     @Override
-    public PublicAttributeResponse createAttributeValue(String attributeId, AttributeValueCreationRequest attributeValueCreationRequest) {
-        return request(String.format("/attributes/%s/values", attributeId), HttpMethod.POST, PublicAttributeResponse.class, attributeValueCreationRequest);
+    public PublicAttributeValueResponse createAttributeValue(String attributeId, AttributeValueCreationRequest attributeValueCreationRequest) {
+        return request(String.format("/attributes/%s/values", attributeId), HttpMethod.POST, PublicAttributeValueResponse.class, attributeValueCreationRequest);
     }
 
     @Override
-    public PublicAttributeResponse updateAttributeValue(String attributeId, String attributeValueId,
-            AttributeValueUpdateRequest attributeUpdateRequest) {
-        return request(String.format("/attributes/%s/values/%s", attributeId, attributeValueId), HttpMethod.PUT, PublicAttributeResponse.class, attributeUpdateRequest);
+    public PublicAttributeValueResponse updateAttributeValue(String attributeId, String attributeValueId, AttributeValueCreationRequest attributeValueCreationRequest) {
+        return request(String.format("/attributes/%s/values/%s", attributeId, attributeValueId), HttpMethod.PUT, PublicAttributeValueResponse.class, attributeValueCreationRequest);
     }
 
 }

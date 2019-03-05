@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -70,6 +71,23 @@ public abstract class AbstractAttribute<T extends AttributeValueComponent> exten
         typeCheck(attributeValue);
         if(values == null) {
             this.values = new HashSet<>();
+        }
+
+        Optional<T> any = this.values.stream()
+                .filter(value -> value.getValue().equals(attributeValue.getValue()))
+                .findAny();
+        if(any.isPresent()) {
+            T oldAttributeValue = any.get();
+            if( oldAttributeValue.getVersion() > attributeValue.getVersion()) {
+                throw new IllegalArgumentException(
+                        String.format(
+                                "Given new AttributeValue is not newer then the old one: Version mismatch new:%d <= old:%d.",
+                                attributeValue.getVersion(),
+                                oldAttributeValue.getVersion()
+                        ));
+            }
+
+            values.remove(oldAttributeValue);
         }
 
         this.values.add(attributeValue);

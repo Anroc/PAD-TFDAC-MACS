@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -23,6 +24,10 @@ public class UserResponse {
     @Valid
     @Nullable
     private TwoFactorPublicKeyDTO twoFactorPublicKey;
+
+    @Valid
+    @Nullable
+    private Map<String, Map<Long, AttributeValueUpdateKeyDTO>> attributeValueUpdateKeys;
 
     @Valid
     @NotNull

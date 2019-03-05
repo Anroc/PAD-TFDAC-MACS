@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.tuberlin.tfdacmacs.centralserver.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.centralserver.user.events.CertificateCreatedEvent;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
+import de.tuberlin.tfdacmacs.lib.user.data.dto.AttributeValueUpdateKeyDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -29,6 +28,10 @@ public class User extends Entity {
     @Valid
     @Nullable
     private TwoFactorPublicKey twoFactorPublicKey;
+
+    @Valid
+    @Nullable
+    private Map<String, Map<Long, AttributeValueUpdateKeyDTO>> attributeValueUpdateKeys;
 
     @NotNull
     @Valid
@@ -55,5 +58,25 @@ public class User extends Entity {
     @JsonIgnore
     public Optional<Device> findDevice(@NonNull String deviceId) {
         return getDevices().stream().filter(device -> device.getCertificateId().equals(deviceId)).findFirst();
+    }
+
+    public User addAttributeValueUpdateKey(@NonNull AttributeValueUpdateKeyDTO attributeValueUpdateKeyDTO) {
+        if(this.attributeValueUpdateKeys == null) {
+            this.attributeValueUpdateKeys = new HashMap<>();
+        }
+
+        if(this.attributeValueUpdateKeys.get(attributeValueUpdateKeyDTO.getAttributeValueId()) == null) {
+            this.attributeValueUpdateKeys.put(attributeValueUpdateKeyDTO.getAttributeValueId(), new HashMap<>());
+        }
+
+        if(this.attributeValueUpdateKeys.get(attributeValueUpdateKeyDTO.getAttributeValueId()).get(attributeValueUpdateKeyDTO.getTargetVersion()) != null) {
+            throw new IllegalArgumentException("Update Key already present.");
+        }
+
+        this.attributeValueUpdateKeys
+                .get(attributeValueUpdateKeyDTO.getAttributeValueId())
+                .put(attributeValueUpdateKeyDTO.getTargetVersion(), attributeValueUpdateKeyDTO);
+
+        return this;
     }
 }

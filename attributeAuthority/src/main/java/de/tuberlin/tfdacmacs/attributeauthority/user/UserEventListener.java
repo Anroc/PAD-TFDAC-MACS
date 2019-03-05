@@ -24,7 +24,6 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,6 +106,10 @@ public class UserEventListener {
                         userId,
                         attributeValueUpdatedEvent.getRevokedAttributeValue(),
                         attributeValueUpdatedEvent.getNewAttributeValue()))
-                .forEach(userClient.);
+                .forEach(updateKey -> userClient.updateUserSecretKey(
+                        updateKey,
+                        attributeValueUpdatedEvent.getNewAttributeValue().getAttributeValueId(),
+                        attributeValueUpdatedEvent.getRevokedAttributeValue().getVersion(),
+                        attributeValueUpdatedEvent.getNewAttributeValue().getVersion()));
     }
 }

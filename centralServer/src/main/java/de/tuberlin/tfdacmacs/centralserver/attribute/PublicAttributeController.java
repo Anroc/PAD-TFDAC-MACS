@@ -67,6 +67,12 @@ public class PublicAttributeController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_AUTHORITY')")
     public PublicAttributeValueResponse addAttributeValue(@PathVariable("id") String id, @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
+        return createAttributeValue(id, attributeValueCreationRequest);
+    }
+
+    private PublicAttributeValueResponse createAttributeValue(
+            String id, AttributeValueCreationRequest attributeValueCreationRequest) {
+
         PublicAttribute publicAttribute = publicAttributeService.findEntity(id)
                 .orElseThrow(() -> new NotFoundException(id));
 
@@ -80,9 +86,20 @@ public class PublicAttributeController {
         try {
             publicAttributeService.addValue(publicAttribute, publicAttributeValue);
             return PublicAttributeValueResponse.from(publicAttributeValue, publicAttributeValue.getSignature());
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new ServiceException(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    @PutMapping("/{attributeId}/values/{valueId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
+    public PublicAttributeValueResponse updateAttributeValue(
+            @PathVariable("attributeId") String attributeId,
+            @PathVariable("valueId") String valueId,
+            @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
+
+        return createAttributeValue(attributeId, attributeValueCreationRequest);
     }
 
     @GetMapping("/{authorityId}/values/{valueId}")

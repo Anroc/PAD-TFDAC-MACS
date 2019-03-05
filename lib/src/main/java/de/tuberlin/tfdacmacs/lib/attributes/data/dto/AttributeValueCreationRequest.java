@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -23,6 +24,9 @@ public class AttributeValueCreationRequest {
     @NotBlank
     private String publicKey;
 
+    @Min(0)
+    private long version;
+
     @NotBlank
     private String signature;
 
@@ -30,6 +34,7 @@ public class AttributeValueCreationRequest {
         return new AttributeValueCreationRequest(
                 attributeValue.getValue().toString(),
                 ElementConverter.convert(attributeValue.getPublicKeyComponent()),
+                attributeValue.getVersion(),
                 signature
         );
     }
@@ -38,7 +43,8 @@ public class AttributeValueCreationRequest {
         return new PublicAttributeValue(
                 ElementConverter.convert(getPublicKey(), field),
                 type.cast(value),
-                signature
+                getVersion(),
+                getSignature()
         );
     }
 }
