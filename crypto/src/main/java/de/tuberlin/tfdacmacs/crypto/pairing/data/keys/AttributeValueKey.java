@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.data.Versioned;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.*;
 

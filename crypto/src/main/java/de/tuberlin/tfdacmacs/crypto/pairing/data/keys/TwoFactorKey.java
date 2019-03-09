@@ -37,6 +37,7 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
 
     @Data
     @NoArgsConstructor
+    @EqualsAndHashCode(callSuper = true)
     public static class Public extends AsymmetricElementKey.Public<TwoFactorKey> {
 
         private String userId;
@@ -48,7 +49,7 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
 
         public Public update(@NonNull TwoFactorUpdateKey twoFactorUpdateKey) {
             Element newPublicKey = getKey().duplicate().mul(twoFactorUpdateKey.getUpdateKey());
-            return new Public(this.getUserId(), newPublicKey);
+            return new Public(this.getUserId(), newPublicKey).incrementVersion();
         }
     }
 }
