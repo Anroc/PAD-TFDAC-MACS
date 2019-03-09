@@ -17,6 +17,7 @@ import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
 import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
+import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
@@ -187,7 +188,7 @@ public class UserRestTest extends RestTestSuite {
 
     @Test
     public void deleteAttributeValueFromUser_passes() {
-
+        String attributeValueId = attributeId + ":student";
         String otherUserId = UUID.randomUUID().toString();
         User otherUser = new User(otherUserId);
         otherUser.setAttributes(
@@ -214,16 +215,23 @@ public class UserRestTest extends RestTestSuite {
         UserResponse body = exchange.getBody();
         assertThat(body.getAttributes()).hasSize(0);
 
-        ArgumentCaptor<AttributeValueUpdateKeyDTO> argumentCaptor = ArgumentCaptor.forClass(AttributeValueUpdateKeyDTO.class);
-        verify(caClient, times(1)).updateAttributeValueUpdateKey(eq(otherUserId), argumentCaptor.capture());
+        ArgumentCaptor<AttributeValueUpdateKeyDTO> userArgumentCaptor = ArgumentCaptor.forClass(AttributeValueUpdateKeyDTO.class);
+        verify(caClient, times(1)).updateAttributeValueUpdateKey(eq(otherUserId), userArgumentCaptor.capture());
 
-        AttributeValueUpdateKeyDTO value = argumentCaptor.getValue();
-        assertThat(value.getTargetVersion()).isEqualTo(0L);
-        assertThat(value.getUpdateVersion()).isEqualTo(1L);
-        assertThat(value.getAttributeValueId()).isEqualTo(attributeId + ":student");
-        assertThat(value.getUpdateKey()).isNotBlank();
+        AttributeValueUpdateKeyDTO userValue = userArgumentCaptor.getValue();
+        assertThat(userValue.getTargetVersion()).isEqualTo(0L);
+        assertThat(userValue.getUpdateVersion()).isEqualTo(1L);
+        assertThat(userValue.getAttributeValueId()).isEqualTo(attributeValueId);
+        assertThat(userValue.getUpdateKey()).isNotBlank();
 
+        ArgumentCaptor<AttributeValueCreationRequest> attributeArgumentCaptor = ArgumentCaptor.forClass(AttributeValueCreationRequest.class);
+        verify(caClient, times(1)).createAttributeValue(eq(attributeId), attributeArgumentCaptor.capture());
 
+        AttributeValueCreationRequest attributeValue = attributeArgumentCaptor.getValue();
+        assertThat(attributeValue.getVersion()).isEqualTo(1L);
+        assertThat(attributeValue.getPublicKey()).isNotBlank();
+        assertThat(attributeValue.getSignature()).isNotBlank();
+        assertThat(attributeValue.getValue()).isEqualTo("student");
     }
 
     @Test

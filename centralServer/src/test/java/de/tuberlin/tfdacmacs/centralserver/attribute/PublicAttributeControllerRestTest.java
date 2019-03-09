@@ -140,7 +140,44 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
     }
 
     @Test
+    public void addAttributeValue_passes_on_newVersion() {
+        mutalAuthenticationRestTemplate(RestTestSuite.AUTHORITY_KEYSTORE);
+
+
+        publicAttributeDB.insert(publicAttribute);
+
+        Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
+
+        AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
+                publicAttributeValue.getValue().toString(),
+                ElementConverter.convert(originalPublicKey),
+                1L,
+                "testSignature"
+        );
+        ResponseEntity<PublicAttributeValueResponse> exchange =
+                mutualAuthRestTemplate.exchange(
+                        "/attributes/" + publicAttribute.getId() + "/values",
+                        HttpMethod.POST,
+                        new HttpEntity<>(attributeValueCreationRequest),
+                        PublicAttributeValueResponse.class
+                );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+
+        PublicAttributeValueResponse body = exchange.getBody();
+        assertThat(body.getValue()).isEqualTo(publicAttributeValue.getValue().toString());
+        assertThat(body.getPublicKey()).isEqualTo(ElementConverter.convert(originalPublicKey));
+        assertThat(body.getVersion()).isEqualTo(1L);
+    }
+
+    @Test
     public void getAttributeValue() {
+        publicAttribute.addValue(new PublicAttributeValue(
+                publicAttributeValue.getKey(),
+                publicAttributeValue.getValue(),
+                publicAttributeValue.getVersion() + 1,
+                publicAttributeValue.getSignature()
+        ));
         publicAttributeDB.insert(publicAttribute);
 
         ResponseEntity<PublicAttributeValueResponse> exchange =
@@ -156,6 +193,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
         PublicAttributeValueResponse body = exchange.getBody();
         assertThat(body.getValue()).isEqualTo(publicAttributeValue.getValue());
         assertThat(body.getPublicKey()).isEqualTo(serializedPublicKey);
+        assertThat(body.getVersion()).isEqualTo(1L);
     }
 
     public void assertPublicAttributeResponse(PublicAttributeResponse body) {

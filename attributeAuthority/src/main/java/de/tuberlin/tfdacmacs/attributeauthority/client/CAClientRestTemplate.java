@@ -9,6 +9,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueRespons
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
@@ -26,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -77,14 +79,14 @@ public class CAClientRestTemplate implements CAClient {
         return response.getBody();
     }
 
-    private <T> List<T> listRequest(String url, HttpMethod httpMethod, Class<T> responseType, Object body) {
+    private <T> List<T> listRequest(String url, HttpMethod httpMethod, ParameterizedTypeReference<List<T>> responseType, Object body) {
         log.info("Asking CA for [{}:{}]", httpMethod, url);
 
         ResponseEntity<List<T>> response = restTemplate.exchange(
                 url,
                 httpMethod,
                 body != null ? new HttpEntity<>(body) : HttpEntity.EMPTY,
-                new ParameterizedTypeReference<List<T>>(){}
+                responseType
         );
 
         postProcessResponse(response, url, httpMethod);
@@ -150,8 +152,13 @@ public class CAClientRestTemplate implements CAClient {
     }
 
     @Override
-    public PublicAttributeValueResponse updateAttributeValue(String attributeId, String attributeValueId, AttributeValueCreationRequest attributeValueCreationRequest) {
-        return request(String.format("/attributes/%s/values/%s", attributeId, attributeValueId), HttpMethod.PUT, PublicAttributeValueResponse.class, attributeValueCreationRequest);
+    public List<CipherTextDTO> getCipherTexts(List<String> attributeValueId) {
+        String joinedQuery = StringUtils.collectionToDelimitedString(attributeValueId, ",");
+        return listRequest(
+                String.format("/ciphertexts?attrIds=%s", joinedQuery),
+                HttpMethod.GET,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
+                null
+        );
     }
-
 }
