@@ -135,8 +135,8 @@ public abstract class CommandTestSuite {
     public void init() {
         gppTestFactory= new GPPTestFactory(pairingGenerator, cryptEngine);
         cipherTextTestFacotry.postConstruct(
-                gppTestFactory.create().getPairing().getG1(),
-                gppTestFactory.create().getPairing().getGT()
+                gppTestFactory.create().g1(),
+                gppTestFactory.create().gt()
         );
     }
 
@@ -181,15 +181,15 @@ public abstract class CommandTestSuite {
     }
 
     public Element randomElementZr() {
-        return gppTestFactory.getGlobalPublicParameter().getPairing().getZr().newRandomElement();
+        return gppTestFactory.getGlobalPublicParameter().zr().newRandomElement();
     }
 
     public Element randomElementG1() {
-        return gppTestFactory.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
+        return gppTestFactory.getGlobalPublicParameter().g1().newRandomElement();
     }
 
     public Element randomElementGT() {
-        return gppTestFactory.getGlobalPublicParameter().getPairing().getGT().newRandomElement();
+        return gppTestFactory.getGlobalPublicParameter().gt().newRandomElement();
     }
 
     public void evaluate(String command) {

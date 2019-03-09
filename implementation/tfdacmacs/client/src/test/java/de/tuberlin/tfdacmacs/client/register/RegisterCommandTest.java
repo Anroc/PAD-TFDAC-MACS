@@ -73,7 +73,7 @@ public class RegisterCommandTest extends CommandTestSuite {
 
         GlobalPublicParameter globalPublicParameter = gppTestFactory.getGlobalPublicParameter();
 
-        Attribute attribute = new Attribute("authid.attr:value", globalPublicParameter.getPairing().getG1().newRandomElement());
+        Attribute attribute = new Attribute("authid.attr:value", globalPublicParameter.g1().newRandomElement());
         Key symmetricCipherKey = symmetricCryptEngine.getSymmetricCipherKey();
         EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = new EncryptedAttributeValueKeyDTO(
                 attribute.getId(),

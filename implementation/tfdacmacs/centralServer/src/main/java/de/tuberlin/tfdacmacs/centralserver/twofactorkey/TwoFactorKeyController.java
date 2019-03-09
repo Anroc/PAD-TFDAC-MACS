@@ -73,7 +73,7 @@ public class TwoFactorKeyController {
             throw new ServiceException("Only the data owner is allowed to update this two factor key.", HttpStatus.FORBIDDEN);
         }
 
-        Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
+        Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().g1();
 
         encryptedTwoFactorKey.getTwoFactorUpdateKeys().add(
                 new TwoFactorUpdateKey(

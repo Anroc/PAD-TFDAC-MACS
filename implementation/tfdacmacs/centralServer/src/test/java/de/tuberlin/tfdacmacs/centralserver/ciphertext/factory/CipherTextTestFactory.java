@@ -22,9 +22,9 @@ public class CipherTextTestFactory {
     public CipherTextEntity create(String... policy) {
         return new CipherTextEntity(
                 UUID.randomUUID().toString(),
-                globalPublicParameter.getPairing().getGT().newRandomElement(),
-                globalPublicParameter.getPairing().getG1().newRandomElement(),
-                globalPublicParameter.getPairing().getG1().newRandomElement(),
+                globalPublicParameter.gt().newRandomElement(),
+                globalPublicParameter.g1().newRandomElement(),
+                globalPublicParameter.g1().newRandomElement(),
                 Arrays.stream(policy).collect(Collectors.toSet()),
                 UUID.randomUUID().toString(),
                 "encryptedMessage");

@@ -76,7 +76,7 @@ public class AttributeClient {
     }
 
     private Field getG1() {
-        return gppService.getGPP().getPairing().getG1();
+        return gppService.getGPP().g1();
     }
 
     public Optional<AttributeValueKey.Public> findAttributePublicKey(@NonNull String attributeValueId) {

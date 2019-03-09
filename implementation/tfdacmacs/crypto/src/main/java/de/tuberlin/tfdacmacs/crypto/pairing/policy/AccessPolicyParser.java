@@ -3,10 +3,7 @@ package de.tuberlin.tfdacmacs.crypto.pairing.policy;
 import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyBaseListener;
 import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyLexer;
 import de.tuberlin.tfdacmacs.crypto.pairing.antlr.PolicyParser;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.AccessPolicyElement;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.AndAccessPolicy;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.AttributePolicyElement;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.exception.ThrowingErrorListener;
@@ -81,7 +78,7 @@ public class AccessPolicyParser {
             current().put(new AttributePolicyElement(
                     authorityPublicKey,
                     attributeValuePublicKey,
-                    attributeValueId)
+                    new VersionedID(attributeValueId, attributeValuePublicKey.getVersion()))
             );
         }
 

@@ -8,6 +8,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DataOwner {
 
-    private final String id;
+    private final VersionedID id;
     private final TwoFactorKey.Private twoFactorPrivateKey;
+
+    public DataOwner(String id,
+            TwoFactorKey.Private twoFactorPrivateKey) {
+        this.id = new VersionedID(id, twoFactorPrivateKey.getVersion());
+        this.twoFactorPrivateKey = twoFactorPrivateKey;
+    }
 }

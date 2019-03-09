@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import lombok.Data;
@@ -20,5 +21,17 @@ public class GlobalPublicParameter {
 
     public Element getG() {
         return g.duplicate();
+    }
+
+    public Field g1() {
+        return getPairing().getG1();
+    }
+
+    public Field zr() {
+        return getPairing().getZr();
+    }
+
+    public Field gt() {
+        return getPairing().getGT();
     }
 }

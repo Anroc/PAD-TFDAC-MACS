@@ -138,7 +138,7 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
     @Test
     public void update() {
         final String userId = UUID.randomUUID().toString();
-        final Element updateKey = getGPP().getPairing().getG1().newRandomElement();
+        final Element updateKey = getGPP().g1().newRandomElement();
         final String enodedUpdateKey = ElementConverter.convert(updateKey);
 
         EncryptedTwoFactorKey encryptedTwoFactorKey = new EncryptedTwoFactorKey(

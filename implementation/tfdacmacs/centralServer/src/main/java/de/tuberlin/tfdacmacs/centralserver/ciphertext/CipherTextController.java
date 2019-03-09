@@ -36,8 +36,8 @@ public class CipherTextController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_USER')")
     public CipherTextDTO createCipherText(@Valid @RequestBody CipherTextDTO cipherTextDTO) {
-        Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
-        Field gt = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getGT();
+        Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().g1();
+        Field gt = globalPublicParameterProvider.getGlobalPublicParameter().gt();
         cipherTextService.insert(toCipherTextEntity(cipherTextDTO, g1, gt));
         return cipherTextDTO;
     }
@@ -99,7 +99,7 @@ public class CipherTextController {
 
         Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys = twoFactorCipherTextUpdateRequest
                 .toCipherText2FAUpdateKey(
-                        globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1()
+                        globalPublicParameterProvider.getGlobalPublicParameter().g1()
                 );
 
         return cipherTextService.update(twoFactorCipherTextUpdateRequest.getOwnerId(), cipherText2FAUpdateKeys)

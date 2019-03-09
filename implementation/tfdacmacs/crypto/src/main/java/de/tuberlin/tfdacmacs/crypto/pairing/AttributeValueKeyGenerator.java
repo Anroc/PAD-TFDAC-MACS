@@ -2,12 +2,15 @@ package de.tuberlin.tfdacmacs.crypto.pairing;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,12 +24,31 @@ public class AttributeValueKeyGenerator {
      * @param gpp the global public paramter
      * @return the attribute key
      */
-    public AttributeValueKey generate(@NonNull GlobalPublicParameter gpp, @NonNull String attributeValueId) {
+    public AttributeValueKey generateNew(@NonNull GlobalPublicParameter gpp, @NonNull String attributeValueId) {
+        return generate(gpp, attributeValueId, 0L);
+    }
+
+    /**
+     * Generates a new attribute private and public key.
+     *
+     * @param gpp the global public paramter
+     * @param currentAttributeValueKey the current attributeValueKey
+     * @return the attribute key
+     */
+    public AttributeValueKey generateNext(@NonNull GlobalPublicParameter gpp, @NonNull AttributeValueKey currentAttributeValueKey) {
+        return generate(gpp, currentAttributeValueKey.getAttributeValueId(), currentAttributeValueKey.getVersion() + 1);
+    }
+
+    private AttributeValueKey generate(GlobalPublicParameter gpp, String attributeValueId, long version) {
         Element g = gpp.getG();
-        Element privateKey = gpp.getPairing().getZr().newRandomElement(); // y
+        Element privateKey = gpp.zr().newRandomElement(); // y
         Element publicKey = g.powZn(privateKey); // g ** y
 
-        return new AttributeValueKey(privateKey, publicKey, attributeValueId);
+        return new AttributeValueKey(
+                privateKey,
+                publicKey,
+                attributeValueId,
+                version);
     }
 
     /**
@@ -47,7 +69,8 @@ public class AttributeValueKeyGenerator {
         Element userIdHash = hashGenerator.g1Hash(gpp, userId);
         // g ** x * H(uid)**y
         return new UserAttributeValueKey(
-                gpp.getG().powZn(privateAuthorityKey.getKey()).mul(userIdHash.powZn(privateAttributeValueKey.getKey()))
+                gpp.getG().powZn(privateAuthorityKey.getKey()).mul(userIdHash.powZn(privateAttributeValueKey.getKey())),
+                privateAttributeValueKey.getVersion()
         );
     }
 
@@ -104,8 +127,9 @@ public class AttributeValueKeyGenerator {
         return  new CipherTextAttributeUpdateKey(
                 cuk,
                 newAttributeValueKey.getAttributeValueId(),
+                Optional.ofNullable(twoFactorPublicKey).map(tf -> new VersionedID(tf.getUserId(), tf.getVersion())).orElse(null),
                 newAttributeValueKey.getPublicKey(),
-                revokedAttributeValueKey.getVersion().getVersion()
+                revokedAttributeValueKey.getVersion()
         );
     }
 }

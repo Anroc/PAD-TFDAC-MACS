@@ -17,12 +17,12 @@ public class CipherText {
     private final Element c2;
     private final Element c3;
 
-    private final Set<String> accessPolicy;
-    private final String ownerId;
+    private final Set<VersionedID> accessPolicy;
+    private final VersionedID ownerId;
 
     private final String fileId;
 
-    public CipherText(Element c1, Element c2, Element c3, Set<String> accessPolicy, String ownerId, String fileId) {
+    public CipherText(Element c1, Element c2, Element c3, Set<VersionedID> accessPolicy, VersionedID ownerId, String fileId) {
         this(UUID.randomUUID().toString(), c1, c2, c3, accessPolicy, ownerId, fileId);
     }
 

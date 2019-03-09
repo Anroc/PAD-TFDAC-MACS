@@ -5,7 +5,7 @@ import lombok.NonNull;
 
 public class AuthorityKey extends AsymmetricElementKey<AuthorityKey> {
 
-    public AuthorityKey(@NonNull Element privateKey, @NonNull Element publicKey) {
-        super(privateKey, publicKey);
+    public AuthorityKey(@NonNull Element privateKey, @NonNull Element publicKey, long version) {
+        super(privateKey, publicKey, version);
     }
 }

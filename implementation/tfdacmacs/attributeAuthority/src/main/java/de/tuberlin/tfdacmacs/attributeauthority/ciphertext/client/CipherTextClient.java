@@ -25,7 +25,7 @@ public class CipherTextClient {
     private final GlobalPublicParameterProvider globalPublicParameterProvider;
 
     public List<CipherText> findCipherTextsByAttribute(@NonNull String attributeValueId) {
-        Field gt = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getGT();
+        Field gt = globalPublicParameterProvider.getGlobalPublicParameter().gt();
         Field g1 = getG1();
 
         return caClient.getCipherTexts(Lists.newArrayList(attributeValueId))
@@ -42,7 +42,7 @@ public class CipherTextClient {
     }
 
     private Field getG1() {
-        return globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
+        return globalPublicParameterProvider.getGlobalPublicParameter().g1();
     }
 
     public Map<String, TwoFactorKey.Public> findTwoFactorPublicKeys(@NonNull Set<String> ownerIds) {

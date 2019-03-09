@@ -1,13 +1,16 @@
 package de.tuberlin.tfdacmacs.crypto.pairing;
 
+import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.*;
+import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.VersionMismatchException;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -26,12 +29,12 @@ public class ABEEncryptor extends ABECrypto {
             throw new IllegalArgumentException("No Attribute policy given.");
         }
 
-        Set<String> attributeValueIdentifier = andAccessPolicy.getAttributePolicyElements().stream()
+        Set<VersionedID> attributeValueIdentifier = andAccessPolicy.getAttributePolicyElements().stream()
                 .map(AttributePolicyElement::getAttributeValueId)
                 .collect(Collectors.toSet());
 
-        key = (key != null)? key : gpp.getPairing().getGT().newRandomElement().getImmutable();
-        Element s = gpp.getPairing().getZr().newRandomElement().getImmutable();
+        key = (key != null)? key : gpp.gt().newRandomElement().getImmutable();
+        Element s = gpp.zr().newRandomElement().getImmutable();
 
         Map<AuthorityKey.Public, Set<AttributePolicyElement>> policy = andAccessPolicy.groupByAttributeAuthority();
 
@@ -55,24 +58,46 @@ public class ABEEncryptor extends ABECrypto {
             @NonNull CipherText cipherText,
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey) {
-        if(! cipherText.getAccessPolicy().contains(cipherTextAttributeUpdateKey.getAttributeValueId())
-            || ! andAccessPolicy.contains(cipherTextAttributeUpdateKey.getAttributeValueId())) {
-
-            log.info("Nothing to do on cipher text. Policy does not contain the attribute value to update.");
-            return cipherText;
+        if(! contains(cipherText.getAccessPolicy(), cipherTextAttributeUpdateKey.getAttributeValueId(), false)) {
+            log.warn("Nothing to do on cipher text. Policy does not contain the attribute value to update.");
         }
 
-        Element r = gpp.getPairing().getZr().newRandomElement();
+        checkConstrains(cipherText, andAccessPolicy, cipherTextAttributeUpdateKey);
+
+        Element r = gpp.zr().newRandomElement();
         Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate().mul(cipherTextAttributeUpdateKey.getUpdateKey())
                 .mul(mulAttributePublicValueKeys(
                         andAccessPolicy.getAttributePolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId())
-                        .orElse(gpp.getPairing().getG1().newOneElement())
+                        .orElse(gpp.g1().newOneElement())
                         .powZn(r))
                 .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
 
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getFileId());
+        HashSet accessPolicy = new HashSet(cipherText.getAccessPolicy());
+        accessPolicy.remove(cipherTextAttributeUpdateKey.getAttributeValueId());
+        accessPolicy.add(cipherTextAttributeUpdateKey.getAttributeValueId().increment());
+
+        return new CipherText(updatedC1, updatedC2, updatedC3, accessPolicy, cipherText.getOwnerId(), cipherText.getFileId());
+    }
+
+    private void checkConstrains(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy,
+            @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey) {
+        if(! containsAll(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true)
+                ||! containsAll(cipherText.getAccessPolicy(), andAccessPolicy.getAttributeValueIds(), true)) {
+            if(! containsAll(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false)
+                    ||! containsAll(cipherText.getAccessPolicy(), andAccessPolicy.getAttributeValueIds(), false)) {
+                throw new IllegalArgumentException("Given and access Policy does not mirror the policy in ciphertext");
+            } else {
+                throw new VersionMismatchException(
+                        String.format("Given AndAccessPolicy %s is not the same as the cipher text policy %s", andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy())
+                );
+            }
+        } else if(cipherText.isTwoFactorSecured() && cipherTextAttributeUpdateKey.getDataOwnerId().equals(cipherText.getOwnerId())) {
+            throw new VersionMismatchException(
+                    String.format("Given cipher text 2FA key has version %s but update key version was %s", cipherText.getOwnerId(), cipherTextAttributeUpdateKey.getDataOwnerId())
+            );
+        }
     }
 
     public CipherText update(
@@ -105,7 +130,7 @@ public class ABEEncryptor extends ABECrypto {
                             cipherText.getAccessPolicy().size() - subSet2FaUpdateKeys.size()));
         }
 
-        Element r = gpp.getPairing().getZr().newRandomElement();
+        Element r = gpp.zr().newRandomElement();
         Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate()
@@ -139,12 +164,27 @@ public class ABEEncryptor extends ABECrypto {
     }
 
     private Optional<Element> mulAttributePublicValueKeys(
-            @NonNull Set<AttributePolicyElement> policy, String excludedAttributeValueId) {
+            @NonNull Set<AttributePolicyElement> policy, VersionedID excludedAttributeValueId) {
         return policy.stream()
                 .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().equals(excludedAttributeValueId))
                 .map(AttributePolicyElement::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
                 .reduce((a, b) -> a.duplicate().mul(b))
                 .map(Element::duplicate);
+    }
+
+    private boolean contains(Set<VersionedID> a, VersionedID b, boolean exact) {
+        return containsAll(a, Sets.newHashSet(b), exact);
+    }
+
+
+    private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact) {
+        if(exact) {
+            return a.containsAll(b);
+        } else {
+            Set<String> aIds = a.stream().map(VersionedID::getId).collect(Collectors.toSet());
+
+            return b.stream().allMatch(versionedID -> aIds.contains(versionedID.getId()));
+        }
     }
 }

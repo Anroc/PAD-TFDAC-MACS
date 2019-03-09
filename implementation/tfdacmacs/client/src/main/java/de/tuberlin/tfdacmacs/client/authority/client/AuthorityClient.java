@@ -43,7 +43,7 @@ public class AuthorityClient {
                     new AuthorityKey.Public<>(
                         ElementConverter.convert(
                             authority.getPublicKey(),
-                            gppService.getGPP().getPairing().getGT())));
+                            gppService.getGPP().gt())));
         } catch(InterServiceCallError e) {
             if(e.getResponseStatus() == HttpStatus.NOT_FOUND) {
                 return Optional.empty();

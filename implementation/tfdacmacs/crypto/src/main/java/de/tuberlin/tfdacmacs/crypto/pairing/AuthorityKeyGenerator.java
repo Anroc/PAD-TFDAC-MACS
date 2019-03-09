@@ -17,12 +17,12 @@ public class AuthorityKeyGenerator {
      * @return the private and public key pair
      */
     public AuthorityKey generate(@NonNull GlobalPublicParameter gpp) {
-        Field Zr = gpp.getPairing().getZr();
+        Field Zr = gpp.zr();
         Element g = gpp.getG();
 
         Element x = Zr.newRandomElement();
         Element egg_x = gpp.getPairing().pairing(g, g).powZn(x);
 
-        return new AuthorityKey(x, egg_x);
+        return new AuthorityKey(x, egg_x, 0L);
     }
 }

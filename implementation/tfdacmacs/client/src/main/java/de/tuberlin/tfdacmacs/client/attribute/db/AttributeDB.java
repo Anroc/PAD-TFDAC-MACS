@@ -18,7 +18,7 @@ public class AttributeDB extends JsonDB<Attribute> {
     @EventListener(GPPReceivedEvent.class)
     public void initElementModule(GPPReceivedEvent gppReceivedEvent) {
         getFileEngine().registerModule(
-                elementModule(gppReceivedEvent.getGPP().getPairing().getG1())
+                elementModule(gppReceivedEvent.getGPP().g1())
         );
     }
 }

@@ -35,7 +35,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
     @Before
     public void setup() {
         this.publicAttributeValue = new PublicAttributeValue(
-                gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement(),
+                gppProvider.getGlobalPublicParameter().g1().newRandomElement(),
                 "test",
                 0L,
                 "testSignature"
@@ -118,7 +118,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
 
         publicAttributeDB.insert(publicAttribute);
 
-        Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
+        Element originalPublicKey = gppProvider.getGlobalPublicParameter().g1().newRandomElement();
         String value = "otherTest";
 
         AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
@@ -146,7 +146,7 @@ public class PublicAttributeControllerRestTest extends RestTestSuite {
 
         publicAttributeDB.insert(publicAttribute);
 
-        Element originalPublicKey = gppProvider.getGlobalPublicParameter().getPairing().getG1().newRandomElement();
+        Element originalPublicKey = gppProvider.getGlobalPublicParameter().g1().newRandomElement();
 
         AttributeValueCreationRequest attributeValueCreationRequest = new AttributeValueCreationRequest(
                 publicAttributeValue.getValue().toString(),

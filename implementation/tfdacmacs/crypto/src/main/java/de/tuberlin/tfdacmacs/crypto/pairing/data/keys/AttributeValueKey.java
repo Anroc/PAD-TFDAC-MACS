@@ -1,8 +1,10 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
-import de.tuberlin.tfdacmacs.crypto.pairing.data.Versioned;
 import it.unisa.dia.gas.jpbc.Element;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
 
@@ -14,8 +16,12 @@ public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
     @NotNull
     private String attributeValueId;
 
-    public AttributeValueKey(@NonNull Element privateKey, @NonNull Element publicKey, @NonNull String attributeValueId) {
-        super(new AttributeValueKey.Private(privateKey, attributeValueId), new AttributeValueKey.Public(publicKey, attributeValueId));
+    public AttributeValueKey(@NonNull Element privateKey, @NonNull Element publicKey, @NonNull String attributeValueId, long version) {
+        super(
+                new AttributeValueKey.Private(privateKey, attributeValueId, version),
+                new AttributeValueKey.Public(publicKey, attributeValueId, version),
+                version
+        );
         this.attributeValueId = attributeValueId;
     }
 
@@ -35,8 +41,8 @@ public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
     public static class Private<T> extends AsymmetricElementKey.Private<AttributeValueKey> {
         private final String attributeValueId;
 
-        public Private(@NonNull Element key, @NonNull String attributeValueId) {
-            super(key);
+        public Private(@NonNull Element key, @NonNull String attributeValueId, long version) {
+            super(key, version);
             this.attributeValueId = attributeValueId;
         }
     }
@@ -47,8 +53,8 @@ public class AttributeValueKey extends AsymmetricElementKey<AttributeValueKey> {
     public static class Public<T> extends AsymmetricElementKey.Public<AttributeValueKey> {
         private final String attributeValueId;
 
-        public Public(@NonNull Element key, @NonNull String attributeValueId) {
-            super(key);
+        public Public(@NonNull Element key, @NonNull String attributeValueId, long version) {
+            super(key, version);
             this.attributeValueId = attributeValueId;
         }
     }

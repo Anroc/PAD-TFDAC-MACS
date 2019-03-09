@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.crypto.UnitTestSuite;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.AccessPolicyNotSatisfiedException;
+import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.VersionMismatchException;
 import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.util.Sets;
 import org.junit.Before;
@@ -30,12 +31,12 @@ public class ABECryptoTest extends UnitTestSuite {
     public void setup() {
         gpp = gppTestFactory.create();
         authorityKeys = authorityKeyGenerator.generate(gpp);
-        attributeKeys = attributeValueKeyGenerator.generate(gpp, attributeValueIdentifier);
+        attributeKeys = attributeValueKeyGenerator.generateNew(gpp, attributeValueIdentifier);
         userSecretAttributeValueKey = attributeValueKeyGenerator
                 .generateUserKey(gpp, userId, authorityKeys.getPrivateKey(), attributeKeys.getPrivateKey());
 
         HashSet<AttributePolicyElement> attributePolicyElements = Sets.newHashSet();
-        attributePolicyElements.add(new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), attributeValueIdentifier));
+        attributePolicyElements.add(new AttributePolicyElement(authorityKeys.getPublicKey(), attributeKeys.getPublicKey(), new VersionedID(attributeValueIdentifier, attributeKeys.getVersion())));
         andAccessPolicy = new AndAccessPolicy(attributePolicyElements);
     }
 
@@ -57,11 +58,11 @@ public class ABECryptoTest extends UnitTestSuite {
     @Test
     public void abe_encrypt_decrypt_failsOnUnsatisfyingPolicy() {
         String attrValueId = "aa.hpi.de.role:student";
-        AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
+        AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generateNew(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
 
         andAccessPolicy.getAttributePolicyElements().add(
-                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), new VersionedID(attrValueId, attributeKeys2.getVersion()))
         );
 
         // encrypt
@@ -84,7 +85,7 @@ public class ABECryptoTest extends UnitTestSuite {
 
         // generate update components
         AttributeValueKey newAttributeValueKey = attributeValueKeyGenerator
-                .generate(gpp, attributeValueIdentifier);
+                .generateNext(gpp, attributeKeys);
         UserAttributeValueUpdateKey newUserAttributeValueUpdateKey = attributeValueKeyGenerator
                 .generateUserUpdateKey(gpp, userId, attributeKeys.getPrivateKey(),
                         newAttributeValueKey.getPrivateKey());
@@ -101,13 +102,14 @@ public class ABECryptoTest extends UnitTestSuite {
         // oldUserSecret component is not able to decrypt new ciphertext
         LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier));
-        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null);
-        assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
+        assertThatExceptionOfType(VersionMismatchException.class).isThrownBy(
+                () -> abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null)
+        );
 
         // updated components are able to decrypt
         LinkedHashSet<UserAttributeSecretComponent> updatedUserAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier));
-        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
+        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
@@ -115,11 +117,11 @@ public class ABECryptoTest extends UnitTestSuite {
     public void ciphertext_update_passes_withMultipleAttributePublicy() {
         // encrypt
         String attrValueId = "aa.hpi.de.role:student";
-        AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generate(gpp, attrValueId);
+        AttributeValueKey attributeKeys2 = attributeValueKeyGenerator.generateNew(gpp, attrValueId);
         AuthorityKey authorityAuthorityKey2 = authorityKeyGenerator.generate(gpp);
 
         andAccessPolicy.getAttributePolicyElements().add(
-                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), attrValueId)
+                new AttributePolicyElement(authorityAuthorityKey2.getPublicKey(), attributeKeys2.getPublicKey(), new VersionedID(attrValueId, attributeKeys2.getVersion()))
         );
         CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, null, null);
         assertThat(cipherText.isTwoFactorSecured()).isFalse();
@@ -130,7 +132,7 @@ public class ABECryptoTest extends UnitTestSuite {
 
         // generate update components
         AttributeValueKey newAttributeValueKey = attributeValueKeyGenerator
-                .generate(gpp, attributeValueIdentifier);
+                .generateNext(gpp, attributeKeys);
         UserAttributeValueUpdateKey newUserAttributeValueUpdateKey = attributeValueKeyGenerator
                 .generateUserUpdateKey(gpp, userId, attributeKeys.getPrivateKey(),
                         newAttributeValueKey.getPrivateKey());
@@ -149,22 +151,23 @@ public class ABECryptoTest extends UnitTestSuite {
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier),
                 new UserAttributeSecretComponent(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
         );
-        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null);
-        assertNotSameElements(key.toBytes(), cipherText.getKey().toBytes());
+        assertThatExceptionOfType(VersionMismatchException.class).isThrownBy(
+                () -> abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, null)
+        );
 
         // updated components are able to decrypt
         LinkedHashSet<UserAttributeSecretComponent> updatedUserAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(updateUserSecretKey, newAttributeValueKey.getPublicKey(), attributeValueIdentifier),
                 new UserAttributeSecretComponent(userSecretAttributeValueKey2, attributeKeys2.getPublicKey(), attrValueId)
         );
-        key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
+        Element key = abeDecryptor.decrypt(updatedCipherText, gpp, userId, updatedUserAttributeSecretComponents, null);
         assertSameElements(key.toBytes(), cipherText.getKey().toBytes());
     }
 
     @Test
     public void ciphertext_2fa_update_passes() {
         String ownerId = UUID.randomUUID().toString();
-        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gpp, userId);
+        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gpp, userId);
         TwoFactorKey.Public user2FAKey = twoFactorKey.getPublicKeyOfUser(userId);
 
         // encrypt
@@ -172,7 +175,7 @@ public class ABECryptoTest extends UnitTestSuite {
         assertThat(cipherText.isTwoFactorSecured()).isTrue();
 
         // generate Update components
-        TwoFactorKey newTwoFactorKey = twoFactorKeyGenerator.generate(gpp, userId);
+        TwoFactorKey newTwoFactorKey = twoFactorKeyGenerator.generateNext(gpp, twoFactorKey, userId);
         TwoFactorUpdateKey twoFactorUpdateKey = twoFactorKeyGenerator.generateUpdateKey(gpp, twoFactorKey.getPrivateKey(), newTwoFactorKey.getPrivateKey(), userId);
         CipherText2FAUpdateKey cipherText2FAUpdateKey = twoFactorKeyGenerator.generateCipherTextUpdateKey(twoFactorKey.getPrivateKey(), newTwoFactorKey.getPrivateKey(), attributeKeys.getPublicKey(), ownerId);
 

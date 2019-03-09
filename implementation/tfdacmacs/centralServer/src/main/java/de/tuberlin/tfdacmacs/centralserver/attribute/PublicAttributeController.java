@@ -106,7 +106,7 @@ public class PublicAttributeController {
     }
 
     public Field getG1() {
-        return gppProvider.getGlobalPublicParameter().getPairing().getG1();
+        return gppProvider.getGlobalPublicParameter().g1();
     }
 
     public void checkAuthorityAccess(PublicAttribute publicAttribute) {

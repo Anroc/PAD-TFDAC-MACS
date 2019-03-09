@@ -21,8 +21,8 @@ public class AttributeValueKeyGeneratorTest extends UnitTestSuite {
 
     @Test
     public void generateAttributeKeys_passes_forTwoValuesGeneration() {
-        AttributeValueKey key1 = attributeValueKeyGenerator.generate(globalPublicParameter, "asd");
-        AttributeValueKey key2 = attributeValueKeyGenerator.generate(globalPublicParameter, "dsa");
+        AttributeValueKey key1 = attributeValueKeyGenerator.generateNew(globalPublicParameter, "asd");
+        AttributeValueKey key2 = attributeValueKeyGenerator.generateNew(globalPublicParameter, "dsa");
 
         assertThat(key1.getPublicKey().getKey().toBytes()).isNotEqualTo(key2.getPrivateKey().getKey().toBytes());
         assertThat(key1.getPublicKey().getKey().toBytes()).isNotEqualTo(key2.getPublicKey().getKey().toBytes());
