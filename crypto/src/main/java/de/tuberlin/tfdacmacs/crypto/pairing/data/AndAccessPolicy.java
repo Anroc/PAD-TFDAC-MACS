@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -24,13 +25,19 @@ public class AndAccessPolicy extends AccessPolicyElement {
                 map.put(attributePolicyElement.getAuthorityPublicKey(), new HashSet<>());
             }
 
-            map.get(attributePolicyElement.getAuthorityPublicKey()).add(attributePolicyElement);
+              map.get(attributePolicyElement.getAuthorityPublicKey()).add(attributePolicyElement);
         }
 
         return map;
     }
 
-    public boolean contains(@NonNull String attributeValueId) {
+    public Set<VersionedID> getAttributeValueIds() {
+        return attributePolicyElements.stream()
+                .map(AttributePolicyElement::getAttributeValueId)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean contains(@NonNull VersionedID attributeValueId) {
         return attributePolicyElements.stream()
                 .map(AttributePolicyElement::getAttributeValueId)
                 .anyMatch(attributeValueId::equals);

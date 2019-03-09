@@ -34,7 +34,7 @@ public class AttributeCommandTest extends CommandTestSuite {
     public void setup() {
         attribute = new Attribute(
                 "testAttribute.type:value",
-                gppTestFactory.getGlobalPublicParameter().getPairing().getG1().newRandomElement()
+                gppTestFactory.getGlobalPublicParameter().g1().newRandomElement()
         );
     }
 

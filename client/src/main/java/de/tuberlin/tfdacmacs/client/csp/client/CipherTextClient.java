@@ -87,11 +87,11 @@ public class CipherTextClient {
     }
 
     private Field g1() {
-        return gppService.getGPP().getPairing().getG1();
+        return gppService.getGPP().g1();
     }
 
     private Field gt() {
-        return gppService.getGPP().getPairing().getGT();
+        return gppService.getGPP().gt();
     }
 
 

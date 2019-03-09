@@ -9,23 +9,18 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public abstract class ElementKey implements Versioned {
 
     private @NotNull @NonNull Element key;
-    private @Min(0) int version;
+    private @Min(0) long version;
 
-    public ElementKey(@NotNull @NonNull Element key) {
-        this.key = key;
-        this.version = 0;
-    }
-
-    public Element getKey() {
-        return this.key.getImmutable();
+    public ElementKey(@NotNull @NonNull Element key, long version) {
+        this.key = key.getImmutable();
+        this.version = version;
     }
 
     protected <T extends ElementKey> T incrementVersion() {
-        this.version++;
+        setVersion(getVersion() + 1L);
         return (T) this;
     }
 }

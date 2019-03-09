@@ -18,8 +18,8 @@ public abstract class AsymmetricElementMultiKey<T> extends ElementKey {
     @NotNull
     protected Map<T, Element> publicKeys;
 
-    public AsymmetricElementMultiKey(@NonNull Element privateKey) {
-        super(privateKey);
+    public AsymmetricElementMultiKey(@NonNull Element privateKey, long version) {
+        super(privateKey, version);
         this.publicKeys = new HashMap<>();
     }
 

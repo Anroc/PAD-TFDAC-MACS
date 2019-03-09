@@ -79,16 +79,16 @@ public class CouchbaseElementConverters {
                     field = gppProvider.getGlobalPublicParameter().getPairing().getG2();
                     break;
                 case GT:
-                    field = gppProvider.getGlobalPublicParameter().getPairing().getGT();
+                    field = gppProvider.getGlobalPublicParameter().gt();
                     break;
                 case ZR:
-                    field = gppProvider.getGlobalPublicParameter().getPairing().getZr();
+                    field = gppProvider.getGlobalPublicParameter().zr();
                     break;
                 case UNKNOWN:
                     log.warn("PBCFieldType was UNKNOWN.");
                 case G1:
                 default:
-                    field = gppProvider.getGlobalPublicParameter().getPairing().getG1();
+                    field = gppProvider.getGlobalPublicParameter().g1();
                     break;
                 }
                 return ElementConverter.convert(split[0], field);

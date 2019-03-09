@@ -132,7 +132,7 @@ public class TwoFactorAuthenticationClient {
     }
 
     private Field getG1() {
-        return gppService.getGPP().getPairing().getG1();
+        return gppService.getGPP().g1();
     }
 
     private String encryptAsymmetrically(PublicKey publicKey, Key symmetricKey) {

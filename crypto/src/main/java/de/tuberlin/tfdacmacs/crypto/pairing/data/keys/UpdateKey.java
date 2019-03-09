@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.VersionMismatchException;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,14 +12,17 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public abstract class UpdateKey extends ElementKey {
 
-    private int targetVersion;
-
-    public UpdateKey(@NotNull @NonNull Element key, int targetVersion) {
-        super(key);
-        this.targetVersion = targetVersion;
+    public UpdateKey(@NotNull @NonNull Element key, long targetVersion) {
+        super(key, targetVersion);
     }
 
     public Element getUpdateKey() {
         return getKey();
+    }
+
+    public void checkApplicablilty(@NonNull ElementKey target) {
+        if(target.getVersion() != getVersion()) {
+            throw new VersionMismatchException(target, this);
+        }
     }
 }

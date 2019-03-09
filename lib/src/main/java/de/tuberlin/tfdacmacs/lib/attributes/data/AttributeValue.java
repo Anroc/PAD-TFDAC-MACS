@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -18,13 +17,14 @@ public class AttributeValue<T> extends AttributeValueKey implements AttributeVal
     @NotNull
     private T value;
 
-    @Min(0)
-    private long version;
-
-    public AttributeValue(@NonNull T value, @NonNull AttributeValueKey attributeValueKey, long version) {
-        super(attributeValueKey.getPrivateKey().getKey(), attributeValueKey.getPublicKey().getKey(), attributeValueKey.getAttributeValueId());
+    public AttributeValue(@NonNull T value, @NonNull AttributeValueKey attributeValueKey) {
+        super(
+                attributeValueKey.getPrivateKey().getKey(),
+                attributeValueKey.getPublicKey().getKey(),
+                attributeValueKey.getAttributeValueId(),
+                attributeValueKey.getVersion()
+        );
         this.value = value;
-        this.version = version;
     }
 
     @Override

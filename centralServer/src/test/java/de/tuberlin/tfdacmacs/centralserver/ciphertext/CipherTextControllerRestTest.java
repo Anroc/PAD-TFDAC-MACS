@@ -44,8 +44,8 @@ public class CipherTextControllerRestTest extends RestTestSuite {
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
 
         CipherTextEntity ct = exchange.getBody().toCipherTextEntity(
-                getGPP().getPairing().getG1(),
-                getGPP().getPairing().getGT());
+                getGPP().g1(),
+                getGPP().gt());
         assertThat(ct).isEqualTo(originalCT);
     }
 

@@ -12,5 +12,14 @@ public class UserAttributeSecretComponent {
     private final UserAttributeValueKey userSecretAttributeKey;
     private final AttributeValueKey.Public attributePublicKey;
 
-    private final String attributeValueId;
+    private final VersionedID attributeValueId;
+
+    public UserAttributeSecretComponent(
+            UserAttributeValueKey userSecretAttributeKey,
+            AttributeValueKey.Public attributePublicKey,
+            String attributeValueId) {
+        this.userSecretAttributeKey = userSecretAttributeKey;
+        this.attributePublicKey = attributePublicKey;
+        this.attributeValueId = new VersionedID(attributeValueId, userSecretAttributeKey.getVersion());
+    }
 }

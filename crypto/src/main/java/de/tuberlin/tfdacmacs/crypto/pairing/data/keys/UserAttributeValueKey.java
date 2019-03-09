@@ -6,12 +6,13 @@ import lombok.NonNull;
 
 @EqualsAndHashCode(callSuper = true)
 public class UserAttributeValueKey extends ElementKey {
-    public UserAttributeValueKey(@NonNull Element key) {
-        super(key);
+    public UserAttributeValueKey(@NonNull Element key, long version) {
+        super(key, version);
     }
 
     public UserAttributeValueKey update(@NonNull UserAttributeValueUpdateKey userAttributeValueUpdateKey) {
+        userAttributeValueUpdateKey.checkApplicablilty(this);
         Element newKey = getKey().duplicate().mul(userAttributeValueUpdateKey.getUpdateKey());
-        return new UserAttributeValueKey(newKey).incrementVersion();
+        return new UserAttributeValueKey(newKey, userAttributeValueUpdateKey.getVersion()).incrementVersion();
     }
 }

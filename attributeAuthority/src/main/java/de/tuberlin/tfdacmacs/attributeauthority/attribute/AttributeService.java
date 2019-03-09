@@ -86,8 +86,8 @@ public class AttributeService {
             @NonNull String attributeValueId,
             @NonNull GlobalPublicParameter gpp,
             long version) {
-        AttributeValueKey key = attributeValueKeyGenerator.generate(gpp, attributeValueId);
-        return new AttributeValue(value, key, version);
+        AttributeValueKey key = attributeValueKeyGenerator.generateNew(gpp, attributeValueId, version);
+        return new AttributeValue(value, key);
     }
 
     public void revoke(@NonNull Attribute attribute, @NonNull String attributeValueId) {

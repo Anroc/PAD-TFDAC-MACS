@@ -62,7 +62,7 @@ public class TFDACMACSDemo {
     }
 
     private AttributeValueKey createAttribute(GlobalPublicParameter gpp, String attributeValueIdentifier) {
-        return attributeValueKeyGenerator.generate(gpp, attributeValueIdentifier);
+        return attributeValueKeyGenerator.generateNew(gpp, attributeValueIdentifier);
     }
 
     private UserAttributeValueKey createUserAttributeKey(GlobalPublicParameter gpp, String userId, AuthorityKey authorityKey, AttributeValueKey attributeValueKey) {
@@ -70,7 +70,7 @@ public class TFDACMACSDemo {
     }
 
     private TwoFactorKey generate2FA(GlobalPublicParameter gpp, TwoFactorKeyGenerator twoFactorKeyGenerator) {
-        return twoFactorKeyGenerator.generate(gpp);
+        return twoFactorKeyGenerator.generateNew(gpp);
     }
 
     private DNFAccessPolicy parsePolicy(String policy, Map<String, AuthorityKey.Public> authorityPublicKeys, Set<AttributeValueKey.Public> attributePublicKeys) {
@@ -96,7 +96,7 @@ public class TFDACMACSDemo {
     private CipherText findSatisfyingCipherText(DNFCipherText cipherText,
             Set<UserAttributeSecretComponent> userAttributeKeys) {
 
-        Set<String> attributeValueIds = userAttributeKeys.stream().map(UserAttributeSecretComponent::getAttributeValueId)
+        Set<VersionedID> attributeValueIds = userAttributeKeys.stream().map(UserAttributeSecretComponent::getAttributeValueId)
                 .collect(Collectors.toSet());
 
         return cipherText.getCipherTexts().stream()

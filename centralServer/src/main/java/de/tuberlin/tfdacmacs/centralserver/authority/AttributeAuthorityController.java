@@ -65,7 +65,7 @@ public class AttributeAuthorityController {
 
         AuthorityKey.Public publicKey = new AuthorityKey.Public<>(ElementConverter.convert(
                 attributeAuthorityPublicKeyRequest.getAuthorityPublicKey(),
-                globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1()
+                globalPublicParameterProvider.getGlobalPublicParameter().g1()
         ));
 
         attributeAuthority.setPublicKey(publicKey);

@@ -15,7 +15,7 @@ public class AttributePolicyElement extends AccessPolicyElement {
     private final AuthorityKey.Public authorityPublicKey;
     private final AttributeValueKey.Public attributePublicKey;
 
-    private final String attributeValueId;
+    private final VersionedID attributeValueId;
 
     @Override
     public void put(@NonNull AccessPolicyElement accessPolicyElement) {

@@ -254,7 +254,7 @@ public class RegisterUser extends IntegrationTestSuite {
 
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         attributeSecretKey = ElementConverter
-                .convert(extractFromSet(exchange.getBody().getAttributes()).getKey(), gpp.getPairing().getG1());
+                .convert(extractFromSet(exchange.getBody().getAttributes()).getKey(), gpp.g1());
     }
 
     private void getAttributeKeys() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {

@@ -17,7 +17,7 @@ public class TwoFactorAuthenticationDB extends JsonDB<TwoFactorAuthentication> {
     @EventListener(GPPReceivedEvent.class)
     public void initElementModule(GPPReceivedEvent gppReceivedEvent) {
         getFileEngine().registerModule(
-                elementModule(gppReceivedEvent.getGPP().getPairing().getG1())
+                elementModule(gppReceivedEvent.getGPP().g1())
         );
     }
 }
