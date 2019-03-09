@@ -2,7 +2,7 @@ package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 
 import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
-import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

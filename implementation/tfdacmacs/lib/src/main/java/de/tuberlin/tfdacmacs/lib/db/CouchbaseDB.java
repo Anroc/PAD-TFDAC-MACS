@@ -154,7 +154,7 @@ public abstract class CouchbaseDB<T extends Entity> {
         List<DomainEvent> events = ImmutableList.copyOf(entity.getEvents());
         entity.getEvents().clear();
         dbCall.accept(entity);
-        entity.getEvents().forEach(publisher::publishEvent);
+        events.forEach(publisher::publishEvent);
     }
 }
 

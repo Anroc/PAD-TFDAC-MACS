@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,17 +92,6 @@ public class PublicAttributeController {
         }
     }
 
-    @PutMapping("/{attributeId}/values/{valueId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ROLE_AUTHORITY')")
-    public PublicAttributeValueResponse updateAttributeValue(
-            @PathVariable("attributeId") String attributeId,
-            @PathVariable("valueId") String valueId,
-            @Valid @RequestBody AttributeValueCreationRequest attributeValueCreationRequest) {
-
-        return createAttributeValue(attributeId, attributeValueCreationRequest);
-    }
-
     @GetMapping("/{authorityId}/values/{valueId}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_AUTHORITY', 'ROLE_ADMIN')")
     public PublicAttributeValueResponse getAttribute(@PathVariable("authorityId") String attributeId, @PathVariable("valueId") String valueId) {
@@ -110,7 +100,7 @@ public class PublicAttributeController {
                 .map(Set::stream)
                 .orElseThrow(() -> new NotFoundException(attributeId))
                 .filter(attributeValue -> attributeValue.getValue().toString().equals(valueId))
-                .findAny()
+                .max(Comparator.comparingLong(PublicAttributeValue::getVersion))
                 .map(publicAttributeValue -> PublicAttributeValueResponse.from(publicAttributeValue, publicAttributeValue.getSignature()))
                 .orElseThrow(() -> new NotFoundException(valueId));
     }

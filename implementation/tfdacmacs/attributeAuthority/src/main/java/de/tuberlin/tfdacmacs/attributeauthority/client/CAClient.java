@@ -7,8 +7,11 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueRespons
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
+
+import java.util.List;
 
 public interface CAClient {
 
@@ -31,5 +34,7 @@ public interface CAClient {
     // ATTRIBUTES
     PublicAttributeResponse createAttribute(AttributeCreationRequest attributeCreationRequest);
     PublicAttributeValueResponse createAttributeValue(String attributeId, AttributeValueCreationRequest attributeValueCreationRequest);
-    PublicAttributeValueResponse updateAttributeValue(String attributeId, String attributeValueId, AttributeValueCreationRequest attributeValueCreationRequest);
+
+    // CIHPERTEXTS
+    List<CipherTextDTO> getCipherTexts(List<String> attributeValueId);
 }

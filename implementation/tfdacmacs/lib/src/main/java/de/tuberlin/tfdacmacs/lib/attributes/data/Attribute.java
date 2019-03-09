@@ -26,7 +26,7 @@ public class Attribute extends AbstractAttribute<AttributeValue> {
     public Attribute updateValue(@NonNull AttributeValue newAttributeValue) {
         AttributeValue attributeValue = findAttributeValue(newAttributeValue.getAttributeValueId())
                 .orElseThrow(() -> new IllegalStateException("Could not find attribute value with id: " + newAttributeValue.getAttributeValueId()));
-
+        addValue(newAttributeValue);
         registerDomainEvent(new AttributeValueUpdatedEvent(this, attributeValue, newAttributeValue));
         return this;
     }

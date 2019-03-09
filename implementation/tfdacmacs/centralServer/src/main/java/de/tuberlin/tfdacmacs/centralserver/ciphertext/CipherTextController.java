@@ -1,13 +1,16 @@
 package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 
-import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
+import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
 import de.tuberlin.tfdacmacs.lib.exceptions.ServiceException;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Field;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +38,7 @@ public class CipherTextController {
     public CipherTextDTO createCipherText(@Valid @RequestBody CipherTextDTO cipherTextDTO) {
         Field g1 = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getG1();
         Field gt = globalPublicParameterProvider.getGlobalPublicParameter().getPairing().getGT();
-        cipherTextService.insert(cipherTextDTO.toCipherTextEntity(g1, gt));
+        cipherTextService.insert(toCipherTextEntity(cipherTextDTO, g1, gt));
         return cipherTextDTO;
     }
 
@@ -59,14 +63,14 @@ public class CipherTextController {
 
     private List<CipherTextDTO> findAll() {
         return cipherTextService.findAll().stream()
-                .map(CipherTextDTO::from)
+                .map(this::buildResponse)
                 .collect(Collectors.toList());
     }
 
     private List<CipherTextDTO> findByOwnerId(String ownerId) {
         return cipherTextService.findAllByOwnerId(ownerId)
                 .stream()
-                .map(CipherTextDTO::from)
+                .map(this::buildResponse)
                 .collect(Collectors.toList());
     }
 
@@ -74,7 +78,7 @@ public class CipherTextController {
         List<String> attributeIds = Arrays.asList(query.split(","));
         return cipherTextService.findAllByPolicyContaining(attributeIds)
                 .stream()
-                .map(CipherTextDTO::from)
+                .map(this::buildResponse)
                 .collect(Collectors.toList());
     }
 
@@ -82,7 +86,7 @@ public class CipherTextController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public CipherTextDTO getCipherText(@PathVariable("id") String id) {
         return cipherTextService.findCipherText(id)
-                .map(CipherTextDTO::from)
+                .map(this::buildResponse)
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
@@ -100,7 +104,31 @@ public class CipherTextController {
 
         return cipherTextService.update(twoFactorCipherTextUpdateRequest.getOwnerId(), cipherText2FAUpdateKeys)
                 .stream()
-                .map(CipherTextDTO::from)
+                .map(this::buildResponse)
                 .collect(Collectors.toList());
+    }
+
+    public CipherTextEntity toCipherTextEntity(@NonNull CipherTextDTO cipherTextDTO, @NonNull Field g1, @NonNull Field gt) {
+        return new CipherTextEntity(
+                cipherTextDTO.getId(),
+                ElementConverter.convert(cipherTextDTO.getC1(), gt),
+                ElementConverter.convert(cipherTextDTO.getC2(), g1),
+                ElementConverter.convert(cipherTextDTO.getC3(), g1),
+                new HashSet<>(cipherTextDTO.getAccessPolicy()),
+                cipherTextDTO.getOwnerId(),
+                cipherTextDTO.getFileId()
+        );
+    }
+
+    public CipherTextDTO buildResponse(@NonNull CipherTextEntity cipherTextEntity) {
+        return new CipherTextDTO(
+                cipherTextEntity.getId(),
+                ElementConverter.convert(cipherTextEntity.getC1()),
+                ElementConverter.convert(cipherTextEntity.getC2()),
+                ElementConverter.convert(cipherTextEntity.getC3()),
+                cipherTextEntity.getAccessPolicy(),
+                cipherTextEntity.getOwnerId(),
+                cipherTextEntity.getFileId()
+        );
     }
 }
