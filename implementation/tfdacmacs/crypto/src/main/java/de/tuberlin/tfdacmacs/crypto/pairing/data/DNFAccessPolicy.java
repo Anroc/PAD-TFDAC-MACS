@@ -1,9 +1,6 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +8,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DNFAccessPolicy extends AccessPolicyElement {
 
     private List<AndAccessPolicy> andAccessPolicies = new ArrayList<>();

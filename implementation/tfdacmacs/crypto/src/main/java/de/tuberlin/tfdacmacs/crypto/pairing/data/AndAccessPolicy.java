@@ -1,10 +1,7 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +11,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AndAccessPolicy extends AccessPolicyElement {
 
     private Set<AttributePolicyElement> attributePolicyElements = new HashSet<>();

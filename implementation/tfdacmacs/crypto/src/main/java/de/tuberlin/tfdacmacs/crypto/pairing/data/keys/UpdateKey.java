@@ -1,15 +1,24 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
 import it.unisa.dia.gas.jpbc.Element;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public abstract class UpdateKey {
+import javax.validation.constraints.NotNull;
 
-    private final @NonNull Element updateKey;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public abstract class UpdateKey extends ElementKey {
+
+    private int targetVersion;
+
+    public UpdateKey(@NotNull @NonNull Element key, int targetVersion) {
+        super(key);
+        this.targetVersion = targetVersion;
+    }
 
     public Element getUpdateKey() {
-        return this.updateKey.getImmutable();
+        return getKey();
     }
 }

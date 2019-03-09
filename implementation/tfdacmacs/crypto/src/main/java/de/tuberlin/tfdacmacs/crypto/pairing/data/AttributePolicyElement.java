@@ -3,11 +3,13 @@ package de.tuberlin.tfdacmacs.crypto.pairing.data;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AttributePolicyElement extends AccessPolicyElement {
 
     private final AuthorityKey.Public authorityPublicKey;

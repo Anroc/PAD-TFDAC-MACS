@@ -71,7 +71,8 @@ public class AttributeValueKeyGenerator {
         // H(uid)**(y' - y)
         return new UserAttributeValueUpdateKey(
                 userId,
-                userIdHash.powZn(newAttributePrivateKey.getKey().duplicate().sub(revokedAttributePrivateKey.getKey()))
+                userIdHash.powZn(newAttributePrivateKey.getKey().duplicate().sub(revokedAttributePrivateKey.getKey())),
+                revokedAttributePrivateKey.getVersion()
         );
     }
 
@@ -103,7 +104,8 @@ public class AttributeValueKeyGenerator {
         return  new CipherTextAttributeUpdateKey(
                 cuk,
                 newAttributeValueKey.getAttributeValueId(),
-                newAttributeValueKey.getPublicKey()
+                newAttributeValueKey.getPublicKey(),
+                revokedAttributeValueKey.getVersion().getVersion()
         );
     }
 }
