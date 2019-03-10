@@ -17,7 +17,7 @@ public class DecryptCommandTest extends CommandTestSuite {
     public void check() {
         String attributeId = "aa.tu-berlin.de.role:student";
         String ctId = UUID.randomUUID().toString();
-        attributeDB.upsert(attributeId, new Attribute(attributeId, randomElementG1()));
+        attributeDB.upsert(attributeId, new Attribute(attributeId, 0L, randomElementG1()));
 
         doReturn(
                 Lists.newArrayList(CipherTextDTO.from(cipherTextTestFacotry.create(ctId, null, attributeId)))

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -13,6 +14,8 @@ public class EncryptedAttributeValueKeyDTO {
 
     @NotBlank
     private String attributeValueId;
+    @Min(0)
+    private long version;
     @NotBlank
     private String encryptedKey;
 }

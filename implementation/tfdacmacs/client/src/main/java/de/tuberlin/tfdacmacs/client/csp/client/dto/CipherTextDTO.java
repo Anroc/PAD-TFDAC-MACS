@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.client.csp.client.dto;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,9 +31,9 @@ public class CipherTextDTO {
     private String c3;
 
     @NotEmpty
-    private Set<String> accessPolicy;
+    private Set<VersionedID> accessPolicy;
     @Nullable
-    private String ownerId;
+    private VersionedID ownerId;
 
     @NotBlank
     private String fileId;

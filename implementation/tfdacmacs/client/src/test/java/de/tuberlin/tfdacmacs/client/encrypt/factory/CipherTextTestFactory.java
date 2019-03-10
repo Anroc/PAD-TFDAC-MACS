@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.client.encrypt.factory;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import it.unisa.dia.gas.jpbc.Field;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +30,8 @@ public class CipherTextTestFactory {
                 gt.newRandomElement(),
                 g1.newRandomElement(),
                 g1.newRandomElement(),
-                Arrays.stream(policy).collect(Collectors.toSet()),
-                ownerId,
+                Arrays.stream(policy).map(p -> new VersionedID(p, 0L)).collect(Collectors.toSet()),
+                new VersionedID(ownerId, 0L),
                 UUID.randomUUID().toString()
         );
     }

@@ -39,7 +39,7 @@ public class CSPService {
                 .filter(ct -> {
                     if(ct.isTwoFactorSecured()) {
                         boolean isPresent = twoFactorAuthenticationService.findPublicTwoFactorAuthentication(
-                                ct.getOwnerId()
+                                ct.getOwnerId().getId()
                         ).isPresent();
 
                         if (!isPresent) {

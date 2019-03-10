@@ -1,10 +1,12 @@
 package de.tuberlin.tfdacmacs.client.rest.error;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class InterServiceCallError extends RuntimeException {
 
     private final HttpStatus responseStatus;

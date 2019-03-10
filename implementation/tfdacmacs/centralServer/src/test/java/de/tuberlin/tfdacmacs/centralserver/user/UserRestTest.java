@@ -106,7 +106,7 @@ public class UserRestTest extends RestTestSuite {
         String attributeValueId = "aa.tu-berlin.de:role:student";
         String attributeEncryptedValue = "somevalue";
         User user = new User(email, aid);
-        Device device = new Device(certId,encryptedKey , Sets.newHashSet(new EncryptedAttributeValueKey(attributeValueId, attributeEncryptedValue)), DeviceState.ACTIVE);
+        Device device = new Device(certId,encryptedKey , Sets.newHashSet(new EncryptedAttributeValueKey(0L, attributeValueId, attributeEncryptedValue)), DeviceState.ACTIVE);
         user.setDevices(Sets.newHashSet(device));
         userDB.insert(user);
 
@@ -131,6 +131,7 @@ public class UserRestTest extends RestTestSuite {
         userDB.insert(user);
 
         TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
+                0L,
                 "asd",
                 "das"
         );

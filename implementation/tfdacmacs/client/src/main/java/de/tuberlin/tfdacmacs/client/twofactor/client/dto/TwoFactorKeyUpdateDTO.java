@@ -10,12 +10,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EncryptedTwoFactorDeviceKeyDTO {
+public class TwoFactorKeyUpdateDTO {
 
-    @NotBlank
-    private String encryptedSymmetricKey;
-    @NotBlank
-    private String encryptedKey;
     @Min(0)
-    private long version;
+    private long targetVersion;
+    @NotBlank
+    private String updateKey;
 }

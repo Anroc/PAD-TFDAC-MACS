@@ -34,6 +34,7 @@ public class AttributeCommandTest extends CommandTestSuite {
     public void setup() {
         attribute = new Attribute(
                 "testAttribute.type:value",
+                0L,
                 gppTestFactory.getGlobalPublicParameter().g1().newRandomElement()
         );
     }
@@ -55,6 +56,7 @@ public class AttributeCommandTest extends CommandTestSuite {
         Key symmetricCipherKey = symmetricCryptEngine.getSymmetricCipherKey();
         EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = new EncryptedAttributeValueKeyDTO(
                 attribute.getId(),
+                0L,
                 Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(attribute.getKey().toBytes(), symmetricCipherKey))
         );
 

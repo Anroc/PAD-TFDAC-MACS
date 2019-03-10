@@ -30,11 +30,11 @@ public class AccessPolicyParserTest {
     public void mockServices() {
         Element element = mock(Element.class);
 
-        doReturn(Optional.of(new AttributeValueKey.Public<>(element, "someId")))
+        doReturn(Optional.of(new AttributeValueKey.Public<>(element, "someId", 0L)))
                 .when(attributeService)
                 .findAttributeValuePublicKey(anyString());
 
-        doReturn(Optional.of(new AuthorityKey.Public<>(element)))
+        doReturn(Optional.of(new AuthorityKey.Public<>(element, 0L)))
                 .when(authorityService)
                 .findAuthorityPublicKey("aa.tu-berlin.de");
     }

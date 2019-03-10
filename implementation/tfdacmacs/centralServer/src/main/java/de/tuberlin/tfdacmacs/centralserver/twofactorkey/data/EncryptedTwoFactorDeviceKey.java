@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -15,6 +16,7 @@ public class EncryptedTwoFactorDeviceKey {
     private String encryptedSymmetricKey;
     @NotBlank
     private String encryptedKey;
-
+    @Min(0)
+    private long version;
 }
 

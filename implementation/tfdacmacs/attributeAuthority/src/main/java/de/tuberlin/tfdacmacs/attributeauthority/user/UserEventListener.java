@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.DeviceApprovedEvent;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserCreatedEvent;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
@@ -58,7 +59,7 @@ public class UserEventListener {
 
         Key aesKey = symmetricCryptEngine.getSymmetricCipherKey();
         String encryptedKey = encryptAsymmetricKey(aesKey, publicKey);
-        Map<String, String> encryptedAttributeValueKeys = encryptSymmetricAttributeKeys(attributes, aesKey);
+        Map<VersionedID, String> encryptedAttributeValueKeys = encryptSymmetricAttributeKeys(attributes, aesKey);
 
         userClient.updateDeviceForEncryptedAttributeValueKeys(
                 user.getId(),
@@ -79,11 +80,11 @@ public class UserEventListener {
         }
     }
 
-    private Map<String, String> encryptSymmetricAttributeKeys(Set<UserAttributeKey> attributes, Key key) {
+    private Map<VersionedID, String> encryptSymmetricAttributeKeys(Set<UserAttributeKey> attributes, Key key) {
 
         return attributes.stream()
                 .collect(Collectors.toMap(
-                        attribute -> attribute.getAttributeValueId(),
+                        attribute -> new VersionedID(attribute.getAttributeValueId(), attribute.getKey().getVersion()),
                         attribute -> {
                             try {
                                 return Base64.toBase64String(symmetricCryptEngine.encryptRaw(attribute.getKey().getKey().toBytes(), key));

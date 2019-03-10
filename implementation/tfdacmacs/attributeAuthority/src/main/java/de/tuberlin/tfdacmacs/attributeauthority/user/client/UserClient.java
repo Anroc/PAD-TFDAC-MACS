@@ -6,6 +6,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.attributeauthority.client.ContentSigner;
 import de.tuberlin.tfdacmacs.attributeauthority.user.data.User;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueUpdateKey;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
@@ -46,10 +47,10 @@ public class UserClient {
         return user;
     }
 
-    public void updateDeviceForEncryptedAttributeValueKeys(@NonNull String userId, @NonNull String deviceId, @NonNull String encryptedKey, @NonNull Map<String, String> encryptedAttributeValueKeys) {
+    public void updateDeviceForEncryptedAttributeValueKeys(@NonNull String userId, @NonNull String deviceId, @NonNull String encryptedKey, @NonNull Map<VersionedID, String> encryptedAttributeValueKeys) {
         Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeyDTOs = encryptedAttributeValueKeys.entrySet()
                 .stream()
-                .map(entry -> new EncryptedAttributeValueKeyDTO(entry.getKey(), entry.getValue()))
+                .map(entry -> new EncryptedAttributeValueKeyDTO(entry.getKey().getId(), entry.getKey().getVersion(), entry.getValue()))
                 .collect(Collectors.toSet());
 
         caClient.updateDevice(

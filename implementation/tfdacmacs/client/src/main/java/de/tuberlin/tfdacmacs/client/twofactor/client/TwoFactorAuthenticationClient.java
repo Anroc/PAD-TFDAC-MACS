@@ -79,7 +79,8 @@ public class TwoFactorAuthenticationClient {
                         .map(X509Certificate::getPublicKey)
                         .map(publicKey -> new EncryptedTwoFactorDeviceKeyDTO(
                                 encryptAsymmetrically(publicKey, symmetricCryptEngine.getSymmetricCipherKey()),
-                                encryptSymmetrically(twoFactoryKey.getKey(), symmetricCryptEngine)))
+                                encryptSymmetrically(twoFactoryKey.getKey(), symmetricCryptEngine),
+                                twoFactoryKey.getVersion()))
                         .ifPresent(encryptedTwoFactorKey -> encryptedTwoFactorKeys.put(deviceId, encryptedTwoFactorKey))
                 );
 
@@ -171,14 +172,16 @@ public class TwoFactorAuthenticationClient {
                                 TwoFactorKey.Public tfPublic = new TwoFactorKey.Public(
                                         session.getEmail(),
                                         decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
-                                                cryptEngine)
+                                                cryptEngine),
+                                        encryptedTwoFactorDeviceKeyDTO.getVersion()
                                 );
 
                                 // apply all updates
-                                twoFactorKeyResponse.getUpdates().forEach(updateBase64Key ->
+                                twoFactorKeyResponse.getUpdates().forEach(updateKey ->
                                         tfPublic.update(new TwoFactorUpdateKey(
                                                 twoFactorKeyResponse.getUserId(),
-                                                ElementConverter.convert(updateBase64Key, getG1())))
+                                                ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
+                                                updateKey.getTargetVersion()))
                                 );
 
                                 return new PublicTwoFactorAuthentication(
@@ -201,7 +204,8 @@ public class TwoFactorAuthenticationClient {
                     caClient.putTwoFactorUpdateKey(
                             twoFactorId,
                             new TwoFactorUpdateKeyRequest(
-                                    ElementConverter.convert(user2FAUpdateKey.getUpdateKey())
+                                    ElementConverter.convert(user2FAUpdateKey.getUpdateKey()),
+                                    user2FAUpdateKey.getVersion()
                             ));
                 });
     }

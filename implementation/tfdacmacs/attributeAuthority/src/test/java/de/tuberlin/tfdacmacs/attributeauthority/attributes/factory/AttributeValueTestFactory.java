@@ -21,9 +21,9 @@ public class AttributeValueTestFactory {
                 new AttributeValueKey(
                     pairing.getZr().newRandomElement(),
                     pairing.getG1().newRandomElement(),
-                        "test.value:testValue"
-                ),
-                0L
+                        "test.value:testValue",
+                        0L
+                )
         );
     }
 }

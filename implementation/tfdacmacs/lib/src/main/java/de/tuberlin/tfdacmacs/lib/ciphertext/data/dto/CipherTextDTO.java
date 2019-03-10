@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.lib.ciphertext.data.dto;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,14 +26,10 @@ public class CipherTextDTO {
     private String c3;
 
     @NotEmpty
-    private Set<String> accessPolicy;
+    private Set<VersionedID> accessPolicy;
     @Nullable
-    private String ownerId;
+    private VersionedID ownerId;
 
     @NotBlank
     private String fileId;
-
-    public boolean isTwoFactorSecured() {
-        return this.ownerId != null;
-    }
 }

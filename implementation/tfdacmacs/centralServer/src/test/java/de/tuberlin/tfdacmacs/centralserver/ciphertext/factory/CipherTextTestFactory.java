@@ -2,6 +2,7 @@ package de.tuberlin.tfdacmacs.centralserver.ciphertext.factory;
 
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -25,8 +26,8 @@ public class CipherTextTestFactory {
                 globalPublicParameter.gt().newRandomElement(),
                 globalPublicParameter.g1().newRandomElement(),
                 globalPublicParameter.g1().newRandomElement(),
-                Arrays.stream(policy).collect(Collectors.toSet()),
-                UUID.randomUUID().toString(),
+                Arrays.stream(policy).map(p -> new VersionedID(p, 0L)).collect(Collectors.toSet()),
+                new VersionedID(UUID.randomUUID().toString(), 0L),
                 "encryptedMessage");
     }
 }

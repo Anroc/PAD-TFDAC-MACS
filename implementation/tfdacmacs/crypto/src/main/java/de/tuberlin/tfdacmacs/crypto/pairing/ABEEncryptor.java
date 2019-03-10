@@ -83,17 +83,16 @@ public class ABEEncryptor extends ABECrypto {
 
     private void checkConstrains(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey) {
-        if(! containsAll(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true)
-                ||! containsAll(cipherText.getAccessPolicy(), andAccessPolicy.getAttributeValueIds(), true)) {
-            if(! containsAll(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false)
-                    ||! containsAll(cipherText.getAccessPolicy(), andAccessPolicy.getAttributeValueIds(), false)) {
+        if(! symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true)) {
+            if (!symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false)) {
                 throw new IllegalArgumentException("Given and access Policy does not mirror the policy in ciphertext");
             } else {
                 throw new VersionMismatchException(
-                        String.format("Given AndAccessPolicy %s is not the same as the cipher text policy %s", andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy())
-                );
+                        String.format("Given AndAccessPolicy %s is not the same as the cipher text policy %s",
+                                andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy()));
             }
-        } else if(cipherText.isTwoFactorSecured() && cipherTextAttributeUpdateKey.getDataOwnerId().equals(cipherText.getOwnerId())) {
+        }
+        if(cipherText.isTwoFactorSecured() && cipherTextAttributeUpdateKey.getDataOwnerId().equals(cipherText.getOwnerId())) {
             throw new VersionMismatchException(
                     String.format("Given cipher text 2FA key has version %s but update key version was %s", cipherText.getOwnerId(), cipherTextAttributeUpdateKey.getDataOwnerId())
             );
@@ -106,37 +105,40 @@ public class ABEEncryptor extends ABECrypto {
             @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
         if(! cipherText.isTwoFactorSecured()) {
+            log.warn("Given cipher text to 2FA update was not a 2FA secured cipher text.");
             return cipherText;
         }
-        if (cipherText2FAUpdateKeys.isEmpty()) {
-            throw new IllegalArgumentException("Given update key set is empty.");
-        }
-        boolean allMatch = cipherText2FAUpdateKeys.stream()
-                .map(CipherText2FAUpdateKey::getOid)
-                .allMatch(oid -> cipherText.getOwnerId().equals(oid));
-        if(! allMatch) {
-            throw new IllegalArgumentException("Given ciphertext owner id does not match issued update key.");
-        }
 
-        Set<Element> subSet2FaUpdateKeys = cipherText2FAUpdateKeys.stream()
-                .filter(cipherText2FAUpdateKey -> cipherText.getAccessPolicy()
-                        .contains(cipherText2FAUpdateKey.getAttributeValueId()))
-                .map(UpdateKey::getUpdateKey)
-                .collect(Collectors.toSet());
+        checkConstrains(cipherText, cipherText2FAUpdateKeys);
 
-        if(subSet2FaUpdateKeys.size() != cipherText.getAccessPolicy().size()) {
-            throw new IllegalArgumentException(
-                    String.format("Could not match all attribute keys to an update key. Missing %d update keys.",
-                            cipherText.getAccessPolicy().size() - subSet2FaUpdateKeys.size()));
-        }
+        Element product = findSatisfingSubSet(cipherText, cipherText2FAUpdateKeys, CipherText2FAUpdateKey::getAttributeValueId)
+                .stream().map(UpdateKey::getUpdateKey).reduce((a,b) -> a.duplicate().mul(b)).get();
 
         Element r = gpp.zr().newRandomElement();
         Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate()
-                .mul(subSet2FaUpdateKeys.stream().reduce((a,b) -> a.duplicate().mul(b)).get())
+                .mul(product)
                 .mul(mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements()).powZn(r));
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId(), cipherText.getFileId());
+        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId().increment(), cipherText.getFileId());
+    }
+
+    private void checkConstrains(CipherText cipherText, Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
+        if (cipherText2FAUpdateKeys.isEmpty()) {
+            throw new IllegalArgumentException("Given update key set is empty.");
+        }
+
+        cipherText2FAUpdateKeys.stream()
+                .map(CipherText2FAUpdateKey::getOid)
+                .forEach(oid -> {
+                    if(! cipherText.getOwnerId().equals(oid)) {
+                        if(! cipherText.getOwnerId().getId().equals(oid.getId())) {
+                            throw new IllegalArgumentException("Given cipher text owner id does not match issued update key.");
+                        } else {
+                            throw new VersionMismatchException(cipherText.getOwnerId(), oid);
+                        }
+                    }
+                });
     }
 
     private Element updateC1(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy, Element r) {
@@ -177,6 +179,9 @@ public class ABEEncryptor extends ABECrypto {
         return containsAll(a, Sets.newHashSet(b), exact);
     }
 
+    private boolean symmetric(Set<VersionedID> a, Set<VersionedID> b, boolean exact) {
+        return containsAll(a, b, exact) && containsAll(b,a, exact);
+    }
 
     private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact) {
         if(exact) {

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -14,6 +15,10 @@ public class AttributeAuthorityPublicKeyRequest {
     @NotBlank
     private String authorityPublicKey;
 
+    @Min(0)
+    private long version;
+
     @NotBlank
+    // authorityPublicKey + version
     private String signature;
 }

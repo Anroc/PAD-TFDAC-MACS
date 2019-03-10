@@ -1,6 +1,7 @@
 package de.tuberlin.tfdacmacs.centralserver.ciphertext.data;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.lib.db.Entity;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.*;
@@ -17,7 +18,7 @@ import java.util.Set;
 public class CipherTextEntity extends Entity {
 
     public CipherTextEntity(@NonNull String id, Element c1, Element c2, Element c3,
-            Set<String> accessPolicy, String ownerId, String fileId) {
+            Set<VersionedID> accessPolicy, VersionedID ownerId, String fileId) {
         super(id);
         this.c1 = c1;
         this.c2 = c2;
@@ -35,9 +36,9 @@ public class CipherTextEntity extends Entity {
     private Element c3;
 
     @NotEmpty
-    private Set<String> accessPolicy;
+    private Set<VersionedID> accessPolicy;
 
-    private String ownerId;
+    private VersionedID ownerId;
 
     @NotBlank
     private String fileId;

@@ -77,8 +77,9 @@ public class TwoFactorKeyController {
 
         encryptedTwoFactorKey.getTwoFactorUpdateKeys().add(
                 new TwoFactorUpdateKey(
-                            encryptedTwoFactorKey.getUserId(),
-                            ElementConverter.convert(twoFactorUpdateKeyRequest.getUpdateKey(), g1)
+                        encryptedTwoFactorKey.getUserId(),
+                        ElementConverter.convert(twoFactorUpdateKeyRequest.getUpdateKey(), g1),
+                        twoFactorUpdateKeyRequest.getTargetVersion()
                 )
         );
         twoFactorKeyService.update(encryptedTwoFactorKey);

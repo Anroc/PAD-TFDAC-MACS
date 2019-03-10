@@ -42,7 +42,7 @@ public class DecryptionService {
         Optional<TwoFactorKey.Public> twoFactorAuthenticationKey = Optional.empty();
         if(cipherText.isTwoFactorSecured()) {
             twoFactorAuthenticationKey = twoFactorAuthenticationService
-                    .findPublicTwoFactorAuthentication(cipherText.getOwnerId())
+                    .findPublicTwoFactorAuthentication(cipherText.getOwnerId().getId())
                     .map(PublicTwoFactorAuthentication::getTwoFactorKey);
         }
 

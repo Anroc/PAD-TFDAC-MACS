@@ -3,10 +3,7 @@ package de.tuberlin.tfdacmacs.centralserver.twofactorkey;
 import de.tuberlin.tfdacmacs.RestTestSuite;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.EncryptedTwoFactorDeviceKey;
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.EncryptedTwoFactorKey;
-import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.EncryptedTwoFactorDeviceKeyDTO;
-import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyRequest;
-import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorKeyResponse;
-import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.TwoFactorUpdateKeyRequest;
+import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import it.unisa.dia.gas.jpbc.Element;
 import org.assertj.core.util.Maps;
@@ -32,7 +29,8 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
             Maps.newHashMap(UUID.randomUUID().toString(),
                     new EncryptedTwoFactorDeviceKeyDTO(
                             UUID.randomUUID().toString(),
-                            UUID.randomUUID().toString()
+                            UUID.randomUUID().toString(),
+                            0L
                     ));
     private Map<String, EncryptedTwoFactorDeviceKey> encryptedTwoFactorDeviceKeys;
 
@@ -151,7 +149,8 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         twoFactorKeyDB.insert(encryptedTwoFactorKey);
 
         TwoFactorUpdateKeyRequest twoFactorUpdateKeyRequest = new TwoFactorUpdateKeyRequest(
-                enodedUpdateKey
+                enodedUpdateKey,
+                0L
         );
 
         ResponseEntity<TwoFactorKeyResponse> exchange = mutualAuthRestTemplate
@@ -167,7 +166,7 @@ public class TwoFactorKeyRestTest extends RestTestSuite {
         assertThat(body.getOwnerId()).isEqualTo(encryptedTwoFactorKey.getDataOwnerId());
         Map<String, EncryptedTwoFactorDeviceKeyDTO> collect = getDeviceKeysAsDTO(encryptedTwoFactorKey);
         assertThat(body.getEncryptedTwoFactorKeys()).isEqualTo(collect);
-        assertThat(body.getUpdates()).hasSize(1).containsOnly(enodedUpdateKey);
+        assertThat(body.getUpdates()).hasSize(1).containsOnly(new TwoFactorKeyUpdateDTO(0L, enodedUpdateKey));
     }
 
     @Test

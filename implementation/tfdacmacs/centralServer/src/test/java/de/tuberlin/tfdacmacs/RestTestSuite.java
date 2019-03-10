@@ -4,6 +4,7 @@ import de.tuberlin.tfdacmacs.centralserver.attribute.db.PublicAttributeDB;
 import de.tuberlin.tfdacmacs.centralserver.authority.db.AttributeAuthorityDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.db.CertificateDB;
 import de.tuberlin.tfdacmacs.centralserver.certificate.factory.CertificateRequestTestFactory;
+import de.tuberlin.tfdacmacs.centralserver.ciphertext.CipherTextController;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.db.CipherTextDB;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.factory.CipherTextTestFactory;
 import de.tuberlin.tfdacmacs.centralserver.gpp.GlobalPublicParameterService;
@@ -58,6 +59,10 @@ public abstract class RestTestSuite {
     // services
     @Autowired
     protected GlobalPublicParameterService globalPublicParameterService;
+
+    // controller
+    @Autowired
+    protected CipherTextController cipherTextController;
 
     // DBs
     @Autowired

@@ -195,7 +195,7 @@ public class UserRestTest extends RestTestSuite {
                 Sets.newHashSet(new UserAttributeKey(
                         attributeId,
                         "student",
-                        new UserAttributeValueKey(globalPublicParameterProvider.getGlobalPublicParameter().g1().newRandomElement())
+                        new UserAttributeValueKey(globalPublicParameterProvider.getGlobalPublicParameter().g1().newRandomElement(), 0L)
                 ))
         );
 

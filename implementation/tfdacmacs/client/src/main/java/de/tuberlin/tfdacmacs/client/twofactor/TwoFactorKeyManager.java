@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.client.twofactor.client.TwoFactorAuthenticationClie
 import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.crypto.pairing.TwoFactorKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
@@ -31,7 +32,7 @@ public class TwoFactorKeyManager {
     private final AttributeClient attributeClient;
 
     public TwoFactorKey generate(String... userIds) {
-        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gppService.getGPP());
+        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gppService.getGPP());
         Arrays.stream(userIds).forEach(userId -> generatePublicKeyForUser(twoFactorKey, userId));
         update2FAPublicKey(twoFactorKey);
         return twoFactorKey;
@@ -57,7 +58,7 @@ public class TwoFactorKeyManager {
             @NonNull Set<String> revokedUserIds) {
         TwoFactorKey.Private revokedMasterKey = twoFactorAuthentication.getTwoFactorKey().getPrivateKey();
 
-        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gppService.getGPP());
+        TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNext(gppService.getGPP(), twoFactorAuthentication.getTwoFactorKey());
         twoFactorKey.getPublicKeys().putAll(twoFactorAuthentication.getTwoFactorKey().getPublicKeys());
         twoFactorAuthentication.setTwoFactorKey(twoFactorKey);
 
@@ -95,6 +96,7 @@ public class TwoFactorKeyManager {
                 .stream()
                 .map(CipherText::getAccessPolicy)
                 .flatMap(Set::stream)
+                .map(VersionedID::getId)
                 .distinct()
                 .map(attributeClient::findAttributePublicKey)
                 .filter(Optional::isPresent)

@@ -25,7 +25,8 @@ public class AuthorityClient {
                 attributeAuthorityConfig.getId(),
                 new AttributeAuthorityPublicKeyRequest(
                         publicKey,
-                        contentSigner.sign(publicKey)
+                        authorityPublicKey.getVersion(),
+                        contentSigner.sign(publicKey + ";" + authorityPublicKey.getVersion())
                 )
         );
     }

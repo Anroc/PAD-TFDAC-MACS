@@ -43,7 +43,7 @@ public class AttributeService {
         GlobalPublicParameter gpp = gppProvider.getGlobalPublicParameter();
 
         Set<AttributeValue> attrValues = values.stream()
-                .map(value -> generateAttributeKey(value, AttributeValue.generateId(config.getId(), name, value), gpp))
+                .map(value -> generateNewAttributeKey(value, AttributeValue.generateId(config.getId(), name, value), gpp))
                 .collect(Collectors.toSet());
 
         Attribute attribute = Attribute.createAttribute(config.getId(), name, attrValues, type);
@@ -60,7 +60,7 @@ public class AttributeService {
         }
 
         log.info("Generating new attribute key for value {} of attribute {}.", value, attribute.getId());
-        AttributeValue<T> newAttributeValue = generateAttributeKey(value, AttributeValue.generateId(attribute, value), gpp);
+        AttributeValue<T> newAttributeValue = generateNewAttributeKey(value, AttributeValue.generateId(attribute, value), gpp);
         attribute.addValue(newAttributeValue);
         attributeDB.update(attribute);
         return newAttributeValue;
@@ -74,19 +74,19 @@ public class AttributeService {
      * @param <T> the type of the attribute
      * @return the computed {@link AttributeValue}
      */
-    private <T> AttributeValue<T> generateAttributeKey(
+    private <T> AttributeValue<T> generateNewAttributeKey(
             @NonNull T value,
             @NonNull String attributeValueId,
             @NonNull GlobalPublicParameter gpp) {
-        return generateAttributeKey(value, attributeValueId, gpp, 0L);
+        AttributeValueKey key = attributeValueKeyGenerator.generateNew(gpp, attributeValueId);
+        return new AttributeValue(value, key);
     }
 
-    private <T> AttributeValue<T> generateAttributeKey(
+    private <T> AttributeValue<T> generateNextAttributeKey(
             @NonNull T value,
-            @NonNull String attributeValueId,
-            @NonNull GlobalPublicParameter gpp,
-            long version) {
-        AttributeValueKey key = attributeValueKeyGenerator.generateNew(gpp, attributeValueId, version);
+            @NonNull AttributeValueKey attributeValueKey,
+            @NonNull GlobalPublicParameter gpp) {
+        AttributeValueKey key = attributeValueKeyGenerator.generateNext(gpp, attributeValueKey);
         return new AttributeValue(value, key);
     }
 
@@ -96,12 +96,11 @@ public class AttributeService {
         AttributeValue attributeValue = attribute.findAttributeValue(attributeValueId)
                 .orElseThrow(() -> new IllegalStateException("Could not find attribute value with id: " + attributeValueId));
 
-        AttributeValue newAttributeValue = generateAttributeKey(
+        AttributeValue newAttributeValue = generateNextAttributeKey(
                 attributeValue.getValue(),
-                attributeValue.getAttributeValueId(),
-                gpp,
-                attributeValue.getVersion()
-        ).incrementVersion();
+                attributeValue,
+                gpp
+        );
 
         attribute.updateValue(newAttributeValue);
         attributeDB.update(attribute);
