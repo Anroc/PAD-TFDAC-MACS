@@ -1,17 +1,15 @@
 package de.tuberlin.tfdacmacs.client.policy;
 
-import de.tuberlin.tfdacmacs.client.attribute.AttributeService;
-import de.tuberlin.tfdacmacs.client.authority.AuthorityService;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.AccessPolicyParser;
+import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
+import de.tuberlin.tfdacmacs.crypto.pairing.policy.AuthorityKeyProvider;
 import it.unisa.dia.gas.jpbc.Element;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -21,8 +19,8 @@ import static org.mockito.Mockito.mock;
 
 public class AccessPolicyParserTest {
 
-    private final AttributeService attributeService = mock(AttributeService.class);
-    private final AuthorityService authorityService = mock(AuthorityService.class);
+    private final AttributeValueKeyProvider attributeService = mock(AttributeValueKeyProvider.class);
+    private final AuthorityKeyProvider authorityService = mock(AuthorityKeyProvider.class);
 
     private final AccessPolicyParser parser = new AccessPolicyParser(attributeService, authorityService);
 
@@ -30,13 +28,13 @@ public class AccessPolicyParserTest {
     public void mockServices() {
         Element element = mock(Element.class);
 
-        doReturn(Optional.of(new AttributeValueKey.Public<>(element, "someId", 0L)))
+        doReturn(new AttributeValueKey.Public<>(element, "someId", 0L))
                 .when(attributeService)
-                .findAttributeValuePublicKey(anyString());
+                .getAttributeValuePublicKey(anyString());
 
-        doReturn(Optional.of(new AuthorityKey.Public<>(element, 0L)))
+        doReturn(new AuthorityKey.Public<>(element, 0L))
                 .when(authorityService)
-                .findAuthorityPublicKey("aa.tu-berlin.de");
+                .getAuthorityPublicKey("aa.tu-berlin.de");
     }
 
     @Test

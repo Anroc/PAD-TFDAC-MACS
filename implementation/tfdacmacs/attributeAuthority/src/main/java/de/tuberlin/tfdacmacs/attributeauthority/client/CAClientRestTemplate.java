@@ -155,7 +155,7 @@ public class CAClientRestTemplate implements CAClient {
     public List<CipherTextDTO> getCipherTexts(List<String> attributeValueId) {
         String joinedQuery = StringUtils.collectionToDelimitedString(attributeValueId, ",");
         return listRequest(
-                String.format("/ciphertexts?attrIds=%s", joinedQuery),
+                String.format("/ciphertexts?attrIds=%s&completeMatch=false", joinedQuery),
                 HttpMethod.GET,
                 new ParameterizedTypeReference<List<CipherTextDTO>>(){},
                 null

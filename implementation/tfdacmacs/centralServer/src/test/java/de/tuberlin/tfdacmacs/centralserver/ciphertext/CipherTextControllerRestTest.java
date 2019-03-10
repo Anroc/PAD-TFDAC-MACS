@@ -69,8 +69,7 @@ public class CipherTextControllerRestTest extends RestTestSuite {
         assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         List<CipherTextDTO> body = exchange.getBody();
         assertThat(body).hasSize(1);
-        assertThat(body.stream().map(CipherTextDTO::getId)).containsExactly(
-                cipherTextEntity2.getId());
+        assertThat(body.stream().map(CipherTextDTO::getId)).containsExactly(cipherTextEntity2.getId());
     }
 
     @Test

@@ -88,10 +88,12 @@ public class AttributeAuthorityController {
                 attributeAuthority.getId(),
                 attributeAuthority.getCertificateId(),
                 Optional.ofNullable(attributeAuthority.getPublicKey())
-                    .map(AuthorityKey.Public::getKey)
-                    .map(ElementConverter::convert)
-                    .orElse(null),
-                attributeAuthority.getPublicKey().getVersion(),
+                        .map(AuthorityKey.Public::getKey)
+                        .map(ElementConverter::convert)
+                        .orElse(null),
+                Optional.ofNullable(attributeAuthority.getPublicKey())
+                        .map(AuthorityKey.Public::getVersion)
+                        .orElse(null),
                 attributeAuthority.getSignature()
         );
     }
