@@ -31,7 +31,7 @@ public class CipherTextTestFactory {
                 g1.newRandomElement(),
                 g1.newRandomElement(),
                 Arrays.stream(policy).map(p -> new VersionedID(p, 0L)).collect(Collectors.toSet()),
-                new VersionedID(ownerId, 0L),
+                (ownerId != null) ? new VersionedID(ownerId, 0L) : null,
                 UUID.randomUUID().toString()
         );
     }

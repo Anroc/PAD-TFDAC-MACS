@@ -46,15 +46,16 @@ public class CipherTextController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public List<CipherTextDTO> getCipherTexts(
             @RequestParam(value = "attrIds", defaultValue = "") String query,
-            @RequestParam(value = "ownerId", defaultValue = "") String ownerId) {
+            @RequestParam(value = "ownerId", defaultValue = "") String ownerId,
+            @RequestParam(value = "completeMatch", defaultValue = "true") boolean completeMatch) {
         if(query.isEmpty() && ownerId.isEmpty()) {
             return findAll();
         } else if (! query.isEmpty() && ownerId.isEmpty()) {
-            return findByAttributeIds(query);
+            return findByAttributeIds(query, completeMatch);
         } else if (query.isEmpty() && ! ownerId.isEmpty()) {
             return findByOwnerId(ownerId);
         } else {
-            return findByAttributeIds(query)
+            return findByAttributeIds(query, completeMatch)
                     .stream()
                     .filter(ct -> ownerId.equals(ct.getOwnerId()))
                     .collect(Collectors.toList());
@@ -74,9 +75,9 @@ public class CipherTextController {
                 .collect(Collectors.toList());
     }
 
-    private List<CipherTextDTO> findByAttributeIds(String query) {
+    private List<CipherTextDTO> findByAttributeIds(String query, boolean complete) {
         List<String> attributeIds = Arrays.asList(query.split(","));
-        return cipherTextService.findAllByPolicyContaining(attributeIds)
+        return cipherTextService.findAllByPolicyContaining(attributeIds, complete)
                 .stream()
                 .map(this::buildResponse)
                 .collect(Collectors.toList());

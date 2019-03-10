@@ -38,8 +38,8 @@ public class CipherTextService {
         return cipherTextDB.findAll();
     }
 
-    public List<CipherTextEntity> findAllByPolicyContaining(List<String> attributeIds) {
-        return cipherTextDB.findAllByPolicyContaining(attributeIds);
+    public List<CipherTextEntity> findAllByPolicyContaining(List<String> attributeIds, boolean complete) {
+        return cipherTextDB.findAllByPolicyContaining(attributeIds, complete);
     }
 
     public List<CipherTextEntity> findAllByOwnerId(String ownerId) {

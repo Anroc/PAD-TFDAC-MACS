@@ -16,11 +16,16 @@ public interface CipherTextRepository extends CouchbaseRepository<CipherTextEnti
 
     @Query("#{#n1ql.selectEntity} "
             + "WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity' "
-            + "AND EVERY p IN accessPolicy SATISFIES p IN $1 END")
-    Stream<CipherTextEntity> findAllByPolicyContaining(JsonArray from);
+            + "AND EVERY p IN accessPolicy SATISFIES p.id IN $1 END")
+    Stream<CipherTextEntity> findAllByPolicyContainingAll(JsonArray from);
 
     @Query("#{#n1ql.selectEntity} "
             + "WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity' "
-            + "AND ownerId = $1")
+            + "AND ANY p IN accessPolicy SATISFIES p.id IN $1 END")
+    Stream<CipherTextEntity> findAllByPolicyContainingAny(JsonArray from);
+
+    @Query("#{#n1ql.selectEntity} "
+            + "WHERE `_class` = 'de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity' "
+            + "AND ownerId.id = $1")
     Stream<CipherTextEntity> findAllByOwnerId(String ownerId);
 }
