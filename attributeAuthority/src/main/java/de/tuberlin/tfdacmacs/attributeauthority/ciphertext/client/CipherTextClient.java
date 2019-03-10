@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Field;
@@ -45,18 +46,19 @@ public class CipherTextClient {
         return globalPublicParameterProvider.getGlobalPublicParameter().g1();
     }
 
-    public Map<String, TwoFactorKey.Public> findTwoFactorPublicKeys(@NonNull Set<String> ownerIds) {
+    public Map<String, TwoFactorKey.Public> findTwoFactorPublicKeys(@NonNull Set<VersionedID> ownerIds) {
         return ownerIds.stream()
+                .map(VersionedID::getId)
                 .map(caClient::getUser)
                 .collect(Collectors.toMap(
                         userResponse -> userResponse.getId(),
                         userResponse -> {
                             // TODO: validate signature of two factor key?
-                            // TODO: extract version
 
                             return new TwoFactorKey.Public(
                                     userResponse.getId(),
-                                    ElementConverter.convert(userResponse.getTwoFactorPublicKey().getTwoFactorAuthenticationPublicKey(), getG1()));
+                                    ElementConverter.convert(userResponse.getTwoFactorPublicKey().getTwoFactorAuthenticationPublicKey(), getG1()),
+                                    userResponse.getTwoFactorPublicKey().getVersion());
                         }));
     }
 }

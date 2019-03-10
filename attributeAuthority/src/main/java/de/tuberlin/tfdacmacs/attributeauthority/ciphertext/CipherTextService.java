@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.attributeauthority.ciphertext;
 import de.tuberlin.tfdacmacs.attributeauthority.ciphertext.client.CipherTextClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherTextAttributeUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
@@ -25,7 +26,7 @@ public class CipherTextService {
     public void updateCipherTexts(@NonNull AttributeValueKey revokedAttributeValueKey, @NonNull AttributeValueKey newAttributeValueKey) {
         List<CipherText> cipherTexts = cipherTextClient.findCipherTextsByAttribute(revokedAttributeValueKey.getAttributeValueId());
 
-        Set<String> ownerIds = cipherTexts.stream()
+        Set<VersionedID> ownerIds = cipherTexts.stream()
                 .filter(CipherText::isTwoFactorSecured)
                 .map(CipherText::getOwnerId)
                 .collect(Collectors.toSet());
@@ -37,7 +38,7 @@ public class CipherTextService {
                     CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey = attributeValueKeyGenerator
                             .generateCipherTextUpdateKey(cipherText, revokedAttributeValueKey,
                                     newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId()));
-                    cipherTextClient.updateCipherText(cipherText.getId(), cipherTextAttributeUpdateKey);
+//                    cipherTextClient.updateCipherText(cipherText.getId(), cipherTextAttributeUpdateKey);
                 });
 
     }

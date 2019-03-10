@@ -23,5 +23,5 @@ public class TwoFactorKeyResponse {
     @NotNull
     private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
     @NotNull
-    private List<String> updates;
+    private List<TwoFactorKeyUpdateDTO> updates;
 }

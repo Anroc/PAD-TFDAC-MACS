@@ -109,6 +109,7 @@ public class UserController {
 
         user.setTwoFactorPublicKey(
                 new TwoFactorPublicKey(
+                        twoFactorPublicKeyDTO.getVersion(),
                         twoFactorPublicKeyDTO.getTwoFactorAuthenticationPublicKey(),
                         twoFactorPublicKeyDTO.getSignature()));
 
@@ -152,7 +153,7 @@ public class UserController {
 
         Set<EncryptedAttributeValueKey> encryptedAttributeValueKeySet = deviceUpdateRequest.getEncryptedAttributeValueKeys()
                 .stream()
-                .map(dto -> new EncryptedAttributeValueKey(dto.getAttributeValueId(), dto.getEncryptedKey()))
+                .map(dto -> new EncryptedAttributeValueKey(dto.getVersion(), dto.getAttributeValueId(), dto.getEncryptedKey()))
                 .collect(Collectors.toSet());
 
         Device device = user.findDevice(deviceId).orElseThrow(
@@ -175,6 +176,7 @@ public class UserController {
                 user.getAuthorityId(),
                 twoFactorPublicKeyOptional.map(twoFactorPublicKey ->
                         new TwoFactorPublicKeyDTO(
+                                twoFactorPublicKey.getVersion(),
                                 twoFactorPublicKey.getTwoFactorAuthenticationPublicKey(),
                                 twoFactorPublicKey.getSignature()
                         )).orElse(null),
@@ -195,6 +197,7 @@ public class UserController {
     private EncryptedAttributeValueKeyDTO toEncryptedAttributeValueKeyDTO(EncryptedAttributeValueKey encryptedAttributeValueKey) {
         return new EncryptedAttributeValueKeyDTO(
                 encryptedAttributeValueKey.getAttributeValueId(),
+                encryptedAttributeValueKey.getVersion(),
                 encryptedAttributeValueKey.getEncryptedKey()
         );
     }

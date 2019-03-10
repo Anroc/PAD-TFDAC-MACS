@@ -69,7 +69,7 @@ public class AttributeClient {
             byte[] byteElement = symmetricCryptEngine.decryptRaw(Base64.decode(encryptedAttributeValueKeyDTO.getEncryptedKey()), symmetricKey);
             Element element = ElementConverter.convert(byteElement, getG1());
 
-            return new Attribute(encryptedAttributeValueKeyDTO.getAttributeValueId(), element);
+            return new Attribute(encryptedAttributeValueKeyDTO.getAttributeValueId(), encryptedAttributeValueKeyDTO.getVersion(), element);
         } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);
         }
@@ -90,7 +90,8 @@ public class AttributeClient {
 
             return Optional.of(new AttributeValueKey.Public(
                     ElementConverter.convert(attributeValueResponse.getPublicKey(), getG1()),
-                    attributeValueId
+                    attributeValueId,
+                    attributeValueResponse.getVersion()
             ));
         } catch(InterServiceCallError e) {
             if(e.getResponseStatus() == HttpStatus.NOT_FOUND) {

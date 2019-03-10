@@ -64,17 +64,20 @@ public class EncryptCommandTest extends CommandTestSuite {
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "Student",
-                "signature"
+                "signature",
+                0L
         )).when(caClient).getAttributeValue(attrId1.split(":")[0], attrId1.split(":")[1]);
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "Professor",
-                "signature"
+                "signature",
+                0L
         )).when(caClient).getAttributeValue(attrId2.split(":")[0], attrId2.split(":")[1]);
         doReturn(new AttributeAuthorityResponse(
                 authorityId,
                 "SomeCertId",
                 ElementConverter.convert(randomElementG1()),
+                0L,
                 "signature"
         )).when(caClient).getAuthority(authorityId);
 
@@ -96,12 +99,14 @@ public class EncryptCommandTest extends CommandTestSuite {
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "Student",
-                "signature"
+                "signature",
+                0L
         )).when(caClient).getAttributeValue(hpiAttrId.split(":")[0], hpiAttrId.split(":")[1]);
         doReturn(new AttributeAuthorityResponse(
                 hpiAuthorityId,
                 "SomeCertId",
                 ElementConverter.convert(randomElementG1()),
+                0L,
                 "signature"
         )).when(caClient).getAuthority(hpiAuthorityId);
         doReturn(true)

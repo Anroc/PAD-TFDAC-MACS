@@ -81,6 +81,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
         String signature = "someSignature";
         AttributeAuthorityPublicKeyRequest attributeAuthorityPublicKeyRequest = new AttributeAuthorityPublicKeyRequest(
                 publicKey,
+                0L,
                 signature
         );
 

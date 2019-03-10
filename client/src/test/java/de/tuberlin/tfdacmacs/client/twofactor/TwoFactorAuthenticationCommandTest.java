@@ -106,7 +106,8 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
     @Test
     public void distrust() {
         TwoFactorKey twoFactorKey = new TwoFactorKey(
-                randomElementZr()
+                randomElementZr(),
+                0L
         );
         twoFactorKey.putPublicKey(email, randomElementG1());
         twoFactorKey.putPublicKey(currentEmail, randomElementG1());
@@ -143,7 +144,8 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "student",
-                "someSignature"
+                "someSignature",
+                0L
         )).when(caClient).getAttributeValue(attributeValueId.getAttributeId(), attributeValueId.getValue());
 
         X509Certificate certificate = mock(X509Certificate.class);

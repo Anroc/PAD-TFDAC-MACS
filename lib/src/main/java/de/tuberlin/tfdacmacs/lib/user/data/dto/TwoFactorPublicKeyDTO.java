@@ -14,13 +14,13 @@ import javax.validation.constraints.NotBlank;
 public class TwoFactorPublicKeyDTO implements Versioned {
 
     @Min(0)
-    int version;
+    private long version;
 
     @NotBlank
     private String twoFactorAuthenticationPublicKey;
 
     @NotBlank
-    // userId + twoFactorAuthencationPublicKey
+    // userId + twoFactorAuthencationPublicKey + version
     private String signature;
 
 

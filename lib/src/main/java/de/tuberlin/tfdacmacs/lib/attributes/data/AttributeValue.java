@@ -2,14 +2,12 @@ package de.tuberlin.tfdacmacs.lib.attributes.data;
 
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import it.unisa.dia.gas.jpbc.Element;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @NoArgsConstructor
 public class AttributeValue<T> extends AttributeValueKey implements AttributeValueComponent<T> {

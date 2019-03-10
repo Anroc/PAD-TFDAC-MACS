@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 
 @Data
 @NoArgsConstructor
@@ -25,6 +26,8 @@ public class AttributeAuthorityResponse {
 
     @Nullable
     private String publicKey;
+    @Nullable
+    private Long version;
     @Nullable
     private String signature;
 }

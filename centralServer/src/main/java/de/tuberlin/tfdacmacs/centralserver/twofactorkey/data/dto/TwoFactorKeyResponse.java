@@ -2,7 +2,6 @@ package de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.dto;
 
 import de.tuberlin.tfdacmacs.centralserver.twofactorkey.data.EncryptedTwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class TwoFactorKeyResponse {
     @NotNull
     private Map<String, EncryptedTwoFactorDeviceKeyDTO> encryptedTwoFactorKeys;
     @NotNull
-    private List<String> updates = new ArrayList<>();
+    private List<TwoFactorKeyUpdateDTO> updates = new ArrayList<>();
 
     public static TwoFactorKeyResponse from(EncryptedTwoFactorKey encryptedTwoFactorKey) {
         return new TwoFactorKeyResponse(
@@ -42,9 +41,10 @@ public class TwoFactorKeyResponse {
                                 entry -> EncryptedTwoFactorDeviceKeyDTO.from(entry.getValue()))),
                 encryptedTwoFactorKey.getTwoFactorUpdateKeys()
                         .stream()
-                        .map(TwoFactorUpdateKey::getUpdateKey)
-                        .map(ElementConverter::convert)
-                        .collect(Collectors.toList())
+                        .map(twoFactorUpdateKey -> new TwoFactorKeyUpdateDTO(
+                                twoFactorUpdateKey.getVersion(),
+                                ElementConverter.convert(twoFactorUpdateKey.getUpdateKey())
+                        )).collect(Collectors.toList())
         );
     }
 }

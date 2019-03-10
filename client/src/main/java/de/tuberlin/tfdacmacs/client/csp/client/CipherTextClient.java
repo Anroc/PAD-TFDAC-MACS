@@ -76,7 +76,7 @@ public class CipherTextClient {
                 ownerId,
                 cipherText2FAUpdateKeys.stream()
                         .map(updateKeys -> new TwoFactorCipherTextUpdateKey(
-                                updateKeys.getAttributeValueId(),
+                                updateKeys.getAttributeValueId().getId(),
                                 ElementConverter.convert(updateKeys.getUpdateKey())))
                         .collect(Collectors.toList())
         );

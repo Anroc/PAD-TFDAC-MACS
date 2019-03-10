@@ -66,7 +66,7 @@ public class AttributeAuthorityController {
         AuthorityKey.Public publicKey = new AuthorityKey.Public<>(ElementConverter.convert(
                 attributeAuthorityPublicKeyRequest.getAuthorityPublicKey(),
                 globalPublicParameterProvider.getGlobalPublicParameter().g1()
-        ));
+        ), attributeAuthorityPublicKeyRequest.getVersion());
 
         attributeAuthority.setPublicKey(publicKey);
         attributeAuthority.setSignature(attributeAuthorityPublicKeyRequest.getSignature());
@@ -91,6 +91,7 @@ public class AttributeAuthorityController {
                     .map(AuthorityKey.Public::getKey)
                     .map(ElementConverter::convert)
                     .orElse(null),
+                attributeAuthority.getPublicKey().getVersion(),
                 attributeAuthority.getSignature()
         );
     }

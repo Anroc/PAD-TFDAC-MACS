@@ -188,9 +188,9 @@ public class ABECryptoTest extends UnitTestSuite {
         LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
         );
-        Element message = abeDecryptor
-                .decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKeyOfUser(userId));
-        assertNotSameElements(message.toBytes(), cipherText.getKey().toBytes());
+        assertThatExceptionOfType(VersionMismatchException.class).isThrownBy(
+                () -> abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKeyOfUser(userId))
+        );
 
         // assert update succeedes
         LinkedHashSet<UserAttributeSecretComponent> updateUserAttributeSecretComponents = Sets.newLinkedHashSet(
