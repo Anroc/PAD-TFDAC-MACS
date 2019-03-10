@@ -37,7 +37,8 @@ public class AuthorityClient {
     public Optional<AuthorityKey.Public> findAuthorityKey(@NonNull String authorityId) {
         try {
             AttributeAuthorityResponse authority = caClient.getAuthority(authorityId);
-            semanticValidator.verifySignature(authority.getPublicKey(), authority.getSignature(), authorityId);
+            String content = authority.getPublicKey() + ";" + authority.getVersion();
+            semanticValidator.verifySignature(content, authority.getSignature(), authorityId);
 
             return Optional.of(
                     new AuthorityKey.Public<>(

@@ -85,7 +85,9 @@ public class AttributeClient {
         try {
             PublicAttributeValueResponse attributeValueResponse = caClient.getAttributeValue(attrValueId.getAttributeId(), attrValueId.getValue());
 
-            String signatureContent = attributeValueResponse.getValue().toString() + ";" + attributeValueResponse.getPublicKey();
+            String signatureContent = attributeValueResponse.getValue().toString()
+                    + ";" + attributeValueResponse.getPublicKey()
+                    + ";" + attributeValueResponse.getVersion();
             semanticValidator.verifySignature(signatureContent, attributeValueResponse.getSignature(), attrValueId.getAuthorityId());
 
             return Optional.of(new AttributeValueKey.Public(

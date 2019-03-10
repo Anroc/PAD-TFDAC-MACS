@@ -17,9 +17,9 @@ public class PublicAttributeValueResponse {
     private String publicKey;
     @NotNull
     private Object value;
-    @NotBlank
-    private String signature;
     @Min(0)
     private long version;
+    @NotBlank
+    private String signature;
 
 }

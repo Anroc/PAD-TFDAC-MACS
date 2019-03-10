@@ -144,8 +144,8 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
         doReturn(new PublicAttributeValueResponse(
                 ElementConverter.convert(randomElementG1()),
                 "student",
-                "someSignature",
-                0L
+                0L,
+                "someSignature"
         )).when(caClient).getAttributeValue(attributeValueId.getAttributeId(), attributeValueId.getValue());
 
         X509Certificate certificate = mock(X509Certificate.class);
