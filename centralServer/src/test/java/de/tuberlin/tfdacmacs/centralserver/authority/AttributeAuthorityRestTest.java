@@ -76,7 +76,7 @@ public class AttributeAuthorityRestTest extends RestTestSuite {
         AttributeAuthority attributeAuthority = new AttributeAuthority(aid, UUID.randomUUID().toString());
         attributeAuthorityDB.insert(attributeAuthority);
 
-        Element element = globalPublicParameter.g1().newRandomElement();
+        Element element = globalPublicParameter.gt().newRandomElement();
         String publicKey = ElementConverter.convert(element);
         String signature = "someSignature";
         AttributeAuthorityPublicKeyRequest attributeAuthorityPublicKeyRequest = new AttributeAuthorityPublicKeyRequest(
