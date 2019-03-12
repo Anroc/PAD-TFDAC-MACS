@@ -100,7 +100,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isFalse();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isTrue();
     }
 
     private void revoke2FA_passes_andUpdatesCT() {
@@ -117,7 +117,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isFalse();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
@@ -156,7 +156,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by " + email + ")\t[aa.tu-berlin.de.role:student")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isTrue();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
