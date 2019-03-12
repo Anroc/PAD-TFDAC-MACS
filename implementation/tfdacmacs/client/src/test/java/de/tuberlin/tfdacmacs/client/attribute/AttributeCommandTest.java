@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceState;
 import de.tuberlin.tfdacmacs.client.user.client.dto.EncryptedAttributeValueKeyDTO;
 import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
 import org.apache.commons.codec.binary.Base64;
@@ -34,8 +35,7 @@ public class AttributeCommandTest extends CommandTestSuite {
     public void setup() {
         attribute = new Attribute(
                 "testAttribute.type:value",
-                0L,
-                gppTestFactory.getGlobalPublicParameter().g1().newRandomElement()
+                new UserAttributeValueKey(gppTestFactory.getGlobalPublicParameter().g1().newRandomElement(), 0L)
         );
     }
 
@@ -57,7 +57,7 @@ public class AttributeCommandTest extends CommandTestSuite {
         EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = new EncryptedAttributeValueKeyDTO(
                 attribute.getId(),
                 0L,
-                Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(attribute.getKey().toBytes(), symmetricCipherKey))
+                Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(attribute.getUserAttributeValueKey().getKey().toBytes(), symmetricCipherKey))
         );
 
         doReturn(email).when(session).getEmail();

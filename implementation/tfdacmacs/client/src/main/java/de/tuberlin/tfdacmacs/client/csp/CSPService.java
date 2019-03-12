@@ -37,6 +37,13 @@ public class CSPService {
                             .collect(Collectors.toList()))
                 .stream()
                 .filter(ct -> {
+                    if(! attributes.containsAll(ct.getAccessPolicy())) {
+                        log.info("Ignoring cipher text [{}] since we don't have the right attribute version.", ct.getId());
+                        return false;
+                    }
+                    return true;
+                })
+                .filter(ct -> {
                     if(ct.isTwoFactorSecured()) {
                         boolean isPresent = twoFactorAuthenticationService.findPublicTwoFactorAuthentication(
                                 ct.getOwnerId().getId()

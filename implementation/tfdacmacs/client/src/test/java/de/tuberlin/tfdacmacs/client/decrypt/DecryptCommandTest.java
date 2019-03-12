@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.client.decrypt;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
 import de.tuberlin.tfdacmacs.client.csp.client.dto.CipherTextDTO;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class DecryptCommandTest extends CommandTestSuite {
     public void check() {
         String attributeId = "aa.tu-berlin.de.role:student";
         String ctId = UUID.randomUUID().toString();
-        attributeDB.upsert(attributeId, new Attribute(attributeId, 0L, randomElementG1()));
+        attributeDB.upsert(attributeId, new Attribute(attributeId, new UserAttributeValueKey(randomElementG1(), 0L)));
 
         doReturn(
                 Lists.newArrayList(CipherTextDTO.from(cipherTextTestFacotry.create(ctId, null, attributeId)))

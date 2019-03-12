@@ -12,6 +12,7 @@ import de.tuberlin.tfdacmacs.client.register.events.LoginEvent;
 import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.client.register.events.SessionInitializedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
@@ -73,12 +74,12 @@ public class RegisterCommandTest extends CommandTestSuite {
 
         GlobalPublicParameter globalPublicParameter = gppTestFactory.getGlobalPublicParameter();
 
-        Attribute attribute = new Attribute("authid.attr:value", 0L, globalPublicParameter.g1().newRandomElement());
+        Attribute attribute = new Attribute("authid.attr:value", new UserAttributeValueKey(globalPublicParameter.g1().newRandomElement(), 0L));
         Key symmetricCipherKey = symmetricCryptEngine.getSymmetricCipherKey();
         EncryptedAttributeValueKeyDTO encryptedAttributeValueKeyDTO = new EncryptedAttributeValueKeyDTO(
                 attribute.getId(),
                 0L,
-                Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(attribute.getKey().toBytes(), symmetricCipherKey))
+                Base64.encodeBase64String(symmetricCryptEngine.encryptRaw(attribute.getUserAttributeValueKey().getKey().toBytes(), symmetricCipherKey))
         );
 
 
