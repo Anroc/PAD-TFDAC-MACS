@@ -177,18 +177,17 @@ public class TwoFactorAuthenticationClient {
                                 );
 
                                 // apply all updates
-                                twoFactorKeyResponse.getUpdates().forEach(updateKey ->
-                                        tfPublic.update(new TwoFactorUpdateKey(
-                                                twoFactorKeyResponse.getUserId(),
-                                                ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
-                                                updateKey.getTargetVersion()))
-                                );
+                                for (TwoFactorKeyUpdateDTO updateKey : twoFactorKeyResponse.getUpdates()) {
+                                    tfPublic = tfPublic.update(new TwoFactorUpdateKey(
+                                            twoFactorKeyResponse.getUserId(),
+                                            ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
+                                            updateKey.getTargetVersion()));
+                                }
 
                                 return new PublicTwoFactorAuthentication(
                                         twoFactorKeyResponse.getOwnerId(),
                                         twoFactorKeyResponse.getUserId(),
                                         tfPublic
-
                                 );
                             });
                 }).filter(Optional::isPresent)
