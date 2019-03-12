@@ -1,21 +1,21 @@
 package de.tuberlin.tfdacmacs.lib.ciphertext.data.dto;
 
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class TwoFactorCipherTextUpdateKey {
+@NoArgsConstructor
+public class AttributeCipherTextUpdateKeyDTO {
 
-    @NotBlank
-    private String attributeValueId;
-    @Min(0)
-    private long attributeVersion;
+    @NotNull
+    private VersionedID dataOwnerId;
+
     @NotBlank
     private String updateKey;
 

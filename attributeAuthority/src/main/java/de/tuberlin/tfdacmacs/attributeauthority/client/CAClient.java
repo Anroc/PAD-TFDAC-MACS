@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueRespons
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.*;
@@ -37,4 +38,5 @@ public interface CAClient {
 
     // CIHPERTEXTS
     List<CipherTextDTO> getCipherTexts(List<String> attributeValueId);
+    List<CipherTextDTO> updateCipherTexts(AttributeCipherTextUpdateRequest attributeCipherTextUpdateRequest);
 }

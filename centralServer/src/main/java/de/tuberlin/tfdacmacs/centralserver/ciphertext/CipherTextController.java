@@ -1,9 +1,13 @@
 package de.tuberlin.tfdacmacs.centralserver.ciphertext;
 
+import de.tuberlin.tfdacmacs.centralserver.attribute.PublicAttributeService;
 import de.tuberlin.tfdacmacs.centralserver.ciphertext.data.CipherTextEntity;
 import de.tuberlin.tfdacmacs.centralserver.security.AuthenticationFacade;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherText2FAUpdateKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherTextAttributeUpdateKey;
+import de.tuberlin.tfdacmacs.crypto.pairing.util.AttributeValueId;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.TwoFactorCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.exceptions.NotFoundException;
@@ -17,10 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,6 +32,7 @@ public class CipherTextController {
     private final CipherTextService cipherTextService;
     private final GlobalPublicParameterProvider globalPublicParameterProvider;
     private final AuthenticationFacade authenticationFacade;
+    private final PublicAttributeService publicAttributeService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -104,6 +106,32 @@ public class CipherTextController {
                 );
 
         return cipherTextService.update(twoFactorCipherTextUpdateRequest.getOwnerId(), cipherText2FAUpdateKeys)
+                .stream()
+                .map(this::buildResponse)
+                .collect(Collectors.toList());
+    }
+
+    @PutMapping("/update/attribute")
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    public List<CipherTextDTO> updateCipherTexts(@RequestBody @Valid AttributeCipherTextUpdateRequest attributeCipherTextUpdateRequest) {
+        AttributeValueId attributeValueId = new AttributeValueId(attributeCipherTextUpdateRequest.getAttributeValueId());
+        if(! attributeValueId.getAuthorityId().equals(authenticationFacade.getId())) {
+            throw new ServiceException("Wrong authorityId.", HttpStatus.FORBIDDEN);
+        }
+
+        Map<String, CipherTextAttributeUpdateKey> cipherTextUpdateKeys = attributeCipherTextUpdateRequest
+                .toCipherTextUpdateKeys(
+                        globalPublicParameterProvider.getGlobalPublicParameter().g1(),
+                        publicAttributeService.findEntity(attributeValueId.getAttributeId())
+                                .orElseThrow(() -> new NotFoundException(attributeValueId.getAttributeId()))
+                                .getValues().stream()
+                                .filter(value -> value.toString().equals(attributeValueId.getValue()))
+                                .findAny()
+                                .orElseThrow(() -> new NotFoundException(attributeValueId.getAttributeValueId()))
+                                .toAttributeValuePublicKey(attributeValueId.getAttributeValueId())
+                );
+
+        return cipherTextService.update(cipherTextUpdateKeys)
                 .stream()
                 .map(this::buildResponse)
                 .collect(Collectors.toList());

@@ -9,6 +9,7 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeValueRespons
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityPublicKeyRequest;
 import de.tuberlin.tfdacmacs.lib.authority.AttributeAuthorityResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.CipherTextDTO;
 import de.tuberlin.tfdacmacs.lib.config.KeyStoreConfig;
 import de.tuberlin.tfdacmacs.lib.gpp.data.dto.GlobalPublicParameterDTO;
@@ -155,10 +156,19 @@ public class CAClientRestTemplate implements CAClient {
     public List<CipherTextDTO> getCipherTexts(List<String> attributeValueId) {
         String joinedQuery = StringUtils.collectionToDelimitedString(attributeValueId, ",");
         return listRequest(
-                String.format("/ciphertexts?attrIds=%s&completeMatch=false", joinedQuery),
+                String.format("/ciphertexts?attrIds=%s&completeMatch=False", joinedQuery),
                 HttpMethod.GET,
                 new ParameterizedTypeReference<List<CipherTextDTO>>(){},
                 null
         );
     }
+
+    @Override
+    public List<CipherTextDTO> updateCipherTexts(AttributeCipherTextUpdateRequest attributeCipherTextUpdateRequest) {
+        return listRequest(
+                String.format("/ciphertexts/update/attribute"),
+                HttpMethod.PUT,
+                new ParameterizedTypeReference<List<CipherTextDTO>>(){},
+                attributeCipherTextUpdateRequest
+        );    }
 }

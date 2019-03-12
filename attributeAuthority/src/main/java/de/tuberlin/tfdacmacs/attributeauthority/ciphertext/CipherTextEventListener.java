@@ -13,6 +13,9 @@ public class CipherTextEventListener {
 
     @EventListener
     public void handleAttributeValueUpdatedEvent(AttributeValueUpdatedEvent attributeValueUpdatedEvent) {
-
+        cipherTextService.updateCipherTexts(
+                attributeValueUpdatedEvent.getRevokedAttributeValue(),
+                attributeValueUpdatedEvent.getNewAttributeValue()
+        );
     }
 }

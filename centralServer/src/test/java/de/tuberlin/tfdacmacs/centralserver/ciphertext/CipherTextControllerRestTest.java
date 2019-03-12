@@ -95,7 +95,38 @@ public class CipherTextControllerRestTest extends RestTestSuite {
                 cipherTextEntity1.getId());
     }
 
+    @Test
+    public void getCipherTexts_passes_onCompleteMatch_isFalse() {
+        String attributeId = "aa.tu-berlin.de.role:Student";
+        CipherTextEntity cipherTextEntity1 = cipherTextTestFactory.create(attributeId, "aa.tu-berlin.de.role:Professor");
+        CipherTextEntity cipherTextEntity2 = cipherTextTestFactory.create(attributeId);
+        CipherTextEntity cipherTextEntity3 = cipherTextTestFactory.create("aa.tu-berlin.de.xx:xx");
+        cipherTextDB.insert(cipherTextEntity1);
+        cipherTextDB.insert(cipherTextEntity2);
+        cipherTextDB.insert(cipherTextEntity3);
+
+        ResponseEntity<List<CipherTextDTO>> exchange = mutualAuthRestTemplate
+                .exchange(cipherTextsQueryParameter(false, attributeId),
+                        HttpMethod.GET,
+                        HttpEntity.EMPTY,
+                        new ParameterizedTypeReference<List<CipherTextDTO>>() {});
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        List<CipherTextDTO> body = exchange.getBody();
+        assertThat(body).hasSize(2);
+        assertThat(body.stream().map(CipherTextDTO::getId)).containsExactlyInAnyOrder(
+                cipherTextEntity2.getId(), cipherTextEntity1.getId());
+    }
+
     private String cipherTextsQueryParameter(String... attributeIds) {
-        return "/ciphertexts?attrIds=" + StringUtils.collectionToDelimitedString(Arrays.asList(attributeIds), ",");
+        return cipherTextsQueryParameter(true, attributeIds);
+    }
+
+    private String cipherTextsQueryParameter(boolean completeMatch, String... attributeIds) {
+        String url = "/ciphertexts?attrIds=" + StringUtils.collectionToDelimitedString(Arrays.asList(attributeIds), ",");
+        if(completeMatch) {
+            return url;
+        }
+        return url + "&completeMatch=False";
     }
 }
