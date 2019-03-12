@@ -18,6 +18,7 @@ import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
 import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.SimpleElementKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.AttributeValueId;
 import de.tuberlin.tfdacmacs.crypto.rsa.converter.KeyConverter;
@@ -109,8 +110,8 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
                 randomElementZr(),
                 0L
         );
-        twoFactorKey.putPublicKey(email, randomElementG1());
-        twoFactorKey.putPublicKey(currentEmail, randomElementG1());
+        twoFactorKey.putPublicKey(email, new SimpleElementKey(randomElementG1(), 0L));
+        twoFactorKey.putPublicKey(currentEmail, new SimpleElementKey(randomElementG1(), 0L));
 
         TwoFactorAuthentication twoFactorAuthentication = new TwoFactorAuthentication(currentEmail, twoFactorKey);
         twoFactorAuthenticationDB.insert(twoFactorAuthentication.getOwnerId(), twoFactorAuthentication);

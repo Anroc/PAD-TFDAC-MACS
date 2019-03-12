@@ -169,20 +169,14 @@ public class TwoFactorAuthenticationClient {
                                         session.getKeyPair().getPrivateKey()
                                 );
 
-                                TwoFactorKey.Public tfPublic = new TwoFactorKey.Public(
-                                        session.getEmail(),
-                                        decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
-                                                cryptEngine),
-                                        encryptedTwoFactorDeviceKeyDTO.getVersion()
-                                );
-
-                                // apply all updates
-                                for (TwoFactorKeyUpdateDTO updateKey : twoFactorKeyResponse.getUpdates()) {
-                                    tfPublic = tfPublic.update(new TwoFactorUpdateKey(
-                                            twoFactorKeyResponse.getUserId(),
-                                            ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
-                                            updateKey.getTargetVersion()));
-                                }
+                                TwoFactorKey.Public tfPublic = applyUpdates(
+                                        twoFactorKeyResponse,
+                                        new TwoFactorKey.Public(
+                                                session.getEmail(),
+                                                decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
+                                                        cryptEngine),
+                                                encryptedTwoFactorDeviceKeyDTO.getVersion()
+                                ));
 
                                 return new PublicTwoFactorAuthentication(
                                         twoFactorKeyResponse.getOwnerId(),
@@ -193,6 +187,23 @@ public class TwoFactorAuthenticationClient {
                 }).filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    private TwoFactorKey.Public applyUpdates(TwoFactorKeyResponse twoFactorKeyResponse, TwoFactorKey.Public tfPublic) {
+        final long version = tfPublic.getVersion();
+
+        // apply all updates
+        twoFactorKeyResponse.getUpdates()
+                .sort(Comparator.comparingLong(TwoFactorKeyUpdateDTO::getTargetVersion));
+        twoFactorKeyResponse.getUpdates().removeIf(update -> update.getTargetVersion() < version);
+
+        for (TwoFactorKeyUpdateDTO updateKey : twoFactorKeyResponse.getUpdates()) {
+            tfPublic.update(new TwoFactorUpdateKey(
+                    twoFactorKeyResponse.getUserId(),
+                    ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
+                    updateKey.getTargetVersion()));
+        }
+        return tfPublic;
     }
 
     public void updateTwoFactorKeys(@NonNull List<TwoFactorUpdateKey> user2FAUpdateKeys) {

@@ -23,4 +23,10 @@ public abstract class ElementKey implements Versioned {
         setVersion(getVersion() + 1L);
         return (T) this;
     }
+
+    protected <T extends ElementKey> T update(@NonNull Element newKey) {
+        setKey(newKey);
+        incrementVersion();
+        return (T) this;
+    }
 }

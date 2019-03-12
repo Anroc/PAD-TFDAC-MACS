@@ -7,7 +7,7 @@ import de.tuberlin.tfdacmacs.client.twofactor.data.TwoFactorAuthentication;
 import de.tuberlin.tfdacmacs.client.twofactor.db.PublicTwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.client.twofactor.db.TwoFactorAuthenticationDB;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
-import it.unisa.dia.gas.jpbc.Element;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.ElementKey;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class TwoFactorAuthenticationService {
 
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationOptional.get();
 
-        Map<String, Element> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
+        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
         Arrays.stream(userIds)
                 .filter(userId -> ! publicKeys.containsKey(userId))
                 .forEach(userId -> twoFactorKeyManager.generatePublicKeyForUser(
@@ -75,7 +75,7 @@ public class TwoFactorAuthenticationService {
 
         Set<String> revokedUserIds = new HashSet<>(Arrays.asList(userIds));
 
-        Map<String, Element> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
+        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
         Set<String> retrainedUserIds = new HashSet<>(publicKeys.keySet());
         revokedUserIds.retainAll(retrainedUserIds);
         retrainedUserIds.removeAll(revokedUserIds);
