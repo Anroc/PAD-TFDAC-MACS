@@ -8,7 +8,6 @@ import de.tuberlin.tfdacmacs.client.register.events.LogoutEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.UserAttributeSecretComponent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +60,7 @@ public class AttributeService implements AttributeValueKeyProvider {
         return getAttributes().stream()
                 .filter(attribute -> attributeIds.contains(attribute.asVersionedID()))
                 .map(attribute -> new UserAttributeSecretComponent(
-                        new UserAttributeValueKey(attribute.getKey(), attribute.getVersion()),
+                        attribute.getUserAttributeValueKey(),
                         getAttributeValuePublicKey(attribute.getId()),
                         attribute.getId()))
                 .collect(Collectors.toSet());

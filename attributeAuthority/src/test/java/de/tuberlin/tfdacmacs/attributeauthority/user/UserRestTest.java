@@ -20,7 +20,6 @@ import de.tuberlin.tfdacmacs.lib.attributes.data.AttributeType;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.AttributeValueCreationRequest;
 import de.tuberlin.tfdacmacs.lib.attributes.data.dto.PublicAttributeResponse;
 import de.tuberlin.tfdacmacs.lib.certificate.data.dto.CertificateResponse;
-import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.user.data.DeviceState;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.AttributeValueUpdateKeyDTO;
 import de.tuberlin.tfdacmacs.lib.user.data.dto.DeviceResponse;
@@ -233,8 +232,6 @@ public class UserRestTest extends RestTestSuite {
         assertThat(attributeValue.getPublicKey()).isNotBlank();
         assertThat(attributeValue.getSignature()).isNotBlank();
         assertThat(attributeValue.getValue()).isEqualTo("student");
-
-        verify(caClient, times(1)).updateCipherTexts(any(AttributeCipherTextUpdateRequest.class));
     }
 
     @Test

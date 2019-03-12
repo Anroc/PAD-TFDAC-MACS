@@ -80,13 +80,37 @@ public class IntegrationTest extends IntegrationTestSuite {
         // --------------- 2 FA Test ------------------
 
         FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
-        encryptDecrypt_with_2FA_trustedMyselfAndBob();
+        encryptDecrypt_with_2FA_trustedMyselfAndTestUser();
 
         FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
         revoke2FA_passes_andUpdatesCT();
 
         revoke2FA_passes_onRevokingMySelf();
 
+
+        // --- attribute revocation test ---
+        FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
+
+        revokeAccess_fromTestUser();
+    }
+
+    private void revokeAccess_fromTestUser() {
+        revokeAttribute(testUserEmail, "aa.tu-berlin.de.role:student");
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isFalse();
+
+        evaluate("attributes update");
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isTrue();
+
+        evaluate(String.format("decrypt %s 1", DECRYPT_DIR));
+        assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
+                .exists()
+                .hasBinaryContent(CONTENT);
     }
 
     private void revoke2FA_passes_onRevokingMySelf() {
@@ -142,7 +166,7 @@ public class IntegrationTest extends IntegrationTestSuite {
                 .hasBinaryContent(CONTENT);
     }
 
-    private void encryptDecrypt_with_2FA_trustedMyselfAndBob() {
+    private void encryptDecrypt_with_2FA_trustedMyselfAndTestUser() {
         // trust myself so that i can use 2fa to decrypt the cipher text
         evaluate(String.format("2fa trust %s,%s", email, testUserEmail));
         evaluate("2fa update");
@@ -210,6 +234,24 @@ public class IntegrationTest extends IntegrationTestSuite {
         ResponseEntity<Object> exchange = restTemplate.exchange(
                 "/users/" + email + "/approve/" + deviceId,
                 HttpMethod.PUT,
+                new HttpEntity<>(httpHeaders),
+                Object.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+    }
+
+    private void revokeAttribute(String attributeValueId, String userId) {
+        log.info("Revoking attribute {} from {} ", attributeValueId, userId);
+        HttpHeaders httpHeaders = basicAuthHeader();
+
+        String[] attribute = attributeValueId.split(":");
+
+        RestTemplate restTemplate = sslRestTemplate(clientConfig.getAaRootUrl());
+
+        ResponseEntity<Object> exchange = restTemplate.exchange(
+                "/users/" + userId + "/attributes/" + attribute[0] + "/values/" + attribute[1],
+                HttpMethod.DELETE,
                 new HttpEntity<>(httpHeaders),
                 Object.class
         );
