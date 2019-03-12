@@ -1,7 +1,11 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unisa.dia.gas.jpbc.Element;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Optional;
@@ -16,6 +20,7 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
         super(privateKey, version);
     }
 
+    @JsonIgnore
     public Set<TwoFactorKey.Public> getPublicKeyValues() {
         return super.publicKeys.entrySet()
                 .stream()
@@ -23,12 +28,14 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
                 .collect(Collectors.toSet());
     }
 
+    @JsonIgnore
     public TwoFactorKey.Public getPublicKeyOfUser(@NonNull String userId) {
         return Optional.ofNullable(super.publicKeys.get(userId))
                 .map(elementKey -> new TwoFactorKey.Public(userId, elementKey.getKey(), elementKey.getVersion()))
                 .orElse(null);
     }
 
+    @JsonIgnore
     public TwoFactorKey.Private getPrivateKey() {
         return new Private(getKey(), getVersion());
     }
