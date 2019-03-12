@@ -13,6 +13,6 @@ public class UserAttributeValueKey extends ElementKey {
     public UserAttributeValueKey update(@NonNull UserAttributeValueUpdateKey userAttributeValueUpdateKey) {
         userAttributeValueUpdateKey.checkApplicablilty(this);
         Element newKey = getKey().duplicate().mul(userAttributeValueUpdateKey.getUpdateKey());
-        return new UserAttributeValueKey(newKey, userAttributeValueUpdateKey.getVersion()).incrementVersion();
+        return update(newKey);
     }
 }

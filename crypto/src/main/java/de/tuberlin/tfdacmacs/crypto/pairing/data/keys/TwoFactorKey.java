@@ -4,6 +4,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,12 +19,14 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     public Set<TwoFactorKey.Public> getPublicKeyValues() {
         return super.publicKeys.entrySet()
                 .stream()
-                .map(entry -> new TwoFactorKey.Public(entry.getKey(), entry.getValue(), getVersion()))
+                .map(entry -> new TwoFactorKey.Public(entry.getKey(), entry.getValue().getKey(), entry.getValue().getVersion()))
                 .collect(Collectors.toSet());
     }
 
     public TwoFactorKey.Public getPublicKeyOfUser(@NonNull String userId) {
-        return new TwoFactorKey.Public(userId, super.publicKeys.get(userId), getVersion());
+        return Optional.ofNullable(super.publicKeys.get(userId))
+                .map(elementKey -> new TwoFactorKey.Public(userId, elementKey.getKey(), elementKey.getVersion()))
+                .orElse(null);
     }
 
     public TwoFactorKey.Private getPrivateKey() {
@@ -52,7 +55,7 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
         public Public update(@NonNull TwoFactorUpdateKey twoFactorUpdateKey) {
             twoFactorUpdateKey.checkApplicablilty(this);
             Element newPublicKey = getKey().duplicate().mul(twoFactorUpdateKey.getUpdateKey());
-            return new Public(this.getUserId(), newPublicKey, twoFactorUpdateKey.getVersion()).incrementVersion();
+            return update(newPublicKey);
         }
     }
 }

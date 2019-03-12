@@ -78,7 +78,7 @@ public class TwoFactorKeyManager {
     private TwoFactorAuthentication calculateLocalUpdate(TwoFactorAuthentication twoFactorAuthentication,
             List<TwoFactorUpdateKey> user2FAUpdateKeys) {
         user2FAUpdateKeys.forEach(twoFactorUpdateKey ->
-                twoFactorAuthentication.getTwoFactorKey().getPublicKeyOfUser(twoFactorUpdateKey.getUserId()).update(twoFactorUpdateKey)
+            twoFactorAuthentication.getTwoFactorKey().getPublicKeyOfUser(twoFactorUpdateKey.getUserId()).update(twoFactorUpdateKey)
         );
 
         return twoFactorAuthentication;

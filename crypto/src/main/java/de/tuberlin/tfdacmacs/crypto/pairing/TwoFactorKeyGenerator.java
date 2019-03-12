@@ -23,7 +23,7 @@ public class TwoFactorKeyGenerator {
     }
 
     public TwoFactorKey generateNext(@NonNull GlobalPublicParameter globalPublicParameter, TwoFactorKey currentTwoFactorKey, String... uids) {
-        return generate(globalPublicParameter, currentTwoFactorKey.getVersion(), uids);
+        return generate(globalPublicParameter, currentTwoFactorKey.getVersion() + 1, uids);
     }
 
     private TwoFactorKey generate(GlobalPublicParameter globalPublicParameter, long version, String... uids) {
@@ -40,7 +40,7 @@ public class TwoFactorKeyGenerator {
     public TwoFactorKey generatePublicKeyForUser(@NonNull GlobalPublicParameter globalPublicParameter,
             @NonNull TwoFactorKey twoFactorKey, @NonNull String uid) {
         Element twoFAKey = hashGenerator.g1Hash(globalPublicParameter, uid).powZn(twoFactorKey.getPrivateKey().getKey());
-        twoFactorKey.putPublicKey(uid, twoFAKey);
+        twoFactorKey.putPublicKey(uid, new SimpleElementKey(twoFAKey, twoFactorKey.getVersion()));
         return twoFactorKey;
     }
 
