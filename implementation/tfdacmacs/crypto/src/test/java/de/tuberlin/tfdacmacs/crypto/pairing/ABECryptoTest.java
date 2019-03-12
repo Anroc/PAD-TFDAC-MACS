@@ -93,7 +93,7 @@ public class ABECryptoTest extends UnitTestSuite {
                 .generateCipherTextUpdateKey(cipherText, attributeKeys, newAttributeValueKey, null);
 
         // 1. update user key
-        UserAttributeValueKey updateUserSecretKey = userSecretAttributeValueKey.update(newUserAttributeValueUpdateKey);
+        UserAttributeValueKey updateUserSecretKey = userSecretAttributeValueKey.clone().update(newUserAttributeValueUpdateKey);
 
         // 2. update cipher text
         CipherText updatedCipherText = abeEncryptor.update(gpp, cipherText, andAccessPolicy,
@@ -140,7 +140,7 @@ public class ABECryptoTest extends UnitTestSuite {
                 .generateCipherTextUpdateKey(cipherText, attributeKeys, newAttributeValueKey, null);
 
         // 1. update user key
-        UserAttributeValueKey updateUserSecretKey = userSecretAttributeValueKey.update(newUserAttributeValueUpdateKey);
+        UserAttributeValueKey updateUserSecretKey = userSecretAttributeValueKey.clone().update(newUserAttributeValueUpdateKey);
 
         // 2. update cipher text
         CipherText updatedCipherText = abeEncryptor.update(gpp, cipherText, andAccessPolicy,

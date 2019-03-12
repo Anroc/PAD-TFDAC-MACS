@@ -15,4 +15,12 @@ public class UserAttributeValueKey extends ElementKey {
         Element newKey = getKey().duplicate().mul(userAttributeValueUpdateKey.getUpdateKey());
         return update(newKey);
     }
+
+    @Override
+    public UserAttributeValueKey clone() {
+        return new UserAttributeValueKey(
+                getKey().duplicate(),
+                getVersion()
+        );
+    }
 }
