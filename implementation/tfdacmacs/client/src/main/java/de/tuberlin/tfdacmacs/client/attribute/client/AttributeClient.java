@@ -70,6 +70,9 @@ public class AttributeClient {
     }
 
     private void updateAttributes(UserResponse userResponse, Set<Attribute> attributes) {
+        if(userResponse.getAttributeValueUpdateKeys() == null) {
+            return;
+        }
         for (Attribute attribute : attributes) {
             if(userResponse.getAttributeValueUpdateKeys().containsKey(attribute.getId())) {
                 Map<Long, AttributeValueUpdateKeyDTO> attributeValueUpdateKeyDTOs = userResponse.getAttributeValueUpdateKeys().get(attribute.getId());

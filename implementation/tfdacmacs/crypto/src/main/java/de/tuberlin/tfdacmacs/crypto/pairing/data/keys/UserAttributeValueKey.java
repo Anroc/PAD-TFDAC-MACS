@@ -1,9 +1,13 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
 import it.unisa.dia.gas.jpbc.Element;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UserAttributeValueKey extends ElementKey {
     public UserAttributeValueKey(@NonNull Element key, long version) {
