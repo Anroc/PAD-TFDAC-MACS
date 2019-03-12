@@ -95,7 +95,7 @@ public class IntegrationTest extends IntegrationTestSuite {
     }
 
     private void revokeAccess_fromTestUser() {
-        revokeAttribute(testUserEmail, "aa.tu-berlin.de.role:student");
+        revokeAttribute("aa.tu-berlin.de.role:student", testUserEmail);
 
         resetStdStreams();
         evaluate("check");

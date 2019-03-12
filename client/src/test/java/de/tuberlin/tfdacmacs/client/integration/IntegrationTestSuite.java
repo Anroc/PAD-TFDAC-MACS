@@ -112,7 +112,7 @@ public abstract class IntegrationTestSuite {
         log.info("executing: {}", command);
         Object ret = shell.evaluate(() -> command);
 
-        if(ret instanceof Exception) {
+        if(ret != null && ret instanceof Exception) {
             throw new RuntimeException((Exception) ret);
         }
     }
