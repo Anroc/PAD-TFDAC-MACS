@@ -71,9 +71,10 @@ public class CipherTextClient {
                 .collect(Collectors.toList());
     }
 
-    public void updateCipherText(String ownerId, List<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
+    public void updateCipherText(String ownerId, long targetVersion, List<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
         TwoFactorCipherTextUpdateRequest twoFactorCipherTextUpdateRequest = new TwoFactorCipherTextUpdateRequest(
                 ownerId,
+                targetVersion,
                 cipherText2FAUpdateKeys.stream()
                         .map(updateKeys -> new TwoFactorCipherTextUpdateKey(
                                 updateKeys.getAttributeValueId().getId(),

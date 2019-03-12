@@ -69,7 +69,7 @@ public class TwoFactorKeyManager {
 
         update2FAPublicKey(twoFactorKey);
         twoFactorClient.updateTwoFactorKeys(user2FAUpdateKeys);
-        cipherTextClient.updateCipherText(twoFactorAuthentication.getOwnerId(), cipherText2FAUpdateKeys);
+        cipherTextClient.updateCipherText(twoFactorAuthentication.getOwnerId(), revokedMasterKey.getVersion(), cipherText2FAUpdateKeys);
         twoFactorClient.deleteTwoFactorKeys(revokedUserIds);
 
         return calculateLocalUpdate(twoFactorAuthentication, user2FAUpdateKeys);
