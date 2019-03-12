@@ -184,6 +184,8 @@ public class ABECryptoTest extends UnitTestSuite {
         CipherText updatedCipherText = abeEncryptor
                 .update(gpp, cipherText, andAccessPolicy, Sets.newLinkedHashSet(cipherText2FAUpdateKey));
 
+        assertThat(updatedCipherText.getOwnerId().getVersion()).isEqualTo(1L);
+
         // assert old keys are not legitimit anymore
         LinkedHashSet<UserAttributeSecretComponent> userAttributeSecretComponents = Sets.newLinkedHashSet(
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
