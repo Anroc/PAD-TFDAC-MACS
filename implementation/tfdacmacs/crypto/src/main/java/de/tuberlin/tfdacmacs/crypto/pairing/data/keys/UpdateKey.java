@@ -1,5 +1,6 @@
 package de.tuberlin.tfdacmacs.crypto.pairing.data.keys;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.tuberlin.tfdacmacs.crypto.pairing.exceptions.VersionMismatchException;
 import it.unisa.dia.gas.jpbc.Element;
 import lombok.Data;
@@ -18,6 +19,7 @@ public abstract class UpdateKey extends ElementKey {
         super(key, targetVersion);
     }
 
+    @JsonIgnore
     public Element getUpdateKey() {
         return getKey();
     }
