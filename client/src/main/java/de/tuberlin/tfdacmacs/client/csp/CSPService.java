@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.client.csp.client.CipherTextClient;
 import de.tuberlin.tfdacmacs.client.encrypt.data.EncryptedFile;
 import de.tuberlin.tfdacmacs.client.twofactor.TwoFactorAuthenticationService;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +32,15 @@ public class CSPService {
     }
 
     public List<CipherText> checkForDecryptableFiles(@NonNull Set<Attribute> attributes) {
+        Set<VersionedID> versionedIDs = attributes.stream().map(Attribute::asVersionedID).collect(Collectors.toSet());
+
         return cipherTextClient.getCipherTexts(
                     attributes.stream()
                             .map(Attribute::getId)
                             .collect(Collectors.toList()))
                 .stream()
                 .filter(ct -> {
-                    if(! attributes.containsAll(ct.getAccessPolicy())) {
+                    if(! versionedIDs.containsAll(ct.getAccessPolicy())) {
                         log.info("Ignoring cipher text [{}] since we don't have the right attribute version.", ct.getId());
                         return false;
                     }
