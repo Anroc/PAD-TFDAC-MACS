@@ -64,20 +64,21 @@ public class AttributeCommandTest extends CommandTestSuite {
         doReturn(certificate).when(session).getCertificate();
         doReturn("fingerprint").when(certificate).getId();
 
+        DeviceResponse deviceResponse = new DeviceResponse(
+                "fingerprint",
+                DeviceState.ACTIVE,
+                cryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), keyPairService.getKeyPair(email).getPublicKey()),
+                Sets.newHashSet(encryptedAttributeValueKeyDTO)
+        );
+
         doAnswer(args -> new UserResponse(
                 email,
                 "aa.tu-berlin.de",
                 null,
                 null,
-                Sets.newHashSet(
-                        new DeviceResponse(
-                                "fingerprint",
-                                DeviceState.ACTIVE,
-                                cryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), keyPairService.getKeyPair(email).getPublicKey()),
-                                Sets.newHashSet(encryptedAttributeValueKeyDTO)
-                        )
-                )
+                Sets.newHashSet(deviceResponse)
         )).when(caClient).getUser(eq(email));
+        doReturn(deviceResponse).when(caClient).getAttributes(email, "fingerprint");
 
         shell.evaluate(() -> "attributes update");
 

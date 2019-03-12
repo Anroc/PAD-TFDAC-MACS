@@ -7,10 +7,7 @@ import de.tuberlin.tfdacmacs.client.keypair.KeyPairService;
 import de.tuberlin.tfdacmacs.client.rest.CAClient;
 import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.error.InterServiceCallError;
-import de.tuberlin.tfdacmacs.client.user.client.dto.AttributeValueUpdateKeyDTO;
-import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
-import de.tuberlin.tfdacmacs.client.user.client.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
+import de.tuberlin.tfdacmacs.client.user.client.dto.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
@@ -51,12 +48,8 @@ public class AttributeClient {
     private final GPPService gppService;
 
     public Set<Attribute> getAttributesForUser(String email, String certificateId) {
+        DeviceResponse deviceResponse = caClient.getAttributes(email, certificateId);
         UserResponse userResponse = caClient.getUser(email);
-
-        DeviceResponse deviceResponse = userResponse.getDevices()
-                .stream().filter(dr -> dr.getCertificateId().equals(certificateId))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("This device does not exist anymore."));
 
         String encryptedKey = deviceResponse.getEncryptedKey();
         Set<EncryptedAttributeValueKeyDTO> encryptedAttributeValueKeys = deviceResponse
