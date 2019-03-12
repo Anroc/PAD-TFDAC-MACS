@@ -78,7 +78,7 @@ public class ABEEncryptor extends ABECrypto {
         accessPolicy.remove(cipherTextAttributeUpdateKey.getAttributeValueId());
         accessPolicy.add(cipherTextAttributeUpdateKey.getAttributeValueId().increment());
 
-        return new CipherText(updatedC1, updatedC2, updatedC3, accessPolicy, cipherText.getOwnerId(), cipherText.getFileId());
+        return new CipherText(cipherText.getId(), updatedC1, updatedC2, updatedC3, accessPolicy, cipherText.getOwnerId(), cipherText.getFileId());
     }
 
     private void checkConstrains(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy,
@@ -120,7 +120,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC3 = cipherText.getC3().duplicate()
                 .mul(product)
                 .mul(mulAttributePublicValueKeys(andAccessPolicy.getAttributePolicyElements()).powZn(r));
-        return new CipherText(updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId().increment(), cipherText.getFileId());
+        return new CipherText(cipherText.getId(), updatedC1, updatedC2, updatedC3, cipherText.getAccessPolicy(), cipherText.getOwnerId().increment(), cipherText.getFileId());
     }
 
     private void checkConstrains(CipherText cipherText, Set<CipherText2FAUpdateKey> cipherText2FAUpdateKeys) {
