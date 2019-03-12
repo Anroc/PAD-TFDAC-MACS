@@ -29,7 +29,7 @@ public class TwoFactorCipherTextUpdateRequest {
 
     @NotNull
     @NotEmpty
-    private List<TwoFactorCipherTextUpdateKey> updates;
+    private List<TwoFactorCipherTextUpdateKeyDTO> updates;
 
     public Set<CipherText2FAUpdateKey> toCipherText2FAUpdateKey(Field g1) {
         return getUpdates().stream()

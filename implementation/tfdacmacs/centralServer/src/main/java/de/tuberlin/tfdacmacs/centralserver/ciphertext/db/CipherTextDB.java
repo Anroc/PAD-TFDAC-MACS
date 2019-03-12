@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,5 +34,9 @@ public class CipherTextDB extends CouchbaseDB<CipherTextEntity> {
 
     public List<CipherTextEntity> findAllByOwnerId(String ownerId) {
         return repository.findAllByOwnerId(ownerId).collect(Collectors.toList());
+    }
+
+    public Optional<CipherTextEntity> findById(String id){
+        return repository.findById(id);
     }
 }

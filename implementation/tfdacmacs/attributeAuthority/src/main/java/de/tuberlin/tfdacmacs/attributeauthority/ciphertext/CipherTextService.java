@@ -33,13 +33,14 @@ public class CipherTextService {
 
         Map<String, TwoFactorKey.Public> twoFactorPublicKeys = cipherTextClient.findTwoFactorPublicKeys(ownerIds);
 
-        cipherTexts.forEach(
-                cipherText -> {
-                    CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey = attributeValueKeyGenerator
-                            .generateCipherTextUpdateKey(cipherText, revokedAttributeValueKey,
-                                    newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId()));
-//                    cipherTextClient.updateCipherText(cipherText.getId(), cipherTextAttributeUpdateKey);
-                });
+        Map<String, CipherTextAttributeUpdateKey> cipherTestUpdates = cipherTexts.stream().collect(
+                Collectors.toMap(
+                        cipherText -> cipherText.getId(),
+                        cipherText -> attributeValueKeyGenerator
+                                .generateCipherTextUpdateKey(cipherText, revokedAttributeValueKey,
+                                        newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId()))
+                ));
 
+        cipherTextClient.updateCipherTexts(cipherTestUpdates);
     }
 }

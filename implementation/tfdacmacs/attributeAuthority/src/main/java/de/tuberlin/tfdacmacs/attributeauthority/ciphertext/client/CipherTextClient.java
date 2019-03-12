@@ -5,17 +5,17 @@ import de.tuberlin.tfdacmacs.attributeauthority.client.CAClient;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.CipherText;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.CipherTextAttributeUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateKeyDTO;
+import de.tuberlin.tfdacmacs.lib.ciphertext.data.dto.AttributeCipherTextUpdateRequest;
 import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Field;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -60,5 +60,29 @@ public class CipherTextClient {
                                     ElementConverter.convert(userResponse.getTwoFactorPublicKey().getTwoFactorAuthenticationPublicKey(), getG1()),
                                     userResponse.getTwoFactorPublicKey().getVersion());
                         }));
+    }
+
+    public void updateCipherTexts(@NonNull Map<String, CipherTextAttributeUpdateKey> cipherTestUpdates) {
+        Optional<CipherTextAttributeUpdateKey> first = cipherTestUpdates.values().stream().findAny();
+        if(! first.isPresent()) {
+            return;
+        }
+
+        long targetVersion = first.get().getVersion();
+        String attributeValueId = first.get().getAttributeValueId().getId();
+
+        caClient.updateCipherTexts(
+                new AttributeCipherTextUpdateRequest(
+                        attributeValueId,
+                        targetVersion,
+                        cipherTestUpdates.entrySet().stream().collect(Collectors.toMap(
+                                entry -> entry.getKey(),
+                                entry -> new AttributeCipherTextUpdateKeyDTO(
+                                        entry.getValue().getDataOwnerId(),
+                                        ElementConverter.convert(entry.getValue().getUpdateKey())
+                                )
+                        ))
+                )
+        );
     }
 }

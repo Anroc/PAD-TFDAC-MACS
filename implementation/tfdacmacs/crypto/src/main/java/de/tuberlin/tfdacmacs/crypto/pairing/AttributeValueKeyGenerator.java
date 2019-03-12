@@ -124,7 +124,7 @@ public class AttributeValueKeyGenerator {
         cuk.powZn(newAttributeValueKey.getPrivateKey().getKey().duplicate()
                 .sub(revokedAttributeValueKey.getPrivateKey().getKey()));
 
-        return  new CipherTextAttributeUpdateKey(
+        return new CipherTextAttributeUpdateKey(
                 cuk,
                 newAttributeValueKey.getAttributeValueId(),
                 Optional.ofNullable(twoFactorPublicKey).map(tf -> new VersionedID(tf.getUserId(), tf.getVersion())).orElse(null),
