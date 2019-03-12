@@ -53,7 +53,7 @@ public class CouchbaseElementConverters {
                 fieldType = PBCFieldType.ZR;
             } else if (value.getField() instanceof GTFiniteField || field instanceof GTFiniteField) {
                 fieldType = PBCFieldType.GT;
-            } else if (field instanceof CurveField) {
+            } else if (value.getField() instanceof CurveField || field instanceof CurveField) {
                 fieldType = PBCFieldType.G1;
             }
 
