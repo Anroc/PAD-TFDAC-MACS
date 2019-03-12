@@ -3,10 +3,11 @@ package de.tuberlin.tfdacmacs.client.attribute;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
 import de.tuberlin.tfdacmacs.client.attribute.data.Attribute;
+import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceState;
 import de.tuberlin.tfdacmacs.client.user.client.dto.EncryptedAttributeValueKeyDTO;
-import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
+import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.SymmetricCryptEngine;
@@ -21,7 +22,6 @@ import java.security.Key;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -64,12 +64,20 @@ public class AttributeCommandTest extends CommandTestSuite {
         doReturn(certificate).when(session).getCertificate();
         doReturn("fingerprint").when(certificate).getId();
 
-        doAnswer(args -> new DeviceResponse(
-                args.getArgument(1),
-                DeviceState.ACTIVE,
-                cryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), keyPairService.getKeyPair(email).getPublicKey()),
-                Sets.newHashSet(encryptedAttributeValueKeyDTO)
-        )).when(caClient).getAttributes(eq(email), anyString());
+        doAnswer(args -> new UserResponse(
+                email,
+                "aa.tu-berlin.de",
+                null,
+                null,
+                Sets.newHashSet(
+                        new DeviceResponse(
+                                "fingerprint",
+                                DeviceState.ACTIVE,
+                                cryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), keyPairService.getKeyPair(email).getPublicKey()),
+                                Sets.newHashSet(encryptedAttributeValueKeyDTO)
+                        )
+                )
+        )).when(caClient).getUser(eq(email));
 
         shell.evaluate(() -> "attributes update");
 
