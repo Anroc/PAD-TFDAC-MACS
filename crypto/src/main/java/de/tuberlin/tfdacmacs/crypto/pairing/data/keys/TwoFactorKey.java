@@ -57,5 +57,10 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
             Element newPublicKey = getKey().duplicate().mul(twoFactorUpdateKey.getUpdateKey());
             return update(newPublicKey);
         }
+
+        @Override
+        public Public clone() {
+            return new Public(getUserId(), getKey().duplicate(), getVersion());
+        }
     }
 }
