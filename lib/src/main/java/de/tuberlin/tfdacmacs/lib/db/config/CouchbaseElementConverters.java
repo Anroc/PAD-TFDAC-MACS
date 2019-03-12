@@ -5,6 +5,7 @@ import de.tuberlin.tfdacmacs.lib.gpp.GlobalPublicParameterProvider;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.FieldOver;
+import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
 import it.unisa.dia.gas.plaf.jpbc.field.gt.GTFiniteField;
 import it.unisa.dia.gas.plaf.jpbc.field.z.ZrElement;
 import it.unisa.dia.gas.plaf.jpbc.pbc.PBCField;
@@ -50,8 +51,10 @@ public class CouchbaseElementConverters {
                 }
             } else if (value instanceof ZrElement) {
                 fieldType = PBCFieldType.ZR;
-            } else if (value instanceof GTFiniteField) {
+            } else if (value.getField() instanceof GTFiniteField || field instanceof GTFiniteField) {
                 fieldType = PBCFieldType.GT;
+            } else if (field instanceof CurveField) {
+                fieldType = PBCFieldType.G1;
             }
 
             if(fieldType == PBCFieldType.UNKNOWN) {
