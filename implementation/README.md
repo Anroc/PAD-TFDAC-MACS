@@ -60,7 +60,7 @@ In the next setup we register a new attribute with the identifier `aa.tu-berlin.
 
 ```java
     AttributeValueKeyGenerator attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
-    AttributeValuekey attributeValuekey = attributeValueKeyGenerator.generate(gpp, "aa.tu-berlin.de.role:Student");
+    AttributeValuekey attributeValuekey = attributeValueKeyGenerator.generateNew(gpp, "aa.tu-berlin.de.role:Student");
 ```
 
 ## Register User
@@ -125,7 +125,8 @@ We need to add another dependency to enable two-factor authentication (2FA) and 
 
 ```java
     String oid = "dataowner@tu-berlin.de";
-    TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generate(gpp);
+    TwoFactorKeyGenerator twoFactorKeyGenerator = new twoFactorKeyGenerator(hashGenerator);
+    TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gpp);
     DataOwner dataOwner = new DataOwner(oid, twoFactorKey.getPrivateKey());
 ```
 
