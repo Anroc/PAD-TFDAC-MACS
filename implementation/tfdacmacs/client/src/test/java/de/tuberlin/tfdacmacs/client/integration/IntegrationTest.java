@@ -96,7 +96,7 @@ public class IntegrationTest extends IntegrationTestSuite {
     }
 
     private void deleteMySelf() {
-        deleteUser(testUserEmail);
+        deleteUser(email);
 
         resetStdStreams();
         evaluate("check");
