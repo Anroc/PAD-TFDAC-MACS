@@ -112,7 +112,7 @@ public class CipherTextController {
     }
 
     @PutMapping("/update/attribute")
-    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_AUTHORITY')")
     public List<CipherTextDTO> updateCipherTexts(@RequestBody @Valid AttributeCipherTextUpdateRequest attributeCipherTextUpdateRequest) {
         AttributeValueId attributeValueId = new AttributeValueId(attributeCipherTextUpdateRequest.getAttributeValueId());
         if(! attributeValueId.getAuthorityId().equals(authenticationFacade.getId())) {
