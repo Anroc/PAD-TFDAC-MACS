@@ -84,8 +84,8 @@ public class ABEEncryptor extends ABECrypto {
     private void checkConstrains(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy,
             @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey,
             @NonNull VersionedID attributeValueIdToIgnore) {
-        if(! symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true, attributeValueIdToIgnore)) {
-            if (!symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false, attributeValueIdToIgnore)) {
+        if(! symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true, attributeValueIdToIgnore.getId())) {
+            if (!symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false, attributeValueIdToIgnore.getId())) {
                 throw new IllegalArgumentException("Given and access Policy does not mirror the policy in ciphertext");
             } else {
                 throw new VersionMismatchException(
@@ -185,29 +185,30 @@ public class ABEEncryptor extends ABECrypto {
         return containsAll(a, b, exact, null) && containsAll(b,a, exact, null);
     }
 
-    private boolean symmetric(Set<VersionedID> a, Set<VersionedID> b, boolean exact, VersionedID ignoring) {
-        return containsAll(a, b, exact, ignoring) && containsAll(b,a, exact, ignoring);
+    private boolean symmetric(Set<VersionedID> a, Set<VersionedID> b, boolean exact, String ignoringAttributeValueId) {
+        return containsAll(a, b, exact, ignoringAttributeValueId) && containsAll(b,a, exact, ignoringAttributeValueId);
     }
 
-    private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact, VersionedID ignoring) {
+    private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact, String ignoringAttributeValueId) {
         if(exact) {
-            if(ignoring != null) {
+            if(ignoringAttributeValueId != null) {
                 a = new HashSet<>(a);
                 b = new HashSet<>(b);
 
-                a.remove(ignoring);
-                b.remove(ignoring);
+                a.removeIf(elem -> elem.getId().equals(ignoringAttributeValueId));
+                b.removeIf(elem -> elem.getId().equals(ignoringAttributeValueId));
             }
 
             return a.containsAll(b);
         } else {
             Set<String> aIds = a.stream().map(VersionedID::getId)
-                    .filter(elem -> ignoring == null || ! elem.equals(ignoring.getId()))
+                    .filter(elem -> ignoringAttributeValueId == null || ! elem.equals(ignoringAttributeValueId))
                     .collect(Collectors.toSet());
 
             return b.stream()
-                    .filter(elem -> ignoring == null || ! elem.getId().equals(ignoring.getId()))
-                    .allMatch(versionedID -> aIds.contains(versionedID.getId()));
+                    .map(VersionedID::getId)
+                    .filter(elem -> ignoringAttributeValueId == null || ! elem.equals(ignoringAttributeValueId))
+                    .allMatch(versionedID -> aIds.contains(versionedID));
         }
     }
 }
