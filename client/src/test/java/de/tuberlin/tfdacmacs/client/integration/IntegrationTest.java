@@ -90,8 +90,39 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         // --- attribute revocation test ---
         FileUtils.cleanDirectory(Paths.get(DECRYPT_DIR).toFile());
-
         revokeAccess_fromTestUser();
+
+        deleteMySelf();
+    }
+
+    private void deleteMySelf() {
+        deleteUser(testUserEmail);
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isFalse();
+
+        evaluate("attributes update");
+
+        resetStdStreams();
+        evaluate("check");
+        assertThat(containsSubSequence(getOutContent(), "aa.tu-berlin.de.role:student")).isFalse();
+    }
+
+    private void deleteUser(String email) {
+        log.info("Deleting user ", email);
+        HttpHeaders httpHeaders = basicAuthHeader();
+
+        RestTemplate restTemplate = sslRestTemplate(clientConfig.getAaRootUrl());
+
+        ResponseEntity<Object> exchange = restTemplate.exchange(
+                "/users/" + email,
+                HttpMethod.DELETE,
+                new HttpEntity<>(httpHeaders),
+                Object.class
+        );
+
+        assertThat(exchange.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
     }
 
     private void revokeAccess_fromTestUser() {
