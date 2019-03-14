@@ -73,7 +73,12 @@ public class AttributeClient {
                 while(attributeValueUpdateKeyDTOs.containsKey(currentVersion)) {
                     AttributeValueUpdateKeyDTO attributeValueUpdateKeyDTO = attributeValueUpdateKeyDTOs.get(currentVersion);
 
-                    semanticValidator.verifySignature(attributeValueUpdateKeyDTO.buildSignatureBody(), attributeValueUpdateKeyDTO.getSignature(), userResponse.getAuthorityId());
+                    semanticValidator.verifySignature(
+                            attributeValueUpdateKeyDTO.signature()
+                                    .pack(attributeValueUpdateKeyDTO.buildSignatureBody())
+                                    .pack(userResponse.getId())
+                                    .toString(),
+                            attributeValueUpdateKeyDTO.getSignature(), userResponse.getAuthorityId());
 
                     log.info("Found new version of attribute {} to update to version {}", attribute.getId(), attributeValueUpdateKeyDTO.getTargetVersion() + 1);
                     UserAttributeValueUpdateKey userAttributeValueUpdateKey = new UserAttributeValueUpdateKey(
