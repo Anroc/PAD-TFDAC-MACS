@@ -69,7 +69,7 @@ public class ABEEncryptor extends ABECrypto {
         Element updatedC2 = updateC2(gpp, cipherText, r);
         Element updatedC3 = cipherText.getC3().duplicate().mul(cipherTextAttributeUpdateKey.getUpdateKey())
                 .mul(mulAttributePublicValueKeys(
-                        andAccessPolicy.getAttributePolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId())
+                        andAccessPolicy.getAttributePolicyElements(), cipherTextAttributeUpdateKey.getAttributeValueId().getId())
                         .orElse(gpp.g1().newOneElement())
                         .powZn(r))
                 .mul(cipherTextAttributeUpdateKey.getNewAttributeValuePublicKey().getKey().duplicate().powZn(r));
@@ -168,9 +168,10 @@ public class ABEEncryptor extends ABECrypto {
     }
 
     private Optional<Element> mulAttributePublicValueKeys(
-            @NonNull Set<AttributePolicyElement> policy, VersionedID excludedAttributeValueId) {
+            @NonNull Set<AttributePolicyElement> policy,
+            String excludedAttributeValueId) {
         return policy.stream()
-                .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().getId().equals(excludedAttributeValueId.getId()))
+                .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().getId().equals(excludedAttributeValueId))
                 .map(AttributePolicyElement::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
                 .reduce((a, b) -> a.duplicate().mul(b))
