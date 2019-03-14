@@ -37,8 +37,12 @@ public class CipherTextService {
                 Collectors.toMap(
                         cipherText -> cipherText.getId(),
                         cipherText -> attributeValueKeyGenerator
-                                .generateCipherTextUpdateKey(cipherText, revokedAttributeValueKey,
-                                        newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId().getId()))
+                                .generateCipherTextUpdateKey(
+                                        cipherText,
+                                        revokedAttributeValueKey,
+                                        newAttributeValueKey,
+                                        cipherText.isTwoFactorSecured() ? twoFactorPublicKeys.get(cipherText.getOwnerId().getId()) : null
+                                )
                 ));
 
         cipherTextClient.updateCipherTexts(cipherTestUpdates);
