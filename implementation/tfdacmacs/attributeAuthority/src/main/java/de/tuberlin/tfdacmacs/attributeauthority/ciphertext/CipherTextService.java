@@ -38,7 +38,7 @@ public class CipherTextService {
                         cipherText -> cipherText.getId(),
                         cipherText -> attributeValueKeyGenerator
                                 .generateCipherTextUpdateKey(cipherText, revokedAttributeValueKey,
-                                        newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId()))
+                                        newAttributeValueKey, twoFactorPublicKeys.get(cipherText.getOwnerId().getId()))
                 ));
 
         cipherTextClient.updateCipherTexts(cipherTestUpdates);
