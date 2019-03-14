@@ -31,5 +31,9 @@ public interface SignatureBody {
         public String finalize(Function<String, String> signingFunction) {
             return signingFunction.apply(stringBuilder.toString());
         }
+
+        public String toString() {
+            return stringBuilder.toString();
+        }
     }
 }
