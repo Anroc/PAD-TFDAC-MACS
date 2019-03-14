@@ -170,7 +170,7 @@ public class ABEEncryptor extends ABECrypto {
     private Optional<Element> mulAttributePublicValueKeys(
             @NonNull Set<AttributePolicyElement> policy, VersionedID excludedAttributeValueId) {
         return policy.stream()
-                .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().equals(excludedAttributeValueId))
+                .filter(accessPolicyElement -> ! accessPolicyElement.getAttributeValueId().getId().equals(excludedAttributeValueId.getId()))
                 .map(AttributePolicyElement::getAttributePublicKey)
                 .map(AttributeValueKey.Public::getKey)
                 .reduce((a, b) -> a.duplicate().mul(b))

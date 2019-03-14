@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.attributeauthority.user.data.UserAttributeKey;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.DeviceApprovedEvent;
 import de.tuberlin.tfdacmacs.attributeauthority.user.events.UserCreatedEvent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.VersionedID;
+import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.UserAttributeValueUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
@@ -102,15 +103,24 @@ public class UserEventListener {
 
         userService.findUsersByAttributeIdAndValue(attributeId, value)
                 .stream()
-                .map(User::getId)
-                .map(userId -> attributeService.generateUpdateKey(
-                        userId,
-                        attributeValueUpdatedEvent.getRevokedAttributeValue(),
-                        attributeValueUpdatedEvent.getNewAttributeValue()))
-                .forEach(updateKey -> userClient.updateUserSecretKey(
-                        updateKey,
-                        attributeValueUpdatedEvent.getNewAttributeValue().getAttributeValueId(),
-                        attributeValueUpdatedEvent.getRevokedAttributeValue().getVersion(),
-                        attributeValueUpdatedEvent.getNewAttributeValue().getVersion()));
+                .forEach(user -> {
+                    UserAttributeValueUpdateKey userAttributeValueUpdateKey = attributeService.generateUpdateKey(
+                            user.getId(),
+                            attributeValueUpdatedEvent.getRevokedAttributeValue(),
+                            attributeValueUpdatedEvent.getNewAttributeValue());
+                    userClient.updateUserSecretKey(
+                            userAttributeValueUpdateKey,
+                            attributeValueUpdatedEvent.getNewAttributeValue().getAttributeValueId(),
+                            attributeValueUpdatedEvent.getRevokedAttributeValue().getVersion(),
+                            attributeValueUpdatedEvent.getNewAttributeValue().getVersion());
+                    UserAttributeKey userAttributeKey = user.getAttributes()
+                            .stream()
+                            .filter(attribute -> attribute.getAttributeId().equals(attributeId))
+                            .filter(attribute -> attribute.getValue().toString().equals(value))
+                            .findAny()
+                            .get();
+                    userAttributeKey.getKey().update(userAttributeValueUpdateKey);
+                    userService.updateUser(user);
+                });
     }
 }
