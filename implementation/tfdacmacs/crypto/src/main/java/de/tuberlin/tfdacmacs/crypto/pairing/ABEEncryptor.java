@@ -206,7 +206,7 @@ public class ABEEncryptor extends ABECrypto {
                     .collect(Collectors.toSet());
 
             return b.stream()
-                    .filter(elem -> ignoring == null || ! elem.equals(ignoring.getId()))
+                    .filter(elem -> ignoring == null || ! elem.getId().equals(ignoring.getId()))
                     .allMatch(versionedID -> aIds.contains(versionedID.getId()));
         }
     }
