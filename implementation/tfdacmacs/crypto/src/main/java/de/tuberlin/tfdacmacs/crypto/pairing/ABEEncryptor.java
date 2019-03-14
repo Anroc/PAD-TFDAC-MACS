@@ -62,7 +62,7 @@ public class ABEEncryptor extends ABECrypto {
             log.warn("Nothing to do on cipher text. Policy does not contain the attribute value to update.");
         }
 
-        checkConstrains(cipherText, andAccessPolicy, cipherTextAttributeUpdateKey);
+        checkConstrains(cipherText, andAccessPolicy, cipherTextAttributeUpdateKey, cipherTextAttributeUpdateKey.getAttributeValueId());
 
         Element r = gpp.zr().newRandomElement();
         Element updatedC1 = updateC1(cipherText, andAccessPolicy, r);
@@ -82,9 +82,10 @@ public class ABEEncryptor extends ABECrypto {
     }
 
     private void checkConstrains(@NonNull CipherText cipherText, @NonNull AndAccessPolicy andAccessPolicy,
-            @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey) {
-        if(! symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true)) {
-            if (!symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false)) {
+            @NonNull CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey,
+            @NonNull VersionedID attributeValueIdToIgnore) {
+        if(! symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), true, attributeValueIdToIgnore)) {
+            if (!symmetric(andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy(), false, attributeValueIdToIgnore)) {
                 throw new IllegalArgumentException("Given and access Policy does not mirror the policy in ciphertext");
             } else {
                 throw new VersionMismatchException(
@@ -92,6 +93,17 @@ public class ABEEncryptor extends ABECrypto {
                                 andAccessPolicy.getAttributeValueIds(), cipherText.getAccessPolicy()));
             }
         }
+
+        VersionedID versionedID = new VersionedID(attributeValueIdToIgnore.getId(),
+                attributeValueIdToIgnore.getVersion() - 1);
+        if(! contains(cipherText.getAccessPolicy(), versionedID, true)) {
+            throw new VersionMismatchException(
+                    String.format("Update key for CT %s is not in the right version. Expected %d but was %d.",
+                    cipherText.getId(),
+                    cipherText.getAccessPolicy().stream().filter(elem -> elem.getId().equals(versionedID.getId())).findAny().get().getVersion(),
+                    attributeValueIdToIgnore.getVersion()));
+        }
+
         if(cipherText.isTwoFactorSecured() && cipherTextAttributeUpdateKey.getDataOwnerId().equals(cipherText.getOwnerId())) {
             throw new VersionMismatchException(
                     String.format("Given cipher text 2FA key has version %s but update key version was %s", cipherText.getOwnerId(), cipherTextAttributeUpdateKey.getDataOwnerId())
@@ -176,20 +188,36 @@ public class ABEEncryptor extends ABECrypto {
     }
 
     private boolean contains(Set<VersionedID> a, VersionedID b, boolean exact) {
-        return containsAll(a, Sets.newHashSet(b), exact);
+        return containsAll(a, Sets.newHashSet(b), exact, null);
     }
 
     private boolean symmetric(Set<VersionedID> a, Set<VersionedID> b, boolean exact) {
-        return containsAll(a, b, exact) && containsAll(b,a, exact);
+        return containsAll(a, b, exact, null) && containsAll(b,a, exact, null);
     }
 
-    private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact) {
+    private boolean symmetric(Set<VersionedID> a, Set<VersionedID> b, boolean exact, VersionedID ignoring) {
+        return containsAll(a, b, exact, ignoring) && containsAll(b,a, exact, ignoring);
+    }
+
+    private boolean containsAll(Set<VersionedID> a, Set<VersionedID> b, boolean exact, VersionedID ignoring) {
         if(exact) {
+            if(ignoring != null) {
+                a = new HashSet<>(a);
+                b = new HashSet<>(b);
+
+                a.remove(ignoring);
+                b.remove(ignoring);
+            }
+
             return a.containsAll(b);
         } else {
-            Set<String> aIds = a.stream().map(VersionedID::getId).collect(Collectors.toSet());
+            Set<String> aIds = a.stream().map(VersionedID::getId)
+                    .filter(elem -> ignoring == null || ! elem.equals(ignoring.getId()))
+                    .collect(Collectors.toSet());
 
-            return b.stream().allMatch(versionedID -> aIds.contains(versionedID.getId()));
+            return b.stream()
+                    .filter(elem -> ignoring == null || ! elem.equals(ignoring.getId()))
+                    .allMatch(versionedID -> aIds.contains(versionedID.getId()));
         }
     }
 }
