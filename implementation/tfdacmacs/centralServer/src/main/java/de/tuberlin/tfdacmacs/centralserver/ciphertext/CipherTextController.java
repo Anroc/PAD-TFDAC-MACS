@@ -125,7 +125,7 @@ public class CipherTextController {
                         publicAttributeService.findEntity(attributeValueId.getAttributeId())
                                 .orElseThrow(() -> new NotFoundException(attributeValueId.getAttributeId()))
                                 .getValues().stream()
-                                .filter(value -> value.toString().equals(attributeValueId.getValue()))
+                                .filter(value -> value.getValue().toString().equals(attributeValueId.getValue()))
                                 .findAny()
                                 .orElseThrow(() -> new NotFoundException(attributeValueId.getAttributeValueId()))
                                 .toAttributeValuePublicKey(attributeValueId.getAttributeValueId())
