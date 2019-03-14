@@ -42,9 +42,4 @@ public class AttributeValue<T> extends AttributeValueKey implements AttributeVal
     public static String generateId(@NonNull String aid, @NonNull String attributeName, @NonNull Object value) {
         return aid + "." + attributeName + ":" + value.toString();
     }
-
-    public AttributeValue<T> incrementVersion() {
-        setVersion(getVersion() + 1);
-        return this;
-    }
 }
