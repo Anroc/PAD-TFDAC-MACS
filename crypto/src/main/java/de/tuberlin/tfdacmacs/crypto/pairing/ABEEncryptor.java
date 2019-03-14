@@ -94,16 +94,6 @@ public class ABEEncryptor extends ABECrypto {
             }
         }
 
-        VersionedID versionedID = new VersionedID(attributeValueIdToIgnore.getId(),
-                attributeValueIdToIgnore.getVersion() - 1);
-        if(! contains(cipherText.getAccessPolicy(), versionedID, true)) {
-            throw new VersionMismatchException(
-                    String.format("Update key for CT %s is not in the right version. Expected %d but was %d.",
-                    cipherText.getId(),
-                    cipherText.getAccessPolicy().stream().filter(elem -> elem.getId().equals(versionedID.getId())).findAny().get().getVersion(),
-                    attributeValueIdToIgnore.getVersion()));
-        }
-
         if(cipherText.isTwoFactorSecured() && cipherTextAttributeUpdateKey.getDataOwnerId().equals(cipherText.getOwnerId())) {
             throw new VersionMismatchException(
                     String.format("Given cipher text 2FA key has version %s but update key version was %s", cipherText.getOwnerId(), cipherTextAttributeUpdateKey.getDataOwnerId())
