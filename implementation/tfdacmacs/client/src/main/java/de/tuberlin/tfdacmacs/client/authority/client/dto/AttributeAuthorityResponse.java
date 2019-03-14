@@ -21,6 +21,7 @@ public class AttributeAuthorityResponse {
     private String publicKey;
     @Min(0)
     private long version;
+
     @NotBlank
     // authorityPublicKey + version
     private String signature;

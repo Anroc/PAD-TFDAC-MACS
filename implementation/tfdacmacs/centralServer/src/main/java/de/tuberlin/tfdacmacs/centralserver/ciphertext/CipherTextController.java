@@ -45,7 +45,7 @@ public class CipherTextController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_AUTHORITY')")
     public List<CipherTextDTO> getCipherTexts(
             @RequestParam(value = "attrIds", defaultValue = "") String query,
             @RequestParam(value = "ownerId", defaultValue = "") String ownerId,
