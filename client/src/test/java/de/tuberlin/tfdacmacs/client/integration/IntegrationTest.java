@@ -111,6 +111,8 @@ public class IntegrationTest extends IntegrationTestSuite {
         assertThat(Paths.get(DECRYPT_DIR, FILE_NAME))
                 .exists()
                 .hasBinaryContent(CONTENT);
+
+
     }
 
     private void revoke2FA_passes_onRevokingMySelf() {
@@ -127,7 +129,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isFalse();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student")).isFalse();
     }
 
     private void revoke2FA_passes_andUpdatesCT() {
@@ -144,7 +146,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=1))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=1))\t[VersionedID(id=aa.tu-berlin.de.role:student")).isTrue();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
@@ -183,7 +185,7 @@ public class IntegrationTest extends IntegrationTestSuite {
 
         resetStdStreams();
         evaluate("check");
-        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student, version=0)")).isTrue();
+        assertThat(containsSubSequence(getOutContent(), "yes (by VersionedID(id=" + email + ", version=0))\t[VersionedID(id=aa.tu-berlin.de.role:student")).isTrue();
 
         int numberOf2FACipherText = find2FACipherTextNumber();
         evaluate(String.format("decrypt %s %d", DECRYPT_DIR, numberOf2FACipherText));
