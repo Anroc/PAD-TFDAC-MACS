@@ -134,6 +134,8 @@ The setup summarizes the steps described in \cite{li2017two} such as: Setup, use
 \subsubsection{Generate Global Public Paramter}
 The very first step is to create the global public parameters on the central server. Thous parameter are exposed on a public bulletin board and available for each entity in the system. Since they are required in every step it is assumed that the entity downloaded this information in advance. 
 
+\todo{rename PRIV key to sec KEY}
+
 % AA setup
 \subsubsection{Setup Attribute Authority}
 \begin{figure}[!h]
@@ -220,6 +222,7 @@ As mentioned in section \ref{sec:extension-to-dnf-policy} an extension to DNF po
     \label{fig:tfdacmacs-encrypt-2fa}
 \end{figure}
 
+\todo{overwork}
 In order to also secure the cipher text utilizing two-factor keys, additional preparation need to be done.  As displayed in figure \ref{fig:tfdacmacs-encrypt-2fa}, first a new two-factor master key is created (1.). This one is kept secret on the device. It will be used later to issue more two-factor authentication keys to other users or revoke two-factor authentication keys. 
 
 For each user that shall receive a two-factor key, the device creates a user specific two-factor authentication secret key (2.). To prevent collusion it is made unique for each user using the hash of the user id as a uniqueness source. Before uploading this keys to the central server, the device needs to encrypt them for each user respectively.  To do so, it is checked that each user that shall receive a two-factor authentication key has an authority that is an element in the trusted ID set. For each user this check returns success, the central service is asked for the certificates of each device of this user (3 and 4).
@@ -235,12 +238,19 @@ Since the central server can not be trusted to return tampered certificates the 
     \caption{Decryption phase}
     \label{fig:tfdacmacs-decryption}
 \end{figure}
-
+\todo{overwork for 2 FA key}
 Compared to encryption, decryption is rather straight forward. As figure \ref{fig:tfdacmacs-decryption} shows, periodically the device checks if new satisfyable cipher texts are present at the central server. This is done by sending all attribute value IDs for that the devices owns a private ABE key in a query to the central server (1.). It on the other hand checks if any cipher text can be satisfied by a subset of this given attribute set. This can be done by selecting all cipher texts and checking their respective access policies if all elements of this policy are a true subset of the given attribute value IDs from the device. All cipher text that satisfy this constrains are returned (2.).
 
 The device proceeds to extract the file ID from the given cipher text and request this encrypted file from the CSP (3. and 4.). \todo{make integrity checks? Maybe make the file Id to the hash of the file content}. Locally, the cipher text is now decrypted using the user specific ABE private keys issued on device register (see section \ref{sec:register-a-device}) (5.). After the file key is recovered it can be used for symmetric  AES decryption of the encrypted file (6.). 
 
 \subsection{Revoke attribute}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=1.0\linewidth]{img/attribute_revokation.png}
+    \caption{Revoking an attribute key}
+    \label{fig:tfdacmacs-attribute-revokation}
+\end{figure}
+
 \todo{write me}
 
 % \begin{figure}[!t]
@@ -253,6 +263,13 @@ The device proceeds to extract the file ID from the given cipher text and reques
 % As displayed in figure \ref{fig:tfdacmacs-attr-revocation}, a revocation of an attribute key is always triggered by the AA that administers this attribute. It first creates a new secret key for the revoked attribute and calculates for each user owning the old attribute a user-specific delta. This delta is send to each non-revoked user respectively. In addition, the AA calculates a cipher text update key. This is send to the CSP which then in turn starts updating all the cipher text for the new attribute secret key. This operation will not affect the plain text message in any kind. 
 
 \subsection{Revoke two-factor key}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=1.0\linewidth]{img/2FA_revoke.png}
+    \caption{Revoking two-factor keys}
+    \label{fig:tfdacmacs-2FA-revokation}
+\end{figure}
+
 \todo{write me}
 
 % \begin{figure}[!t]
