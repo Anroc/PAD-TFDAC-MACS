@@ -3,6 +3,7 @@ package de.tuberlin.tfdacmacs.client.twofactor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tuberlin.tfdacmacs.CommandTestSuite;
+import de.tuberlin.tfdacmacs.client.certificate.data.Certificate;
 import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceState;
 import de.tuberlin.tfdacmacs.client.attribute.client.dto.PublicAttributeValueResponse;
@@ -55,6 +56,9 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
     @Test
     public void trust() {
         X509Certificate certificate = mock(X509Certificate.class);
+        Certificate myCert = mock(Certificate.class);
+        doReturn(myCert).when(session).getCertificate();
+        doReturn(UUID.randomUUID().toString()).when(myCert).getId();
         doReturn(mock(PublicKey.class)).when(certificate).getPublicKey();
         semanticValidator.updateTrustedPublicKeys(
                 new TrustedAuthorityUpdatedEvent(
@@ -138,6 +142,9 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
                 CipherTextDTO.from(cipherTextTestFacotry
                         .create(UUID.randomUUID().toString(), currentEmail, attributeValueId.getAttributeValueId())));
 
+        Certificate myCert = mock(Certificate.class);
+        doReturn(myCert).when(session).getCertificate();
+        doReturn(UUID.randomUUID().toString()).when(myCert).getId();
         doReturn(new UserResponse()).when(caClient).updateTwoFactorPublicKey(eq(currentEmail), any(TwoFactorPublicKeyDTO.class));
         doReturn(currentEmail).when(session).getEmail();
         doReturn(KeyPair.from(stringAsymmetricCryptEngine.getAsymmetricCipherKeyPair())).when(session).getKeyPair();
