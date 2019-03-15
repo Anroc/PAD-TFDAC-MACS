@@ -246,20 +246,28 @@ public class TwoFactorAuthenticationClient {
     public void updateUserForTwoFactorPublicKey(@NonNull AsymmetricElementKey.Public twoFactorPublicKey) {
         String encodedPublicKey = ElementConverter.convert(twoFactorPublicKey.getKey());
 
-        try {
-            String signature = asymmetricCryptEngine.sign(
-                    session.getEmail() + ";" + encodedPublicKey,
-                    session.getKeyPair().getPrivateKey()
-            );
+        TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
+                twoFactorPublicKey.getVersion(),
+                encodedPublicKey,
+                null,
+                session.getCertificate().getId()
+        );
 
-            TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
-                    encodedPublicKey,
-                    signature
-            );
 
-            caClient.updateTwoFactorPublicKey(session.getEmail(), twoFactorPublicKeyDTO);
-        } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+        String signature = twoFactorPublicKeyDTO.signature()
+                .pack(session.getEmail())
+                .pack(twoFactorPublicKeyDTO)
+                .finalize(content -> {
+                    try {
+                        return asymmetricCryptEngine.sign(content, session.getKeyPair().getPrivateKey());
+                    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+        twoFactorPublicKeyDTO.setSignature(signature);
+
+        caClient.updateTwoFactorPublicKey(session.getEmail(), twoFactorPublicKeyDTO);
+
     }
 }
