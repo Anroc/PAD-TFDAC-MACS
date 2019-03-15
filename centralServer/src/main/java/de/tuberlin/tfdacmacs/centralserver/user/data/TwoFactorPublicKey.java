@@ -20,4 +20,7 @@ public class TwoFactorPublicKey {
 
     @NotBlank
     private String signature;
+
+    @NotBlank
+    private String signingDeviceId;
 }

@@ -111,7 +111,9 @@ public class UserController {
                 new TwoFactorPublicKey(
                         twoFactorPublicKeyDTO.getVersion(),
                         twoFactorPublicKeyDTO.getTwoFactorAuthenticationPublicKey(),
-                        twoFactorPublicKeyDTO.getSignature()));
+                        twoFactorPublicKeyDTO.getSignature(),
+                        twoFactorPublicKeyDTO.getSigningDeviceId())
+                );
 
         userService.updateUser(user);
         return toUserResponse(user);
@@ -178,7 +180,8 @@ public class UserController {
                         new TwoFactorPublicKeyDTO(
                                 twoFactorPublicKey.getVersion(),
                                 twoFactorPublicKey.getTwoFactorAuthenticationPublicKey(),
-                                twoFactorPublicKey.getSignature()
+                                twoFactorPublicKey.getSignature(),
+                                twoFactorPublicKey.getSigningDeviceId()
                         )).orElse(null),
                 user.getAttributeValueUpdateKeys(),
                 user.getDevices().stream().map(this::toDeviceResponse).collect(Collectors.toSet())

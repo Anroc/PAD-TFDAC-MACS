@@ -133,7 +133,8 @@ public class UserRestTest extends RestTestSuite {
         TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(
                 0L,
                 "asd",
-                "das"
+                "das",
+                "xxx"
         );
 
         ResponseEntity<UserResponse> response = mutualAuthRestTemplate
