@@ -63,8 +63,9 @@ public class CipherTextClient {
                         userResponse -> {
                             TwoFactorPublicKeyDTO twoFactorPublicKey = userResponse.getTwoFactorPublicKey();
 
-                            Certificate certificate = certificateClient.getCertificate(userResponse.getId(),
-                                    twoFactorPublicKey.getSigningDeviceId());
+                            Certificate certificate = certificateClient.getCertificate(
+                                    twoFactorPublicKey.getSigningDeviceId(), userResponse.getId()
+                            );
                             PublicKey publicKey = certificate.getCertificate().getPublicKey();
 
                             if( ! asymmetricCryptEngine.isSignatureAuthentic(
