@@ -251,7 +251,15 @@ The device proceeds to extract the file ID from the given cipher text and reques
     \label{fig:tfdacmacs-attribute-revokation}
 \end{figure}
 
-\todo{write me}
+As displayed in figure \ref{fig:tfdacmacs-attribute-revokation}, a revokation of an attribute key is always initiated by the AA that administeres this attribute. It first creates a new private and public attribute components (1.). In the later steps from this new attribute private key a delta to the old attribute private key is calculated. This delta builds up the core component of the update key that is later distributed to the users and ciphertexts in respective versions. 
+
+In that design the cipher text update key is calculated. To do so, all cipher texts are queried that have the revoked attribute embedded in their attribute policy (3.). To construct a valid cipher text update key, the public attribute keys and the public two-factor keys for each cipher text are needed. They are requested in step 4. and retrieved in step 5. The signature of each of the public keys do not nessecaryly have to be checked since the thread model of the central server only states that the central server will tamper values if it results an significat decryption adventage. However, tampering public attribute keys in that step will result in invalid update keys, which will just render the system inusable. 
+
+Given the public attribute keys, the public two-factor keys and the previous computed delta to the old key the AA can create the two-factor update key (2FA\_CT\_UPDATE\_KEY) for each cipher text (6.). Thouse cipher text update keys are uploaded to the CSP (7.) which starts updating the corresponding cipher texts (8a). 
+While the CSP updates the cipher text, the AA proceeds by creating a attribute update key for each users secret key (ATTR\_SEC\_UPDATE\_KEY, 8b). There keys are again user specific. The actual revokation process here is simply to not create an update key for the revoked user. Thouse update keys are uploaded to the central server where they can be discovered by the respective user (10.). Again, this update keys do not have to be signed since they do not contains tamper worthy material nor need they to be encrypted since they contain as a secret the delta to the old version. But if the original secret is known, the new secret can not be calulated. Additionally, the new attribute public key is uploaded in a signed version to the central server (9.). It needs to be tamper proof due it is used on encryption. The central server could act as an own AA to replace the public key with its own, breaking the encryption process due to global decryption power. 
+
+In the last steps, the new update key for the addressed user is downloaded (11.) and applied to the exisiting attribute secret key of the user (12.).
+
 
 % \begin{figure}[!t]
 % \centering
