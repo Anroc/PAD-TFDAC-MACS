@@ -94,7 +94,7 @@ public class ABEEncryptor extends ABECrypto {
             }
         }
 
-        if(cipherText.isTwoFactorSecured() && cipherText.getOwnerId().equals(cipherTextAttributeUpdateKey.getDataOwnerId())) {
+        if(cipherText.isTwoFactorSecured() && ! cipherText.getOwnerId().equals(cipherTextAttributeUpdateKey.getDataOwnerId())) {
             throw new VersionMismatchException(
                     String.format("Given cipher text 2FA key has version %s but update key version was %s", cipherText.getOwnerId(), cipherTextAttributeUpdateKey.getDataOwnerId())
             );
