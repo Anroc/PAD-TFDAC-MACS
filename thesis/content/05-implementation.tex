@@ -6,7 +6,7 @@ While TF-DAC-MACS satisfy all the requirements it fits not perfectly. To make th
 
 \subsection{Removing The Fix Two-Factor Constrain}
 \label{sec:removing-the-fix-two-factor-constrain}
-To make \ac{TF-DAC-MACS} more practically applicable the fixed two-factor constrain was removed from encryption, decryption, and the cipher update phase. The two factor identifier $\alpha$ is used by the data owner to restrict the access to the content for certain users. 
+To make \ac{TF-DAC-MACS} more practically applicable the fixed two-factor constrain was removed from encryption, decryption, and the cipher update phase. The two factor identifier $\alpha$ is used by the data owner to restrict the access to the content for certain users. This makes sense since only if the two-factor authentication is in place end-to-end encryption can be garanteed. Users are in charge of generting this two-factor keys, while the attribute keys are created by the AA which has the decryption power of all attributes it created.
 
 This leads to the fact that the underlying \ac{ABE} schemes looses some of it expressiveness. The zero knowledge of the data owner on which individual is able to decrypt the cipher text is broken with the two factor part. Here each user, who wants to decrypt the encrypted content, needs to make an \textit{authentication request} to the data owner to receive the corresponding decryption key. To restore the possibility to let an unknown user group decrypt the cipher text, the two factor part was made optional. To do so encryption, decryption and cipher text update was adapted. The authentication key update will be ignored since it makes no sense to apply it on a non existing authentication key. 
 
@@ -222,12 +222,13 @@ As mentioned in section \ref{sec:extension-to-dnf-policy} an extension to DNF po
     \label{fig:tfdacmacs-encrypt-2fa}
 \end{figure}
 
-\todo{overwork}
-In order to also secure the cipher text utilizing two-factor keys, additional preparation need to be done.  As displayed in figure \ref{fig:tfdacmacs-encrypt-2fa}, first a new two-factor master key is created (1.). This one is kept secret on the device. It will be used later to issue more two-factor authentication keys to other users or revoke two-factor authentication keys. 
+In order to also secure the cipher text utilizing two-factor keys, additional preparation need to be done.  As displayed in figure \ref{fig:tfdacmacs-encrypt-2fa}, first a new two-factor private and public key is created (1.). The private key is kept secret on the device. It will be used later to issue more two-factor authentication keys to other users or revoke two-factor authentication keys. The public key on the other hand will be signed and uploaded to the central server. It serves as input for attribut revokation by an AA. 
 
-For each user that shall receive a two-factor key, the device creates a user specific two-factor authentication secret key (2.). To prevent collusion it is made unique for each user using the hash of the user id as a uniqueness source. Before uploading this keys to the central server, the device needs to encrypt them for each user respectively.  To do so, it is checked that each user that shall receive a two-factor authentication key has an authority that is an element in the trusted ID set. For each user this check returns success, the central service is asked for the certificates of each device of this user (3 and 4).
+For each user that shall receive a two-factor key, the device needs to create a user specific secret two-factor authentication key. To prevent collusion it is made unique for each user using the hash of the user id as a uniqueness source. Before uploading this keys to the central server, the device needs to encrypt them for each user respectively. 
 
-Since the central server can not be trusted to return tampered certificates the device needs to request each administrating AA of each user to double check the retrieved certificates (5.). Here the AA validates that the presented certificate fingerprint is valid and the requested device is active. For each device this check returns success the respective user secret keys are encrypted using the public key embedded in the validated certificate (7.). Thous are uploaded to the central server where they can be downloaded by each respective recipient. 
+This process is quite complex, since the central server can not be trusted to provide the right user device certificates. It can fake them to retrieve and decrypt the two-factor keys. To cirumvent this, the two-factor issuer askes the central server for the authority ID of the target user (2. and 3.). It is validated, that the retrieved authority ID is an element in the trusted authority ID set (4.). If this check returns success the respective authority is asked directly for the certificate of the devices of the target user (5. and 6.). The certificates are valiadted and finally the user secret two-factor key is created (7.). It is  encrypted using the embedded public keys of the retrieved certificates and uploaded to the central server (9.). Additionally, the two-factor public key is signed and uploaded as well to the central server. The targeted users, will download the encrypted two-factor secret keys (10.) and decrypt them using they private key (11.).  
+
+The encryption process is then triggered by the two-factor issuer. He can use his privat two-factor key to additionally secure the prepared cipher text. Only users who had the correct two-factor secret key issued and fullfill the access policy can decrypt the cipher text. 
 
 
 \subsection{Decryption}
@@ -238,10 +239,12 @@ Since the central server can not be trusted to return tampered certificates the 
     \caption{Decryption phase}
     \label{fig:tfdacmacs-decryption}
 \end{figure}
-\todo{overwork for 2 FA key}
 Compared to encryption, decryption is rather straight forward. As figure \ref{fig:tfdacmacs-decryption} shows, periodically the device checks if new satisfyable cipher texts are present at the central server. This is done by sending all attribute value IDs for that the devices owns a private ABE key in a query to the central server (1.). It on the other hand checks if any cipher text can be satisfied by a subset of this given attribute set. This can be done by selecting all cipher texts and checking their respective access policies if all elements of this policy are a true subset of the given attribute value IDs from the device. All cipher text that satisfy this constrains are returned (2.).
 
 The device proceeds to extract the file ID from the given cipher text and request this encrypted file from the CSP (3. and 4.). \todo{make integrity checks? Maybe make the file Id to the hash of the file content}. Locally, the cipher text is now decrypted using the user specific ABE private keys issued on device register (see section \ref{sec:register-a-device}) (5.). After the file key is recovered it can be used for symmetric  AES decryption of the encrypted file (6.). 
+
+\subsubsection{Decryption Utalizing Two-Factor Keys}
+If a cipher text is additionally secured by a two-factor authentication the user needs to use the suitable two-factor secret key to decrypt the cipher text. Using a wrong or even no two-factor secret key at all will result in a wrong decryption result.
 
 \subsection{Revoke attribute}
 \begin{figure}[!t]
@@ -270,7 +273,7 @@ To delete a user all attributes need to be revoked from him. So the above proces
     \label{fig:tfdacmacs-2FA-revokation}
 \end{figure}
 
-The revokation process of revoking a two-factor authentication from a user follows the same guide lines as the revokation of an attribute. The only difference is that the revokation process is triggered by the user that issued the two-factor key in the first place. 
+The revokation process of revoking a two-factor (Figure \ref{fig:tfdacmacs-2FA-revokation}) authentication from a user follows the same guide lines as the revokation of an attribute. The only difference is that the revokation process is triggered by the user that issued the two-factor key in the first place. 
 
 The data owner frist creates a new two-factor public and private key (1.). Again the delta to the old version is calculated, which makes the update key non-securable obstacle for the later process. Now all cipher text need to be collected from the CSP that where issued by this user and secured by a two-factor authentication (3. and 4.). For each cipher text the attribute policy is extracted and unioned into a set of attribute IDs, which will be send to the central server (4.) to receive the corresponing attribute public keys in return (5.).
 
