@@ -260,15 +260,7 @@ While the CSP updates the cipher text, the AA proceeds by creating a attribute u
 
 In the last steps, the new update key for the addressed user is downloaded (11.) and applied to the exisiting attribute secret key of the user (12.).
 
-
-% \begin{figure}[!t]
-% \centering
-%     \includegraphics[width=0.7\linewidth]{img/TF-DAC-MACS-overview-revoce-attr.png}
-%     \caption{Attribute revocation}
-%     \label{fig:tfdacmacs-attr-revocation}
-% \end{figure}
-
-% As displayed in figure \ref{fig:tfdacmacs-attr-revocation}, a revocation of an attribute key is always triggered by the AA that administers this attribute. It first creates a new secret key for the revoked attribute and calculates for each user owning the old attribute a user-specific delta. This delta is send to each non-revoked user respectively. In addition, the AA calculates a cipher text update key. This is send to the CSP which then in turn starts updating all the cipher text for the new attribute secret key. This operation will not affect the plain text message in any kind. 
+To delete a user all attributes need to be revoked from him. So the above process will be triggered for each attribute the deleted owers owned.
 
 \subsection{Revoke two-factor key}
 \begin{figure}[!t]
@@ -278,16 +270,11 @@ In the last steps, the new update key for the addressed user is downloaded (11.)
     \label{fig:tfdacmacs-2FA-revokation}
 \end{figure}
 
-\todo{write me}
+The revokation process of revoking a two-factor authentication from a user follows the same guide lines as the revokation of an attribute. The only difference is that the revokation process is triggered by the user that issued the two-factor key in the first place. 
 
-% \begin{figure}[!t]
-% \centering
-%     \includegraphics[width=0.6\linewidth]{img/TF-DAC-MACS-overview-revoce-user-key.png}
-%     \caption{Two-factor key revocation}
-%     \label{fig:tfdacmacs-user-auth-key-revocation}
-% \end{figure}
+The data owner frist creates a new two-factor public and private key (1.). Again the delta to the old version is calculated, which makes the update key non-securable obstacle for the later process. Now all cipher text need to be collected from the CSP that where issued by this user and secured by a two-factor authentication (3. and 4.). For each cipher text the attribute policy is extracted and unioned into a set of attribute IDs, which will be send to the central server (4.) to receive the corresponing attribute public keys in return (5.).
 
-% In a similar way as attributes are revoked, 2FA-Keys can be revoked. Alice, as the data owner, starts  by calculating a new two-factor key. She computes the delta to all old two-factor keys she issued and distributes them to all non-revoked users. Finally, she calculates the ciphertext update key and sends it to the CSP. The CSP updates all relevant cipher texts.
+Given the new two-factor private key and the attribute public keys, for each cipher text a cipher text update key can be calculated (6.). In Step 7. each of the update keys are send to the CSP where they will be applied to update the old two-factor authentication in the cipher texts (8a). While the CSP applies the update, the client continues with creating for each non-revoked user a user specific update key (8b). The new two-factor public key is uploaded in a signed version to the central server, where it can be used by the AA to create new attribute revokation keys (9.). For each non-revoked user the user update key is uploaded to the central server so that it can be discovered by the respective user, downloaded (11.) and applied to the local user secret (12.).   
 
 \section{Technologies}
 To develop the first prototype of the system defined previously we will use the following technology stack:
