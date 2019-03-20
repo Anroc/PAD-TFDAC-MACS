@@ -1,5 +1,6 @@
-\chapter{Implementation}
-As evaluated in the last sections this work will proceed to implement TF-DAC-MACS \cite{li2017two} with small adaptions for a practical secure cloud storage system. 
+\chapter{\name}
+\label{sec:implementation}
+As evaluated in the last sections this work will proceed to implement TF-DAC-MACS \cite{li2017two} with small adaptions for a practical secure cloud storage system. \name (\fullname) describes the practical application and adaption of TF-DAC-MACS for a districuted system for the use-case of secure cloud storage systems.  
 
 \section{Adaptions and Improvements}
 While TF-DAC-MACS satisfy all the requirements it fits not perfectly. To make the scheme more usable, the fix contain that each cipher text need to be secured by a two-factor authentication was removed. In addition, the key generation of the attribute is made more dynamic. Now the attributes do not need to be known in the setup phase but can be created dynamically when an AA admin registers a user. Further, a simple technique to break up TF-DAC-MACS n-of-n threshold policy to DNF-policy in trade-off for performance is proposed. And finally it is argued why the basic access policy of TF-DAC-MACS, even with this proposed extension, renders the usage of numerical attributes and their Boolean comparison inapplicable.
