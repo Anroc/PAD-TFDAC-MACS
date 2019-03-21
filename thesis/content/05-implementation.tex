@@ -329,3 +329,14 @@ C''_3 =
 \label{eq:wrong-update}
 \end{equation}
 In equation \ref{eq:wrong-update}, $g^{y'_{aid_i,j}}$ refernces the revoked attribute and $\left(g^{y_{aid_i,j}}\right)^{(\beta - \alpha)}$ the two factor update key $UAU_{aid_i,j}$ for this revoked attribute. In that case the data owner used the old attribute public key $g^{y_{aid_i,j}}$ to compute $UAU_{aid_i,j}$.
+
+The very first step to countermeasure this kind of problems is to detect this issue. This is done by assigning each key a version. If a private ABE key gets created it gets the initial version $0$ assigned. Each other key that is derivatived from this private key ends up with the same version. 
+In the same way the user attribute secret keys and two-factor secret keys are created. Both of them need to be updated if a revocation takes place. 
+
+On the other hand, cipher texts contain for each attribute used in its policy the version of the used attribute public key as well as the version of the public two-factor authentication key that was used to additionally secure it. Only keys that are present in the same version as the used public encryption keys can be used to decrypt this cipher text. Each other key will be rejected.
+
+Update keys contain a target version and increment the version of the applied key. If applied in a cipher text it will increment the version of the targeted two-factor component or targeted attribute component. 
+
+Having this versioning in place, the CSP can now detect any wrong issued update to a cipher text. It will check that the given update is applicable to the given cipher text and only if this check returns true, it will proceed to update the cipher text. Next steps will be to notify the update issuer about the conflicting versioning and request a updated update key. 
+
+Since updates on keys need to be incremental and strictly sequential, the CSP or user need to wait until a suitable update was issued to him.  
