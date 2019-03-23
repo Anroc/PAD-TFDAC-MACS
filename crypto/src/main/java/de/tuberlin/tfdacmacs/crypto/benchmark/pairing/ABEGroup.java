@@ -1,5 +1,6 @@
-package de.tuberlin.tfdacmacs.crypto.benchmark;
+package de.tuberlin.tfdacmacs.crypto.benchmark.pairing;
 
+import de.tuberlin.tfdacmacs.crypto.benchmark.Group;
 import de.tuberlin.tfdacmacs.crypto.pairing.ABEDecryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.ABEEncryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
@@ -10,7 +11,6 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.*;
 import de.tuberlin.tfdacmacs.crypto.pairing.util.HashGenerator;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,19 +78,5 @@ public class ABEGroup extends Group<ABEUser, DNFCipherText> {
                 .orElseThrow(
                         () -> new IllegalStateException("User does not satisfy any given CT.")
                 );
-    }
-
-    @Override
-    protected void doLeave(ABEUser member, Set<ABEUser> members) {
-        attributeValueKeyGenerator.gene
-    }
-
-    @Override
-    protected void doJoin(ABEUser member, Set<ABEUser> members) {
-
-    }
-
-    @Override protected List<CipherText> getCipherTexts() {
-        return null;
     }
 }

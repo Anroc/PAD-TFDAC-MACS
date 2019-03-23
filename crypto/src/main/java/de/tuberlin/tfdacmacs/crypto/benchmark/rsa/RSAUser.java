@@ -1,5 +1,6 @@
-package de.tuberlin.tfdacmacs.crypto.benchmark;
+package de.tuberlin.tfdacmacs.crypto.benchmark.rsa;
 
+import de.tuberlin.tfdacmacs.crypto.benchmark.User;
 import lombok.Data;
 
 import java.security.PrivateKey;
