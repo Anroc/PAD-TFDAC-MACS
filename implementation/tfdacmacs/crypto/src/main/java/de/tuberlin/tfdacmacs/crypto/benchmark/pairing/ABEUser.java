@@ -1,5 +1,6 @@
-package de.tuberlin.tfdacmacs.crypto.benchmark;
+package de.tuberlin.tfdacmacs.crypto.benchmark.pairing;
 
+import de.tuberlin.tfdacmacs.crypto.benchmark.User;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.UserAttributeSecretComponent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
@@ -17,6 +18,11 @@ public class ABEUser extends User {
     private Map<String, TwoFactorKey.Public> tfPublics;
 
     private boolean useTowFactorKey;
+
+    public ABEUser(String id, Set<UserAttributeSecretComponent> attributes) {
+        super(id);
+        this.attributes = attributes;
+    }
 
     public DataOwner asDataOwner() {
         if(useTowFactorKey) {

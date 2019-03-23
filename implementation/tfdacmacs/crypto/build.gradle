@@ -39,3 +39,13 @@ dependencies {
     compile('com.google.guava:guava:27.0.1-jre')
     testCompile('org.assertj:assertj-core:3.11.1')
 }
+
+test {
+    exclude '**/benchmark/**'
+}
+
+task integrationTest( type: Test ) {
+    filter {
+        includeTestsMatching "de.tuberlin.tfdacmacs.crypto.benchmark.*"
+    }
+}
