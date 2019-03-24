@@ -5,11 +5,13 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.DataOwner;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.UserAttributeSecretComponent;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 import java.util.Set;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ABEUser extends User {
 
     private Set<UserAttributeSecretComponent> attributes;
