@@ -44,7 +44,7 @@ test {
     exclude '**/benchmark/**'
 }
 
-task integrationTest( type: Test ) {
+task benchmark( type: Test ) {
     filter {
         includeTestsMatching "de.tuberlin.tfdacmacs.crypto.benchmark.*"
     }
