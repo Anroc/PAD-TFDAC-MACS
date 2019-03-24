@@ -1,6 +1,5 @@
 package de.tuberlin.tfdacmacs.crypto.benchmark;
 
-import javafx.util.Pair;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -19,12 +18,12 @@ public abstract class Group<T extends  User, E extends CipherTextLength> {
     }
 
     public RunTimeResult encrypt(byte[] content, T asMember) {
-        Pair<Long, E> result = measure(
+        CipherTextResult<E> result = measure(
             () -> doEncrypt(content, this.members, asMember)
         );
-        long size = result.getValue().getSize();
-        long numberOfFileKeys = result.getValue().getNumberOfFileKeys();
-        return new RunTimeResult(result.getKey(), size, numberOfFileKeys);
+        long size = result.getCipherText().getSize();
+        long numberOfFileKeys = result.getCipherText().getNumberOfFileKeys();
+        return new RunTimeResult(result.getTime(), size, numberOfFileKeys);
     }
 
     public RunTimeResult decrypt(E content, T asMember) {
@@ -33,7 +32,7 @@ public abstract class Group<T extends  User, E extends CipherTextLength> {
                     doDecrypt(content, asMember);
                     return null;
                 }
-        ).getKey();
+        ).getTime();
 
         return new RunTimeResult(time, content.getSize(), content.getNumberOfFileKeys());
     }
@@ -53,15 +52,21 @@ public abstract class Group<T extends  User, E extends CipherTextLength> {
     protected abstract E doEncrypt(byte[] content, Set<T> members, T asMember);
     protected abstract byte[] doDecrypt(E content, T asMember);
 
-    private Pair<Long, E> measure(Supplier<E> processor) {
+    private CipherTextResult<E> measure(Supplier<E> processor) {
         long start = System.nanoTime();
         E e = processor.get();
-        return new Pair<>(System.nanoTime() - start, e);
+        return new CipherTextResult<>(System.nanoTime() - start, e);
     }
 
     public Group reset() {
         this.cipherTexts.clear();
         this.members.clear();
         return this;
+    }
+
+    @Data
+    private class CipherTextResult<E extends CipherTextLength> {
+        private final long time;
+        private final E cipherText;
     }
 }
