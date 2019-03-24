@@ -15,6 +15,8 @@ public class EncryptionDecryptionBenchmark extends UnitTestSuite {
 
     private final String authorityId = "aa.tu-berlin.de";
 
+    private static final int NUM_USERS = 250;
+
     @Before
     public void setup() {
         this.gpp = gppTestFactory.create();
@@ -24,9 +26,9 @@ public class EncryptionDecryptionBenchmark extends UnitTestSuite {
     public void encrypt_incrementing_10() {
         SetupWrapper setupWrapper = new SetupWrapper(gpp, authorityId);
         List<AttributeValueKey> attributeValueKeys = setupWrapper.createAttributeValueKeys(1);
-        int numberOfRuns = 100;
+        int numberOfRuns = 25;
 
-        for(int numUsers = 1; numUsers <= 250; numUsers += 10) {
+        for(int numUsers = 1; numUsers <= NUM_USERS; numUsers += 10) {
             boolean firstRun = numUsers == 1;
 
             BenchmarkResult rsaRun = Benchmark.rsa()
@@ -82,7 +84,7 @@ public class EncryptionDecryptionBenchmark extends UnitTestSuite {
         int numberOfRuns = 25;
         int stepSize  = 10;
 
-        for(int numUsers = attributesPerUser; numUsers <= 300; numUsers += stepSize ) {
+        for(int numUsers = attributesPerUser; numUsers <= NUM_USERS; numUsers += stepSize ) {
             boolean firstRun = numUsers == attributesPerUser;
 
             BenchmarkResult rsaRun = Benchmark.rsa()
