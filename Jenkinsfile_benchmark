@@ -1,0 +1,34 @@
+// http://your.jenkins.host/scriptApproval/
+import groovy.json.JsonOutput
+
+SOURCE_DIR = "./implementation/tfdacmacs"
+
+node {
+    try {
+        checkout scm
+
+        stage('gradle testClasses') {
+                // sh('printenv')
+                dir (SOURCE_DIR) {
+                sh('./gradlew crypto:clean crypto:assemble crypto:testClasses')
+            }
+        }
+
+        stage('gradle crypto:test') {
+            // sh('printenv')
+            dir (SOURCE_DIR) {
+                try {
+                    sh('./gradlew crypto:benchmark')
+                } finally {
+                    step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
+                    archiveArtifacts artifacts: "**/*.csv", fingerprint: true
+                }
+            }
+        }
+
+        currentBuild.result = 'SUCCESS'
+    } catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    }
+}
