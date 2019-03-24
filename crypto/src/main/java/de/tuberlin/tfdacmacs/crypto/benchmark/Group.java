@@ -1,12 +1,14 @@
 package de.tuberlin.tfdacmacs.crypto.benchmark;
 
+import javafx.util.Pair;
 import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Data
-public abstract class Group<T extends  User, E> {
+public abstract class Group<T extends  User, E extends CipherTextLength> {
 
     private Set<T> members;
     private Set<E> cipherTexts;
@@ -16,18 +18,24 @@ public abstract class Group<T extends  User, E> {
         this.cipherTexts = new HashSet<>();
     }
 
-    public long encrypt(byte[] content, T asMember) {
-        return measure(
-            () -> cipherTexts.add(
-                    doEncrypt(content, this.members, asMember)
-            )
+    public RunTimeResult encrypt(byte[] content, T asMember) {
+        Pair<Long, E> result = measure(
+            () -> doEncrypt(content, this.members, asMember)
         );
+        long size = result.getValue().getSize();
+        long numberOfFileKeys = result.getValue().getNumberOfFileKeys();
+        return new RunTimeResult(result.getKey(), size, numberOfFileKeys);
     }
 
-    public long decrypt(E content, T asMember) {
-        return measure(
-                () -> doDecrypt(content, asMember)
-        );
+    public RunTimeResult decrypt(E content, T asMember) {
+        long time = measure(
+                () -> {
+                    doDecrypt(content, asMember);
+                    return null;
+                }
+        ).getKey();
+
+        return new RunTimeResult(time, content.getSize(), content.getNumberOfFileKeys());
     }
 
 //    public long join(T member) {
@@ -45,10 +53,10 @@ public abstract class Group<T extends  User, E> {
     protected abstract E doEncrypt(byte[] content, Set<T> members, T asMember);
     protected abstract byte[] doDecrypt(E content, T asMember);
 
-    private long measure(Runnable processor) {
+    private Pair<Long, E> measure(Supplier<E> processor) {
         long start = System.nanoTime();
-        processor.run();
-        return System.nanoTime() - start;
+        E e = processor.get();
+        return new Pair<>(System.nanoTime() - start, e);
     }
 
     public Group reset() {

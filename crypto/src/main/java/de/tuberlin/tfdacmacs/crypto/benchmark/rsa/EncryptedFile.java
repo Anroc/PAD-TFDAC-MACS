@@ -1,4 +1,4 @@
-package de.tuberlin.tfdacmacs.crypto.rsa.data;
+package de.tuberlin.tfdacmacs.crypto.benchmark.rsa;
 
 import lombok.Data;
 
