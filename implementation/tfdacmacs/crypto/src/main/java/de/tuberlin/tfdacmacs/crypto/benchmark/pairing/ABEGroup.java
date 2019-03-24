@@ -3,7 +3,6 @@ package de.tuberlin.tfdacmacs.crypto.benchmark.pairing;
 import de.tuberlin.tfdacmacs.crypto.benchmark.Group;
 import de.tuberlin.tfdacmacs.crypto.pairing.ABEDecryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.ABEEncryptor;
-import de.tuberlin.tfdacmacs.crypto.pairing.AttributeValueKeyGenerator;
 import de.tuberlin.tfdacmacs.crypto.pairing.PairingCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.pairing.aes.AESDecryptor;
 import de.tuberlin.tfdacmacs.crypto.pairing.aes.AESEncryptor;
@@ -14,12 +13,11 @@ import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ABEGroup extends Group<ABEUser, DNFCipherText> {
+public class ABEGroup extends Group<ABEUser, ABECipherText> {
 
     private final PairingCryptEngine pairingCryptEngine;
     private final GlobalPublicParameter gpp;
     private final DNFAccessPolicy dnfAccessPolicy;
-    private final AttributeValueKeyGenerator attributeValueKeyGenerator;
 
     public ABEGroup(GlobalPublicParameter globalPublicParameter, DNFAccessPolicy dnfAccessPolicy) {
         StringSymmetricCryptEngine symmetricCryptEngine = new StringSymmetricCryptEngine();
@@ -37,23 +35,24 @@ public class ABEGroup extends Group<ABEUser, DNFCipherText> {
                 abeDecryptor
         );
 
-        this.attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
         this.gpp = globalPublicParameter;
         this.dnfAccessPolicy = dnfAccessPolicy;
     }
 
     @Override
-    protected DNFCipherText doEncrypt(byte[] content, Set<ABEUser> members, ABEUser asMember) {
-        return pairingCryptEngine.encrypt(
-                content,
-                dnfAccessPolicy,
-                gpp,
-                asMember.asDataOwner()
-        );
+    protected ABECipherText doEncrypt(byte[] content, Set<ABEUser> members, ABEUser asMember) {
+        return new ABECipherText(
+                pairingCryptEngine.encrypt(
+                    content,
+                    dnfAccessPolicy,
+                    gpp,
+                    asMember.asDataOwner()
+        ));
     }
 
     @Override
-    protected byte[] doDecrypt(DNFCipherText content, ABEUser asMember) {
+    protected byte[] doDecrypt(ABECipherText abeCipherText, ABEUser asMember) {
+        DNFCipherText content = abeCipherText.getCipherText();
         CipherText suitableCipherText = findSuitableCipherText(content, asMember);
 
         return pairingCryptEngine.decrypt(

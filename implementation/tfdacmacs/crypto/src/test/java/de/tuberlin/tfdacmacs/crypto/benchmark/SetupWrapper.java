@@ -12,6 +12,7 @@ import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SetupWrapper {
 
@@ -77,6 +78,10 @@ public class SetupWrapper {
             builder.append(alphabet.charAt(r.nextInt(alphabet.length())));
         }
         return builder.toString();
+    }
+
+    public List<AttributeValueKey> createdKeys() {
+        return this.createdKeys.values().stream().collect(Collectors.toList());
     }
 
 }

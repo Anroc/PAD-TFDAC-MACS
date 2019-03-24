@@ -32,7 +32,7 @@ public class Benchmark {
     }
 
     @Data
-    private static abstract class ConfiguredBenchmark {
+    public static abstract class ConfiguredBenchmark {
         private final int numberOfRuns;
         private final int numberOfUsers;
 
@@ -40,7 +40,18 @@ public class Benchmark {
 
         public abstract BenchmarkResult run();
 
-        protected BenchmarkResult doRun(Supplier<Long> method) {
+        public ConfiguredBenchmark preHeat(boolean shouldPreheat) {
+            if(shouldPreheat) {
+                for (int i = 0; i < 2000; i++) {
+                    doPreHeat();
+                }
+            }
+            return this;
+        }
+
+        protected abstract void doPreHeat();
+
+        protected BenchmarkResult doRun(Supplier<RunTimeResult> method) {
             BenchmarkResult result = new BenchmarkResult();
 
             for (int i = 0; i < getNumberOfRuns(); i++) {
@@ -64,14 +75,27 @@ public class Benchmark {
         @Override
         public BenchmarkResult run() {
             if(rsaGroup == null) {
-                Set<RSAUser> rsaUsers = rsaUserFactory.create(getNumberOfUsers());
-
-                this.rsaGroup = new RSAGroup();
-                this.rsaGroup.setMembers(rsaUsers);
-                this.member = SetUtils.first(rsaUsers);
+                setupGroup();
             }
 
             return doRun(() -> rsaGroup.encrypt(getContent(), member));
+        }
+
+        @Override
+        public void doPreHeat() {
+            if(rsaGroup == null) {
+                setupGroup();
+            }
+
+            rsaGroup.encrypt(getContent(), member);
+        }
+
+        private void setupGroup() {
+            Set<RSAUser> rsaUsers = rsaUserFactory.create(getNumberOfUsers());
+
+            this.rsaGroup = new RSAGroup();
+            this.rsaGroup.setMembers(rsaUsers);
+            this.member = SetUtils.first(rsaUsers);
         }
     }
 
@@ -108,14 +132,27 @@ public class Benchmark {
         public BenchmarkResult run() {
             if(abeGroup == null) {
 
-                Set<ABEUser> rsaUsers = abeUserFactory.create(getNumberOfUsers());
-
-                abeGroup = new ABEGroup(gpp, dnfAccessPolicy);
-                abeGroup.setMembers(rsaUsers);
-                member = SetUtils.first(rsaUsers);
+                setupGroup();
             }
 
             return doRun(() -> abeGroup.encrypt(getContent(), member));
+        }
+
+        @Override
+        protected void doPreHeat() {
+            if(abeGroup == null) {
+                setupGroup();
+            }
+
+            abeGroup.encrypt(getContent(), member);
+        }
+
+        private void setupGroup() {
+            Set<ABEUser> rsaUsers = abeUserFactory.create(getNumberOfUsers());
+
+            abeGroup = new ABEGroup(gpp, dnfAccessPolicy);
+            abeGroup.setMembers(rsaUsers);
+            member = SetUtils.first(rsaUsers);
         }
     }
 }

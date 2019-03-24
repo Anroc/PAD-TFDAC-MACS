@@ -3,7 +3,6 @@ package de.tuberlin.tfdacmacs.crypto.benchmark.rsa;
 import de.tuberlin.tfdacmacs.crypto.benchmark.Group;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
-import de.tuberlin.tfdacmacs.crypto.rsa.data.EncryptedFile;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -13,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RSAGroup extends Group<RSAUser, Map<String, EncryptedFile>> {
+public class RSAGroup extends Group<RSAUser, RSACipherText> {
 
     private StringAsymmetricCryptEngine asymmetricCryptEngine;
     private StringSymmetricCryptEngine symmetricCryptEngine;
@@ -28,25 +27,28 @@ public class RSAGroup extends Group<RSAUser, Map<String, EncryptedFile>> {
     }
 
     @Override
-    protected Map<String, EncryptedFile> doEncrypt(byte[] content, Set<RSAUser> members, RSAUser asMember) {
+    protected RSACipherText doEncrypt(byte[] content, Set<RSAUser> members, RSAUser asMember) {
         Key symmetricCipherKey = symmetricCryptEngine.getSymmetricCipherKey();
 
-        return members.stream().collect(Collectors.toMap(
-                member -> member.getId(),
-                member -> {
-                    try {
-                        return new EncryptedFile(
-                                asymmetricCryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), member.getPublicKey()),
-                                symmetricCryptEngine.encryptRaw(content, symmetricCipherKey)
-                        );
-                    } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
-                        throw new RuntimeException(e);
-                    }
-                }));
+        return new RSACipherText(
+                members.stream().collect(Collectors.toMap(
+                    member -> member.getId(),
+                    member -> {
+                        try {
+                            return new EncryptedFile(
+                                    asymmetricCryptEngine.encryptRaw(symmetricCipherKey.getEncoded(), member.getPublicKey()),
+                                    symmetricCryptEngine.encryptRaw(content, symmetricCipherKey)
+                            );
+                        } catch (BadPaddingException | InvalidKeyException | IllegalBlockSizeException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }))
+        );
     }
 
     @Override
-    protected byte[] doDecrypt(Map<String, EncryptedFile> content, RSAUser asMember) {
+    protected byte[] doDecrypt(RSACipherText rsaCipherText, RSAUser asMember) {
+        Map<String, EncryptedFile> content = rsaCipherText.getEncryptedFile();
         EncryptedFile encryptedFile = content.get(asMember.getId());
         try{
             byte[] bytes = asymmetricCryptEngine.decryptRaw(encryptedFile.getFileKey(), asMember.getPrivateKey());
