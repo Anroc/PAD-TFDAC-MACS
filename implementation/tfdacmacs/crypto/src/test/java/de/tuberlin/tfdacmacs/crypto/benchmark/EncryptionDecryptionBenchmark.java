@@ -2,101 +2,66 @@ package de.tuberlin.tfdacmacs.crypto.benchmark;
 
 import de.tuberlin.tfdacmacs.crypto.UnitTestSuite;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.BeforeClass;
 
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.Locale;
 
-public class EncryptionDecryptionBenchmark extends UnitTestSuite {
+public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
 
-    private GlobalPublicParameter gpp;
+    protected GlobalPublicParameter gpp;
 
-    private final String authorityId = "aa.tu-berlin.de";
+    @Getter
+    @Setter
+    protected int numUsers;
+    protected final String authorityId = "aa.tu-berlin.de";
+    private final static int DEFAULT_NUM_USERS = 250;
 
-    private static final int NUM_USERS = 250;
+    public EncryptionDecryptionBenchmark(int numUsers) {
+        this.numUsers = numUsers;
+    }
+
+    public EncryptionDecryptionBenchmark() {
+        this(DEFAULT_NUM_USERS);
+    }
+
+    @BeforeClass
+    public static void init() {
+        Locale.setDefault(Locale.US);
+    }
 
     @Before
     public void setup() {
         this.gpp = gppTestFactory.create();
     }
 
-    @Test
-    public void encrypt_incrementing_10() {
-        SetupWrapper setupWrapper = new SetupWrapper(gpp, authorityId);
-        List<AttributeValueKey> attributeValueKeys = setupWrapper.createAttributeValueKeys(1);
-        int numberOfRuns = 25;
+    abstract String getFileDir();
 
-        for(int numUsers = 1; numUsers <= NUM_USERS; numUsers += 10) {
-            boolean firstRun = numUsers == 1;
-
-            BenchmarkResult rsaRun = Benchmark.rsa()
-                    .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(numUsers)
-                    .configure()
-                    .run();
-
-            BenchmarkResult abeRun = Benchmark.abe()
-                    .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(numUsers)
-                    .gpp(gppTestFactory.create())
-                    .attributesPerUser(attributeValueKeys)
-                    .policy(setupWrapper.policy())
-                    .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
-                    .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityPrivateKey(setupWrapper.authorityPrivateKey())
-                    .configure()
-                    .run();
-
-            printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
-        }
-    }
-
-    @Test
-    public void encrypt_incrementing_10_attribute_increment_1per1User() {
-        incrementAttributes(1);
-    }
-
-    @Test
-    public void encrypt_incrementing_10_attribute_increment_1per2User() {
-        incrementAttributes(2);
-    }
-
-    @Test
-    public void encrypt_incrementing_10_attribute_increment_1per3User() {
-        incrementAttributes(3);
-    }
-
-    @Test
-    public void encrypt_incrementing_10_attribute_increment_1per4User() {
-        incrementAttributes(4);
-    }
-
-    @Test
-    public void encrypt_incrementing_10_attribute_increment_1per5User() {
-        incrementAttributes(5);
-    }
-
-    private void incrementAttributes(int attributesPerUser) {
+    protected void incrementAttributes(int attributesPerUser, boolean andPolicy) {
         SetupWrapper setupWrapper = new SetupWrapper(gpp, authorityId);
         setupWrapper.createAttributeValueKeys(1);
+        setupWrapper.setPolicy(andPolicy);
         int numberOfRuns = 25;
         int stepSize  = 10;
 
-        for(int numUsers = attributesPerUser; numUsers <= NUM_USERS; numUsers += stepSize ) {
-            boolean firstRun = numUsers == attributesPerUser;
+        int buffer = 1;
+
+        for(int userCount = 1; userCount <= this.numUsers; userCount += stepSize ) {
+            boolean firstRun = userCount == 1;
 
             BenchmarkResult rsaRun = Benchmark.rsa()
                     .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(numUsers)
+                    .numberOfUsers(userCount)
                     .configure()
                     .preHeat(firstRun)
                     .run();
 
             BenchmarkResult abeRun = Benchmark.abe()
                     .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(numUsers)
+                    .numberOfUsers(userCount)
                     .gpp(gppTestFactory.create())
                     .attributesPerUser(setupWrapper.createdKeys())
                     .policy(setupWrapper.policy())
@@ -107,16 +72,21 @@ public class EncryptionDecryptionBenchmark extends UnitTestSuite {
                     .preHeat(firstRun)
                     .run();
 
-            printResults(3, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
-            setupWrapper.createAttributeValueKeys(stepSize / attributesPerUser);
+            printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun);
+
+            if(buffer / attributesPerUser > 0) {
+                setupWrapper.createAttributeValueKeys(buffer / attributesPerUser);
+                buffer = buffer % attributesPerUser;
+            }
+            buffer += stepSize;
         }
     }
 
-    private void printResults(int methodIndex, boolean firstRun, int numUsers, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
+    protected void printResults(int methodIndex, boolean firstRun, int numUsers, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
         BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numUsers);
-        String fileName = Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";
+        String fileName = "./" + getFileDir() + "/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";
 
         if(firstRun) {
             benchmarkCombinedResult.csvPrintHeaders(fileName);

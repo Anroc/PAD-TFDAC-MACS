@@ -14,13 +14,13 @@ node {
             }
         }
 
-        stage('gradle crypto:test') {
+        stage('gradle crypto:benchmark') {
             // sh('printenv')
             dir (SOURCE_DIR) {
                 try {
                     sh('./gradlew crypto:benchmark')
                 } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/test/*.xml'])
+                    step([$class: 'JUnitResultArchiver', testResults: 'crypto/build/test-results/benchmark/*.xml'])
                     archiveArtifacts artifacts: "**/*.csv", fingerprint: true
                 }
             }

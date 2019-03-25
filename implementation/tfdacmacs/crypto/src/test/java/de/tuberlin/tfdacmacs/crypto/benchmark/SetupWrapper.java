@@ -24,6 +24,8 @@ public class SetupWrapper {
     @Getter
     private final AuthorityKey authorityKey;
 
+    private String policy = "and";
+
     public SetupWrapper(GlobalPublicParameter globalPublicParameter, String authorityId) {
         this.globalPublicParameter = globalPublicParameter;
         this.attributeValueKeyGenerator = new AttributeValueKeyGenerator(new HashGenerator());
@@ -41,7 +43,7 @@ public class SetupWrapper {
     }
 
     public String policy() {
-        return "(" + StringUtils.collectionToDelimitedString(createdKeys.keySet(), " and ") + ")";
+        return "(" + StringUtils.collectionToDelimitedString(createdKeys.keySet(), " " + policy + " ") + ")";
     }
 
     public AuthorityKey.Private authorityPrivateKey() {
@@ -82,6 +84,15 @@ public class SetupWrapper {
 
     public List<AttributeValueKey> createdKeys() {
         return this.createdKeys.values().stream().collect(Collectors.toList());
+    }
+
+    public SetupWrapper setPolicy(boolean and) {
+        if(and) {
+            this.policy = "and";
+        } else {
+            this.policy = "or";
+        }
+        return this;
     }
 
 }
