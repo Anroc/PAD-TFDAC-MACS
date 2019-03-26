@@ -23,7 +23,7 @@ If it fails remove the model android from the pom.xml.
 ## 3. Setting up native extension
 
 You need `make`, `cmake` and a c-compiler to do the next set:
-Access the `./JPBC/jpbc-pbc` directory and type:
+Access the `./jpbc-pbc` directory and type:
 
 ```
 cmake .
@@ -37,7 +37,7 @@ After this is finished compile the wrapper:
 make
 ```
 
-You will find a shared library called `jpbc-pbc.so` in the `./build` directory.
+You will find a shared library called `jpbc-pbc.so` in the `./build` or root directory.
 
 ## 4. Add dependencies to project
 
