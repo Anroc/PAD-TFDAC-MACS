@@ -2,6 +2,7 @@
 import groovy.json.JsonOutput
 
 SOURCE_DIR = "./implementation/tfdacmacs"
+CRYPTO_RESOURCES_DIR = "./implementation/tfdacmacs/crypto/src/main/resources"
 
 node {
     try {
@@ -11,6 +12,13 @@ node {
                 // sh('printenv')
                 dir (SOURCE_DIR) {
                 sh('./gradlew crypto:clean crypto:assemble crypto:testClasses')
+            }
+        }
+
+        stage('prepare native libs') {
+            sh('mkdir -p ' + CRYPTO_RESOURCES_DIR)
+            dir (CRYPTO_RESOURCES_DIR) {
+                sh('ln -s /usr/local/lib/libpbc.so libjpbc-pbc.so')
             }
         }
 

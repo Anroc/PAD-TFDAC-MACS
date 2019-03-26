@@ -7,7 +7,10 @@ import scipy.interpolate
 def approximate(x, y):
     half = int(len(y) / 2)
     m = (np.average(y[:half]) - np.average(y[half:])) / (np.average(x[:half]) - np.average(x[half:]))
-    return lambda x : x * m + y[0]
+    midx = np.average(x)
+    midy = np.average(y)
+
+    return lambda x : x * m + -midx * m + midy
 
 def findIntersection(l1, l2):
     x1, y1, x2, y2 = 0, l1(0), 50, l1(50)
@@ -92,4 +95,4 @@ def add_attribute_xlabel(ax1, model_data):
     ax2.tick_params(axis='x', labelrotation=45)
 
 
-read_csv("or-policies/encrypt_incrementing_10_attribute_increment_1per140User.csv")
+read_csv("or-policies/encrypt_incrementing_10_attribute_increment_1per200User.csv")
