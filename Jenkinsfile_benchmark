@@ -18,7 +18,7 @@ node {
         stage('prepare native libs') {
             sh('mkdir -p ' + CRYPTO_RESOURCES_DIR)
             dir (CRYPTO_RESOURCES_DIR) {
-                sh('ln -s /usr/local/lib/libjpbc-pbc.so libjpbc-pbc.so')
+                sh('ln -f -s /usr/local/lib/libjpbc-pbc.so libjpbc-pbc.so')
             }
         }
 
