@@ -42,15 +42,18 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
 
     protected void incrementAttributes(int attributesPerUser, boolean andPolicy) {
         SetupWrapper setupWrapper = new SetupWrapper(gpp, authorityId);
-        setupWrapper.createAttributeValueKeys(1);
         setupWrapper.setPolicy(andPolicy);
         int numberOfRuns = 25;
         int stepSize  = 10;
 
         int buffer = 1;
-
         for(int userCount = 1; userCount <= this.numUsers; userCount += stepSize ) {
             boolean firstRun = userCount == 1;
+
+            if(buffer / attributesPerUser > 0) {
+                setupWrapper.createAttributeValueKeys(buffer / attributesPerUser);
+                buffer = buffer % attributesPerUser;
+            }
 
             BenchmarkResult rsaRun = Benchmark.rsa()
                     .numberOfRuns(numberOfRuns)
@@ -74,10 +77,6 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
 
             printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun);
 
-            if(buffer / attributesPerUser > 0) {
-                setupWrapper.createAttributeValueKeys(buffer / attributesPerUser);
-                buffer = buffer % attributesPerUser;
-            }
             buffer += stepSize;
         }
     }
