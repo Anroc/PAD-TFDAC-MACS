@@ -53,6 +53,8 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
             if(buffer / attributesPerUser > 0) {
                 setupWrapper.createAttributeValueKeys(buffer / attributesPerUser);
                 buffer = buffer % attributesPerUser;
+            } else if(userCount < attributesPerUser) {
+                setupWrapper.createAttributeValueKeys(1);
             }
 
             BenchmarkResult rsaRun = Benchmark.rsa()
