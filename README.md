@@ -2,7 +2,8 @@
 
 ## 1. Install PBC
 
-Follow the instructions in [here](https://crypto.stanford.edu/pbc/manual/ch01.html).
+Download the [sources](https://crypto.stanford.edu/pbc/download.html) of the latest pbc release and
+follow the instructions in [here](https://crypto.stanford.edu/pbc/manual/ch01.html).
 Requirement for this installation is the existance of [GMP](https://gmplib.org/). 
 Since GMP is quite old, it might be compiled manually.
 
@@ -16,6 +17,8 @@ After the download finished access the directory via the terminal and type:
 ```
 mvn install -DskipTests
 ```
+
+If it fails remove the model android from the pom.xml.
 
 ## 3. Setting up native extension
 
