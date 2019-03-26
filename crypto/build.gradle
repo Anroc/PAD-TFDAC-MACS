@@ -46,6 +46,6 @@ test {
 
 task benchmark( type: Test ) {
     filter {
-        includeTestsMatching "de.tuberlin.tfdacmacs.crypto.pairing.*"
+        includeTestsMatching "de.tuberlin.tfdacmacs.crypto.benchmark.*"
     }
 }
