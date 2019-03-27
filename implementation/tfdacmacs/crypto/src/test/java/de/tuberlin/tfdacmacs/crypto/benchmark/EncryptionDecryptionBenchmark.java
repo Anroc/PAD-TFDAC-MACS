@@ -53,7 +53,7 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
             if(buffer / attributesPerUser > 0) {
                 setupWrapper.createAttributeValueKeys(buffer / attributesPerUser);
                 buffer = buffer % attributesPerUser;
-            } else if(userCount < attributesPerUser) {
+            } else if(userCount < attributesPerUser && firstRun) {
                 setupWrapper.createAttributeValueKeys(1);
             }
 
