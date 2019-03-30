@@ -46,8 +46,8 @@ public class SetupWrapper {
         return "(" + StringUtils.collectionToDelimitedString(createdKeys.keySet(), " " + policy + " ") + ")";
     }
 
-    public AuthorityKey.Private authorityPrivateKey() {
-        return authorityKey.getPrivateKey();
+    public AuthorityKey authorityKey() {
+        return authorityKey;
     }
 
     public AttributeValueKeyProvider attributeValueKeyProvider() {

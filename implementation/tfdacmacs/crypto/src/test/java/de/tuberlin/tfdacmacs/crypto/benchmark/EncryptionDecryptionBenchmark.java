@@ -62,7 +62,7 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
                     .numberOfUsers(userCount)
                     .configure()
                     .preHeat(firstRun)
-                    .run();
+                    .benchmarkEncrypt();
 
             BenchmarkResult abeRun = Benchmark.abe()
                     .numberOfRuns(numberOfRuns)
@@ -72,10 +72,10 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityPrivateKey(setupWrapper.authorityPrivateKey())
+                    .authorityKey(setupWrapper.authorityKey())
                     .configure()
                     .preHeat(firstRun)
-                    .run();
+                    .benchmarkEncrypt();
 
             printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun);
 
