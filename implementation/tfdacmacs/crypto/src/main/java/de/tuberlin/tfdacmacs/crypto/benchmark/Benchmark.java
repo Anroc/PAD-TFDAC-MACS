@@ -135,7 +135,7 @@ public class Benchmark {
 
         private final ABEUserFactory abeUserFactory;
         private final AccessPolicyParser accessPolicyParser;
-        private final DNFAccessPolicy dnfAccessPolicy;
+        private DNFAccessPolicy dnfAccessPolicy;
         private final GlobalPublicParameter gpp;
 
         private final AuthorityKey authorityKey;
