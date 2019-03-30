@@ -18,7 +18,7 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
     public void encrypt_incrementing_10() {
         SetupWrapper setupWrapper = new SetupWrapper(gpp, authorityId);
         List<AttributeValueKey> attributeValueKeys = setupWrapper.createAttributeValueKeys(1);
-        int numberOfRuns = 10;
+        int numberOfRuns = 25;
 
         for(int numUsers = 1; numUsers <= getNumUsers(); numUsers += 10) {
             boolean firstRun = numUsers == 1;
@@ -27,7 +27,7 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .numberOfRuns(numberOfRuns)
                     .numberOfUsers(numUsers)
                     .configure()
-                    .run();
+                    .benchmarkEncrypt();
 
             BenchmarkResult abeRun = Benchmark.abe()
                     .numberOfRuns(numberOfRuns)
@@ -37,9 +37,9 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityPrivateKey(setupWrapper.authorityPrivateKey())
+                    .authorityKey(setupWrapper.authorityKey())
                     .configure()
-                    .run();
+                    .benchmarkEncrypt();
 
             printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
         }

@@ -12,13 +12,13 @@ public class BenchmarkCombinedResult {
     private final BenchmarkResult abeResult;
 
     public void csvPrintHeaders(String fileName) {
-        CSVPrinter.writeCSV(fileName, "numUsers,numberOfAttributes,rsaAvgTime,rsaMedTime,rsaAvgCTSize,rsaNumberOfFileKeys,abeAvgTime,abeMedTime,abeAvgCTSize,abeNumberOfFileKeys", false);
+        CSVPrinter.writeCSV(fileName, "x,numberOfAttributes,rsaAvgTime,rsaMedTime,rsaAvgCTSize,rsaNumberOfFileKeys,abeAvgTime,abeMedTime,abeAvgCTSize,abeNumberOfFileKeys", false);
     }
 
-    public void csvPrintStatistics(String fn, int numUsers, int numerOfAttributes) {
+    public void csvPrintStatistics(String fn, int x, int numerOfAttributes) {
         CSVPrinter.writeCSV(fn,
                 String.format("%d,%d,%f,%f,%f,%d,%f,%f,%f,%d",
-                        numUsers,
+                        x,
                         numerOfAttributes,
                         rsaResult.averageTime(),
                         rsaResult.medianTime(),

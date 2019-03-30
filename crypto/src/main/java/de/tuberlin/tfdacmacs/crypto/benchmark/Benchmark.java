@@ -16,10 +16,14 @@ import de.tuberlin.tfdacmacs.crypto.pairing.policy.AttributeValueKeyProvider;
 import de.tuberlin.tfdacmacs.crypto.pairing.policy.AuthorityKeyProvider;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class Benchmark {
 
@@ -35,13 +39,20 @@ public class Benchmark {
     public static abstract class ConfiguredBenchmark {
         private final int numberOfRuns;
         private final int numberOfUsers;
+        private final int numberOfCipherTexts;
 
         private final byte[] content = "Sample Text that need to be encrypted.".getBytes();
 
-        public abstract BenchmarkResult run();
+        public abstract BenchmarkResult benchmarkEncrypt();
+        public abstract BenchmarkResult benchmarkMemberJoin();
+        public abstract BenchmarkResult benchmarkMemberLeave();
+        public abstract Group getGroup();
+        public abstract Group doSetupGroup();
+        protected abstract void doPreHeat();
 
         public ConfiguredBenchmark preHeat(boolean shouldPreheat) {
             if(shouldPreheat) {
+                initGroupIfNessecary();
                 for (int i = 0; i < 2000; i++) {
                     doPreHeat();
                 }
@@ -49,53 +60,74 @@ public class Benchmark {
             return this;
         }
 
-        protected abstract void doPreHeat();
+        protected Group setupGroup() {
+            Group group = doSetupGroup();
+            IntStream.range(0, getNumberOfCipherTexts()).forEach(
+                    (i) -> group.encrypt(("content_" + i).getBytes(), (User) SetUtils.first(group.getMembers()))
+            );
+
+            return group;
+        }
+
 
         protected BenchmarkResult doRun(Supplier<RunTimeResult> method) {
             BenchmarkResult result = new BenchmarkResult();
 
             for (int i = 0; i < getNumberOfRuns(); i++) {
+                setupGroup();
                 result.addRun(method.get());
             }
             return result;
+        }
+
+        private void initGroupIfNessecary() {
+            if(getGroup() == null) {
+                setupGroup();
+            }
         }
     }
 
     public static class RSAConfiguredBenchmark extends ConfiguredBenchmark {
 
         private final RSAUserFactory rsaUserFactory = new RSAUserFactory();
-        private RSAGroup rsaGroup = null;
+
+        @Getter(onMethod = @__(@Override))
+        private RSAGroup group = null;
         private RSAUser member = null;
 
         @Builder(buildMethodName = "configure")
-        public RSAConfiguredBenchmark(int numberOfRuns, int numberOfUsers) {
-            super(numberOfRuns, numberOfUsers);
+        public RSAConfiguredBenchmark(int numberOfRuns, int numberOfUsers, int numberOfCipherTexts) {
+            super(numberOfRuns, numberOfUsers, numberOfCipherTexts);
         }
 
         @Override
-        public BenchmarkResult run() {
-            if(rsaGroup == null) {
-                setupGroup();
-            }
+        public BenchmarkResult benchmarkEncrypt() {
+            return doRun(() -> group.encrypt(getContent(), member));
+        }
 
-            return doRun(() -> rsaGroup.encrypt(getContent(), member));
+        @Override
+        public BenchmarkResult benchmarkMemberJoin() {
+            return doRun(() -> group.join(SetUtils.first(rsaUserFactory.create(1))));
+        }
+
+        @Override
+        public BenchmarkResult benchmarkMemberLeave() {
+            return doRun(() -> group.leave(SetUtils.first(group.getMembers())));
         }
 
         @Override
         public void doPreHeat() {
-            if(rsaGroup == null) {
-                setupGroup();
-            }
-
-            rsaGroup.encrypt(getContent(), member);
+            group.encrypt(getContent(), member);
         }
 
-        private void setupGroup() {
+        @Override
+        public Group doSetupGroup() {
             Set<RSAUser> rsaUsers = rsaUserFactory.create(getNumberOfUsers());
 
-            this.rsaGroup = new RSAGroup();
-            this.rsaGroup.setMembers(rsaUsers);
+            this.group = new RSAGroup();
+            this.group.setMembers(rsaUsers);
             this.member = SetUtils.first(rsaUsers);
+            return this.group;
         }
     }
 
@@ -106,53 +138,62 @@ public class Benchmark {
         private final DNFAccessPolicy dnfAccessPolicy;
         private final GlobalPublicParameter gpp;
 
-        private ABEGroup abeGroup = null;
+        private final AuthorityKey authorityKey;
+        private final List<AttributeValueKey> attributesPerUser;
+
+        @Getter(onMethod = @__(@Override))
+        private ABEGroup group = null;
         private ABEUser member = null;
 
         @Builder(buildMethodName = "configure")
         public ABEConfiguredBenchmark(
                 int numberOfRuns,
                 int numberOfUsers,
+                int numberOfCipherTexts,
                 String policy,
                 GlobalPublicParameter gpp,
                 AttributeValueKeyProvider attributeValueKeyProvider,
                 AuthorityKeyProvider authorityKeyProvider,
-                AuthorityKey.Private authorityPrivateKey,
+                AuthorityKey authorityKey,
                 List<AttributeValueKey> attributesPerUser) {
-            super(numberOfRuns, numberOfUsers);
+            super(numberOfRuns, numberOfUsers, numberOfCipherTexts);
             this.accessPolicyParser = new AccessPolicyParser(attributeValueKeyProvider, authorityKeyProvider);
             this.dnfAccessPolicy = accessPolicyParser.parse(policy);
 
-            this.abeUserFactory = new ABEUserFactory(gpp, authorityPrivateKey, attributesPerUser);
+            this.abeUserFactory = new ABEUserFactory(gpp, authorityKey.getPrivateKey(), attributesPerUser);
             this.gpp = gpp;
 
+            this.authorityKey = authorityKey;
+            this.attributesPerUser = attributesPerUser;
         }
 
         @Override
-        public BenchmarkResult run() {
-            if(abeGroup == null) {
+        public BenchmarkResult benchmarkEncrypt() {
+            return doRun(() -> group.encrypt(getContent(), member));
+        }
 
-                setupGroup();
-            }
+        @Override
+        public BenchmarkResult benchmarkMemberJoin() {
+            return doRun(() -> group.join(new ABEUser(UUID.randomUUID().toString(), new HashSet<>())));
+        }
 
-            return doRun(() -> abeGroup.encrypt(getContent(), member));
+        @Override
+        public BenchmarkResult benchmarkMemberLeave() {
+            return doRun(() -> group.leave(SetUtils.first(group.getMembers())));
         }
 
         @Override
         protected void doPreHeat() {
-            if(abeGroup == null) {
-                setupGroup();
-            }
-
-            abeGroup.encrypt(getContent(), member);
+            group.encrypt(getContent(), member);
         }
 
-        private void setupGroup() {
+        public Group doSetupGroup() {
             Set<ABEUser> rsaUsers = abeUserFactory.create(getNumberOfUsers());
 
-            abeGroup = new ABEGroup(gpp, dnfAccessPolicy);
-            abeGroup.setMembers(rsaUsers);
+            this.group = new ABEGroup(gpp, dnfAccessPolicy, attributesPerUser, authorityKey);
+            this.group.setMembers(rsaUsers);
             member = SetUtils.first(rsaUsers);
+            return this.group;
         }
     }
 }
