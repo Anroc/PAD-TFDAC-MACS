@@ -49,7 +49,7 @@ public class LeaveBenchmark extends UnitTestSuite {
         assert numUsers >= 2;
         assert numAttributes >= 1;
 
-        int maxCT = 100;
+        int maxCT = 10;
 
         for(int numCT = 1; numCT <= maxCT; numCT += 1) {
             boolean firstRun = numCT == 1;
