@@ -52,7 +52,7 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
 
         this.gpp = globalPublicParameter;
         this.dnfAccessPolicy = dnfAccessPolicy;
-        this.attributeValueKeys = attributeValueKeys;
+        this.attributeValueKeys = new ArrayList<>(attributeValueKeys);
         this.authorityKey = authorityKey;
     }
 
@@ -100,10 +100,7 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
                 .map(UserAttributeSecretComponent::getAttributeValueId).collect(Collectors.toList());
 
         for ( VersionedID attributeToRevoke : attributesToRevoke) {
-            AttributeValueKey attributeValueKey = attributeValueKeys.stream()
-                    .filter(avk -> avk.getAttributeValueId().equals(attributeToRevoke.getId()))
-                    .findAny()
-                    .get();
+            AttributeValueKey attributeValueKey = findAttributeValueKey(attributeToRevoke.getId());
             AttributeValueKey attributeValueKeyNext = attributeValueKeyGenerator.generateNext(gpp, attributeValueKey);
 
             attributeValueKeys.remove(attributeValueKey);
@@ -123,7 +120,7 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
 
             // ct update
             Set<ABECipherText> updatedABECT = new HashSet<>();
-            for( ABECipherText abeCipherText : cipherTexts) {
+            for( ABECipherText abeCipherText : getCipherTexts()) {
                 List<CipherText> updatedCT = new ArrayList<>();
                 for (CipherText cipherText : abeCipherText.getCipherText().getCipherTexts()) {
                     CipherTextAttributeUpdateKey cipherTextAttributeUpdateKey = attributeValueKeyGenerator
@@ -132,11 +129,9 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
                     AndAccessPolicy andAccessPolicy = new AndAccessPolicy(
                             cipherText.getAccessPolicy()
                             .stream()
-                            .map(accessPolicy -> new AttributePolicyElement(authorityKey.getPublicKey(), attributeValueKey.getPublicKey(), new VersionedID(attributeValueKey.getAttributeValueId(), attributeValueKey.getVersion())))
+                            .map(accessPolicy -> new AttributePolicyElement(authorityKey.getPublicKey(), findAttributeValueKey(accessPolicy.getId()).getPublicKey()))
                             .collect(Collectors.toSet())
                     );
-
-
 
                     updatedCT.add(pairingCryptEngine.update(cipherText, andAccessPolicy, cipherTextAttributeUpdateKey, gpp));
                 }
@@ -146,6 +141,13 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
 
             setCipherTexts(updatedABECT);
         }
+    }
+
+    private AttributeValueKey findAttributeValueKey(String attributeValueId) {
+        return attributeValueKeys.stream()
+                .filter(avk -> avk.getAttributeValueId().equals(attributeValueId))
+                .findAny()
+                .get();
     }
 
     private CipherText findSuitableCipherText(DNFCipherText dnfCipherText, ABEUser asMember) {

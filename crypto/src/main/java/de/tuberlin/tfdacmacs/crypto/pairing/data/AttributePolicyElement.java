@@ -17,6 +17,12 @@ public class AttributePolicyElement extends AccessPolicyElement {
 
     private final VersionedID attributeValueId;
 
+    public AttributePolicyElement(AuthorityKey.Public authorityPublicKey, AttributeValueKey.Public attributePublicKey) {
+        this.authorityPublicKey = authorityPublicKey;
+        this.attributePublicKey = attributePublicKey;
+        this.attributeValueId = new VersionedID(attributePublicKey.getAttributeValueId(), attributePublicKey.getVersion());
+    }
+
     @Override
     public void put(@NonNull AccessPolicyElement accessPolicyElement) {
         throw new UnsupportedOperationException("Can not put accessPolicyElement on attribute");
