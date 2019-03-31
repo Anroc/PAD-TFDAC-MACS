@@ -71,10 +71,17 @@ public class Benchmark {
 
 
         protected BenchmarkResult doRun(Supplier<RunTimeResult> method) {
+           return doRun(true, method);
+        }
+
+        protected BenchmarkResult doRun(boolean setupGroup, Supplier<RunTimeResult> method) {
             BenchmarkResult result = new BenchmarkResult();
 
+            initGroupIfNessecary();
             for (int i = 0; i < getNumberOfRuns(); i++) {
-                setupGroup();
+                if(setupGroup) {
+                    setupGroup();
+                }
                 result.addRun(method.get());
             }
             return result;
@@ -102,7 +109,7 @@ public class Benchmark {
 
         @Override
         public BenchmarkResult benchmarkEncrypt() {
-            return doRun(() -> group.encrypt(getContent(), member));
+            return doRun(false, () -> group.encrypt(getContent(), member));
         }
 
         @Override
@@ -169,7 +176,7 @@ public class Benchmark {
 
         @Override
         public BenchmarkResult benchmarkEncrypt() {
-            return doRun(() -> group.encrypt(getContent(), member));
+            return doRun(false, () -> group.encrypt(getContent(), member));
         }
 
         @Override

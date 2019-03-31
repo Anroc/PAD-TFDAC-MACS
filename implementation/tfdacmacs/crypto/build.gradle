@@ -40,6 +40,10 @@ dependencies {
     testCompile('org.assertj:assertj-core:3.11.1')
 }
 
+def getDate() {
+    return new Date().format('dd/MM/yyyy HH:mm:ss:SSS')
+}
+
 test {
     exclude '**/benchmark/**'
 }
@@ -51,6 +55,6 @@ task benchmark( type: Test ) {
 
     // listen to standard out and standard error of the test JVM(s)
     onOutput { descriptor, event ->
-        logger.lifecycle("[" + descriptor + "]: " + event.message )
+        logger.lifecycle(getDate() + " [" + descriptor + "]: " + event.message )
     }
 }
