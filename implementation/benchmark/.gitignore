@@ -1,3 +1,4 @@
 *.csv
 venv/
 .idea/
+*.png

@@ -27,6 +27,100 @@ The remaining assumption that needs to be shown is that for each "AND" used in t
 
 \section{Performance and Scalability Analysis}
 
+To evaluate the performance and scalalbility of \name against the classical implementation different benchmarks are conducted. While the main focus remains on reducing the number of file keys for group sharings, it is also importend to mesure the performance of encryption, decryption, member join and member leave actions. Since encryption is the most interessing evaluation because it scales with the number of users, number of attributes, effects the cipher text length and number of file keys. In the following sections each of the four different actions will be evaluated and an expection about the experiment ourcome will be given.
+
+The benchmark evaluation is executed on a Server machine utalizing 6 vCPU cors (Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz, 30MB cache size), 12 GB RAM and running on Ubuntu 16.04 LTS 64bit. For the evaluation OpenJDK 1.8.0\_191 is used. Each of the benchmark does not spawn any threads or uses parallelisation. Computing power results from a single thread. \footnote{Single thread assumption is based on the implementation of \name. This assumption must not hold true for libraries that are used under the hood for RSA and AES cryptography (bouncycastle 1.60) or pairing-based cryptography (jPBC 2.0.0).} 
+
+\subsection{Encryption}
+Encryption is the most interessing topic to evaluate since it scales using RSA with the number of users and using ABE with the number of attriubtes. With having the assumption of section \ref{sec:comparing-secure-group-communication-to-attribute-based-encryption} in mind, that states that the number of attributes is smaller or equal to the number of users in the shared group, ABE should be albe to archive a better performance. 
+
+\subsubsection{Assumption}
+Classical encryption that uses RSA to encrypt the file key asymmetrically scales with the number of users. For each new file in the group a suitable file key for each user must be created. The resulting assumption is that the RSA based approach scales linearly with increasing number of users. Same holds true for the cipher text size. This describes the aggregated sum of all file keys for one file. The number of file keys should scale on the order of 1-to-1 with the number of users. 
+
+In contrast to that stands \name. It scales with the number of attributes per cipher text rather then the number of users. Given this assumption an intersecting point of "attributes per user" can be calculated where \name scales better then the RSA approach. Where this intersecting point is depends on the number of attributes, number of users, the choosen policy and the computing power of the executing machine. Since in pure performance RSA computes faster then pairing-based cryptography, it can be assumped that there can be cases where there is no intersection point and the RSA-appraoch simply scales better. 
+
+\subsubsection{Benchmark: "and"-policies}
+There where two different scenarios evaluated. Frist, the and-policies (best-case) and then the or-policies (worst-case) were analysed for performance and scalability. The benchmarks are performed over an increasing number of users. For each $n$ users a new attribute is introduced. The notation of $a$-for-$n$ defining $a$ as the number of attributes \textit{for} $n$ users. The benchmark is evaluated for the configurations $1$-for-$\infty$, $1$-for-$1$, $1$-for-$2$, $1$-for-$4$, $1$-for-$5$.
+
+% picture
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-and-policy/encrypt_incrementing_10.png}
+    \caption{$1$-for-$\infty$ configuration using "and"-policy}
+    \label{fig:1-for-infty-and}
+\end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-and-policy/encrypt_incrementing_10_attribute_increment_1per5User.png}
+    \caption{$1$-for-$5$ configuration using "and"-policy}
+    \label{fig:1-for-5-and}
+\end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-and-policy/encrypt_incrementing_10_attribute_increment_1per1User.png}
+    \caption{$1$-for-$1$ configuration using "and"-policy}
+    \label{fig:1-for-1-and}
+\end{figure}
+
+The configuration of $1$-for-$\infty$ as shown in figure \ref{fig:1-for-infty-and} describes the best-case scenario. Here a group can be complelty described by only one attribute, regardless of the number of users. \name has an constant overhead since the number of attributes remain constant. The intersecting point can be approximated at 145 users. From that point onwards \name scales better then the RSA-based approach. With increasing the number of attributes per user, the overhead of \name becomes greater. In the configuration of $1$-for-$1$, so that each new user introduces a new attribute, the intersecting point gets pushed back to roughly 200 users. 
+
+Comparing the number of file keys over the increasing number of attributes per user, it is obserable that the number of file keys indeed scale truely linearly to the number of users. \name archieves to hold the number of file keys, when using "and"-policies, constant to $1$. The cipher text size raises linearly with increasing number of attributes that need to be embedded into this policy. It still scales better then the RSA based approach. 
+
+\subsubsection{Benchmark: "or"-policies}
+Complelty different is the benchmark for "or"-policies. Since for each "or" a new cipher text needs to be created \name scales very badly.
+
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per1User.png}
+    \caption{$1$-for-$1$ configuration using "or"-policy}
+    \label{fig:1-for-infter1-or}
+\end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per2User.png}
+    \caption{$1$-for-$2$ configuration using "or"-policy}
+    \label{fig:1-for-2-or}
+\end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per16User.png}
+    \caption{$1$-for-$16$ configuration using "or"-policy}
+    \label{fig:1-for-16-or}
+\end{figure}
+\begin{figure}[!t]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per140User.png}
+    \caption{$1$-for-$140$ configuration using "or"-policy}
+    \label{fig:1-for-140-or}
+\end{figure}
+%\begin{figure}[!t]
+%\centering
+%    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per200User.png}
+%    \caption{$1$-for-$200$ configuration using "or"-policy}
+%    \label{fig:1-for-200-or}
+%\end{figure}
+
+\subsection{Member Join}
+\subsubsection{Assumption}
+\subsubsection{Benchmark: Member Join}
+
+\begin{figure}[!ht]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-join/join_attr_1.png}
+    \caption{Rekeying for one new member. Scaled over the number of attributes}
+    \label{fig:member-join}
+\end{figure}
+
+\subsection{Member Leave}
+\subsubsection{Assumption}
+\subsubsection{Benchmark: Member Leave}
+
+\begin{figure}[!ht]
+\centering
+    \includegraphics[width=\linewidth]{img/eval-leave/leave_attr_1_users_2.png}
+    \caption{One member leaves the share. Scaled over the number of attributes}
+    \label{fig:member-leave}
+\end{figure}
 
 \section{Future adaptations}
 
