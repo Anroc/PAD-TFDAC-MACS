@@ -186,7 +186,7 @@ def generate_all():
                 for filename in filenames:
                     read_csv(filename)
             else:
-                read_csv(filenames, subplots=1)
+                read_csv(filenames, subplots=1, x_label="Number of cipher texts")
 
 
 #read_csv("server-artifacts/or-policies/encrypt_incrementing_10_attribute_increment_1per200User.csv")

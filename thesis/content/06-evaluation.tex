@@ -11,6 +11,7 @@ To stress this last point, different benchmarks will be conducted to compare the
 While this assumption should hold true on group operations such as member join and file upload, the proposed approach comes with an additional overhead on member removal due to additional shared-key revocation management. 
 
 \section{Upper-Bound and Worst-Case Scenario}
+\label{sec:upper-bound-and-worst-case-scenario}
 In this section it will theoretically argued why \name scales at least as good as the current solution for secure cloud storage systems. The number of files keys per $n$ user scale with $O(n)$ (same way as Bdrive) in \name if and only if, no suitable subset of district attributes of any two users can be found so that the $n$ users can be described with $a < n$ attributes $a$. 
 That means that if in that group at least two users would share the same attribute only $a < n$ attributes would be needed to describe this group, resulting in $a$ file keys. 
 If that is not the case, say no user share the same attribute, for each user an unique attribute needs to be used (for example the email address of the user) which is embedded in an inclusive attribute policy. 
@@ -67,13 +68,11 @@ The configuration of $1$-for-$\infty$ as shown in figure \ref{fig:1-for-infty-an
 Comparing the number of file keys over the increasing number of attributes per user, it is obserable that the number of file keys indeed scale truely linearly to the number of users. \name archieves to hold the number of file keys, when using "and"-policies, constant to $1$. The cipher text size raises linearly with increasing number of attributes that need to be embedded into this policy. It still scales better then the RSA based approach. 
 
 \subsubsection{Benchmark: "or"-policies}
-Complelty different is the benchmark for "or"-policies. Since for each "or" a new cipher text needs to be created \name scales very badly.
-
 \begin{figure}[!t]
 \centering
     \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per1User.png}
     \caption{$1$-for-$1$ configuration using "or"-policy}
-    \label{fig:1-for-infter1-or}
+    \label{fig:1-for-1-or}
 \end{figure}
 \begin{figure}[!t]
 \centering
@@ -93,6 +92,10 @@ Complelty different is the benchmark for "or"-policies. Since for each "or" a ne
     \caption{$1$-for-$140$ configuration using "or"-policy}
     \label{fig:1-for-140-or}
 \end{figure}
+
+Complelty different is the benchmark for "or"-policies. Since for each "or" a new cipher text needs to be created \name scales with the number of "or" elements present in the access policy.
+
+
 %\begin{figure}[!t]
 %\centering
 %    \includegraphics[width=\linewidth]{img/eval-or-policy/encrypt_incrementing_10_attribute_increment_1per200User.png}
@@ -100,10 +103,26 @@ Complelty different is the benchmark for "or"-policies. Since for each "or" a ne
 %    \label{fig:1-for-200-or}
 %\end{figure}
 
-\subsection{Member Join}
-\subsubsection{Assumption}
-\subsubsection{Benchmark: Member Join}
 
+As it was introduced in the previous chapture, TF-DAC-MACS was adapted to support access policies that are present DNF-fomular. For each additional "or" and its suptree a new chiper text gets created. This is visible in the Figure \ref{fig:1-for-16-or} in the cipher text size and number of file key graphic. Here a stepwise increasing function is notable. Each step is directly correlated to a new attribute that was included into the policy using konjunction.
+
+The worst-case scenario, as introduced in section \ref{sec:upper-bound-and-worst-case-scenario}, is defined as the scenarion were the number of users is equal the number of attributes in an or-policy. This case is shown in figure \ref{fig:1-for-1-or}. In that case is encryption time of \name two magintues higher ($\approx 0-550$ms) than the computation time of the RSA-approach ($\approx 0-10$ms). Even the cipher text size is substantial greater than the cipher text size per file key. This results from the fact that now, \name scales with the same overhead as the RSA approach regarding the number of file keys. So no adventage could be gained over the RSA approach in the worst-case scenario.
+
+Interessting to notice is if a configuration of one attribute per two users is used (Figure \ref{fig:1-for-2-or}) the file keys scale twice as good and the cipher text size scale rather similar to the size of the RSA based file keys. 
+
+Reducing the overhead to a 1-for-16 configuration using "or"-policies, as shown in Figure \ref{fig:1-for-16-or}, a step wise function is notable in each of the plottet functions. The next step happens each 16 users - each attribute. The less attributes are used to describe a user group using "or"-policies, the better does \name scale. Since the number of attributes and the number of cipher text are directly correltated, a great adventage over the classical RSA-based appraoch can be archieved.
+
+Finally, in Figure \ref{fig:1-for-140-or}, a configuration was when \name can b expected to scale better then the RSA-based appraoch. When a group of user can be described by a policy that utalized no "or" for at least 140 members, the assumption can be made that \name scales better regarding computation time in comparison to the classical RSA-based appraoch. 
+
+In general it holds true that the regarding the cipher text size and the number of file keys \name scales better if a group of user can be described by "or" conditions then there are users. 
+
+\subsection{Member Join}
+On member join, in RSA each file key needs to be reencrypted for the new member. Using the ABE appraoch simply a attribute key that matches the group policy needs to be created. 
+
+\subsubsection{Assumption}
+Given the previous statement, it can be assumped that \name scales with an constant overhead and the RSA approach scales linearly with the increasing number of cipher texts.
+
+\subsubsection{Benchmark: Member Join}
 \begin{figure}[!ht]
 \centering
     \includegraphics[width=\linewidth]{img/eval-join/join_attr_1.png}
@@ -111,16 +130,25 @@ Complelty different is the benchmark for "or"-policies. Since for each "or" a ne
     \label{fig:member-join}
 \end{figure}
 
-\subsection{Member Leave}
-\subsubsection{Assumption}
-\subsubsection{Benchmark: Member Leave}
+As shown in figure \ref{fig:member-join} the assumption can be supported. Three group configurations were evaluated. Having 1, 2 or 4 attributes respectivcally. Depending on the number of attributes the intersecting points of 20, 40 and 90 cipher texts can be extracted. After this amount of attributes \name is faster in adding members to a group. 
 
+\subsection{Member Leave}
+Member Leave comes with a greater overhead for \name. Additionally all cipher text need to be updated, each non-revoker user need to revieve a new update key, and the cipher text update key, user secret update key and new attribute value private and public key need to be calculated. On the other hand is the biggest adventage of the RSA-based appraoch that simply the respective file keys of the revoked user need to be deleted.
+
+\subsubsection{Assumption}
+The assumption is simply stated that \name can not scale better then the RSA-based approach. Even the attribute value key creation might take longer then just removing the saved file keys for the respektive user. 
+
+\subsubsection{Benchmark: Member Leave}
 \begin{figure}[!ht]
 \centering
     \includegraphics[width=\linewidth]{img/eval-leave/leave_attr_1_users_2.png}
     \caption{One member leaves the share. Scaled over the number of attributes}
     \label{fig:member-leave}
 \end{figure}
+
+Figure \ref{fig:member-leave} shows the exact expected behavior. For already one cipher text the gab between the different number of attributes and the RSA-based approach is crealy notable. More attributes means here that a user was revoked that owned multible attribute, which each need to be revoked by itself. 
+
+In a real world system the cipher text update and the user secret key update would happen on the server and client device side. Further it could also happen in parallel to speed up this process. Still it holds true, that \name scales definilty much worse then the RSA-based approach.
 
 \section{Future adaptations}
 
