@@ -41,6 +41,19 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .configure()
                     .benchmarkEncrypt();
 
+            BenchmarkResult abeRun2Fa = Benchmark.abe()
+                    .numberOfRuns(numberOfRuns)
+                    .numberOfUsers(numUsers)
+                    .gpp(gppTestFactory.create())
+                    .attributesPerUser(attributeValueKeys)
+                    .policy(setupWrapper.policy())
+                    .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
+                    .authorityKeyProvider(setupWrapper.authorityKeyProvider())
+                    .authorityKey(setupWrapper.authorityKey())
+                    .use2FA(true)
+                    .configure()
+                    .benchmarkEncrypt();
+
             printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
         }
     }

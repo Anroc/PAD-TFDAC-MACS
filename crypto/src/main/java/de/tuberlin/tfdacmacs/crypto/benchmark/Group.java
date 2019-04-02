@@ -2,18 +2,20 @@ package de.tuberlin.tfdacmacs.crypto.benchmark;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
 @Data
 public abstract class Group<USER extends  User, CIPHERTEXT extends CipherTextLength> {
 
-    private Set<USER> members;
+    private List<USER> members;
     private Set<CIPHERTEXT> cipherTexts;
 
     public Group() {
-        this.members = new HashSet<>();
+        this.members = new ArrayList<>();
         this.cipherTexts = new HashSet<>();
     }
 
@@ -52,10 +54,10 @@ public abstract class Group<USER extends  User, CIPHERTEXT extends CipherTextLen
     }
 
 
-    protected abstract CIPHERTEXT doEncrypt(byte[] content, Set<USER> members, USER asMember);
+    protected abstract CIPHERTEXT doEncrypt(byte[] content, List<USER> members, USER asMember);
     protected abstract byte[] doDecrypt(CIPHERTEXT content, USER asMember);
-    protected abstract void doJoin(USER newMember, Set<USER> existingMembers, Set<CIPHERTEXT> cipherTexts);
-    protected abstract void doLeave(USER newMember, Set<USER> existingMembers, Set<CIPHERTEXT> cipherTexts);
+    protected abstract void doJoin(USER newMember, List<USER> existingMembers, Set<CIPHERTEXT> cipherTexts);
+    protected abstract void doLeave(USER newMember, List<USER> existingMembers, Set<CIPHERTEXT> cipherTexts);
 
     private CipherTextResult<CIPHERTEXT> measure(Supplier<CIPHERTEXT> processor) {
         long start = System.nanoTime();

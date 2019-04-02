@@ -1,6 +1,5 @@
 package de.tuberlin.tfdacmacs.client.twofactor.client;
 
-import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.authority.exception.CertificateManipulationException;
 import de.tuberlin.tfdacmacs.client.authority.exception.NotTrustedAuthorityException;
 import de.tuberlin.tfdacmacs.client.certificate.client.dto.CertificateResponse;
@@ -11,10 +10,10 @@ import de.tuberlin.tfdacmacs.client.rest.SemanticValidator;
 import de.tuberlin.tfdacmacs.client.rest.session.Session;
 import de.tuberlin.tfdacmacs.client.twofactor.client.dto.*;
 import de.tuberlin.tfdacmacs.client.twofactor.data.PublicTwoFactorAuthentication;
+import de.tuberlin.tfdacmacs.client.user.client.dto.DeviceResponse;
 import de.tuberlin.tfdacmacs.client.user.client.dto.TwoFactorPublicKeyDTO;
 import de.tuberlin.tfdacmacs.client.user.client.dto.UserResponse;
 import de.tuberlin.tfdacmacs.crypto.pairing.converter.ElementConverter;
-import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AsymmetricElementKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorUpdateKey;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
@@ -54,7 +53,7 @@ public class TwoFactorAuthenticationClient {
     private final StringAsymmetricCryptEngine asymmetricCryptEngine;
     private final GPPService gppService;
 
-    public String uploadTwoFactorKey(@NonNull TwoFactorKey.Public twoFactoryKey) {
+    public String uploadTwoFactorKey(@NonNull TwoFactorKey.Secret twoFactoryKey) {
         String userId = twoFactoryKey.getUserId();
 
         UserResponse user = caClient.getUser(userId);
@@ -169,9 +168,9 @@ public class TwoFactorAuthenticationClient {
                                         session.getKeyPair().getPrivateKey()
                                 );
 
-                                TwoFactorKey.Public tfPublic = applyUpdates(
+                                TwoFactorKey.Secret tfSecret = applyUpdates(
                                         twoFactorKeyResponse,
-                                        new TwoFactorKey.Public(
+                                        new TwoFactorKey.Secret(
                                                 session.getEmail(),
                                                 decryptSymmetrically(encryptedTwoFactorDeviceKeyDTO.getEncryptedKey(),
                                                         cryptEngine),
@@ -181,7 +180,7 @@ public class TwoFactorAuthenticationClient {
                                 return new PublicTwoFactorAuthentication(
                                         twoFactorKeyResponse.getOwnerId(),
                                         twoFactorKeyResponse.getUserId(),
-                                        tfPublic
+                                        tfSecret
                                 );
                             });
                 }).filter(Optional::isPresent)
@@ -189,8 +188,8 @@ public class TwoFactorAuthenticationClient {
                 .collect(Collectors.toList());
     }
 
-    private TwoFactorKey.Public applyUpdates(TwoFactorKeyResponse twoFactorKeyResponse, TwoFactorKey.Public tfPublic) {
-        final long version = tfPublic.getVersion();
+    private TwoFactorKey.Secret applyUpdates(TwoFactorKeyResponse twoFactorKeyResponse, TwoFactorKey.Secret tfSecret) {
+        final long version = tfSecret.getVersion();
 
         // apply all updates
         twoFactorKeyResponse.getUpdates()
@@ -198,12 +197,12 @@ public class TwoFactorAuthenticationClient {
         twoFactorKeyResponse.getUpdates().removeIf(update -> update.getTargetVersion() < version);
 
         for (TwoFactorKeyUpdateDTO updateKey : twoFactorKeyResponse.getUpdates()) {
-            tfPublic.update(new TwoFactorUpdateKey(
+            tfSecret.update(new TwoFactorUpdateKey(
                     twoFactorKeyResponse.getUserId(),
                     ElementConverter.convert(updateKey.getUpdateKey(), getG1()),
                     updateKey.getTargetVersion()));
         }
-        return tfPublic;
+        return tfSecret;
     }
 
     public void updateTwoFactorKeys(@NonNull List<TwoFactorUpdateKey> user2FAUpdateKeys) {
@@ -243,7 +242,7 @@ public class TwoFactorAuthenticationClient {
                 .getId();
     }
 
-    public void updateUserForTwoFactorPublicKey(@NonNull AsymmetricElementKey.Public twoFactorPublicKey) {
+    public void updateUserForTwoFactorPublicKey(@NonNull TwoFactorKey.Public twoFactorPublicKey) {
         String encodedPublicKey = ElementConverter.convert(twoFactorPublicKey.getKey());
 
         TwoFactorPublicKeyDTO twoFactorPublicKeyDTO = new TwoFactorPublicKeyDTO(

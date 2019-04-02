@@ -56,7 +56,7 @@ public class TwoFactorAuthenticationService {
 
         TwoFactorAuthentication twoFactorAuthentication = twoFactorAuthenticationOptional.get();
 
-        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
+        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getSecrets();
         Arrays.stream(userIds)
                 .filter(userId -> ! publicKeys.containsKey(userId))
                 .forEach(userId -> twoFactorKeyManager.generatePublicKeyForUser(
@@ -75,7 +75,7 @@ public class TwoFactorAuthenticationService {
 
         Set<String> revokedUserIds = new HashSet<>(Arrays.asList(userIds));
 
-        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getPublicKeys();
+        Map<String, ElementKey> publicKeys = twoFactorAuthentication.getTwoFactorKey().getSecrets();
         Set<String> retrainedUserIds = new HashSet<>(publicKeys.keySet());
         revokedUserIds.retainAll(retrainedUserIds);
         retrainedUserIds.removeAll(revokedUserIds);

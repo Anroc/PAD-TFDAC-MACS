@@ -30,7 +30,8 @@ public class TwoFactorKeyGenerator {
         Pairing pairing = globalPublicParameter.getPairing();
 
         Element alpha = pairing.getZr().newRandomElement();
-        TwoFactorKey twoFactorKey = new TwoFactorKey(alpha, version);
+        Element g_alpha = globalPublicParameter.getG().getImmutable().powZn(alpha.duplicate());
+        TwoFactorKey twoFactorKey = new TwoFactorKey(alpha, g_alpha, version);
 
         Arrays.stream(uids).forEach(uid -> generatePublicKeyForUser(globalPublicParameter, twoFactorKey, uid));
 
@@ -67,13 +68,5 @@ public class TwoFactorKeyGenerator {
                 oid,
                 revokedKey.getVersion()
         );
-    }
-
-    public AsymmetricElementKey.Public generatePublicKey(
-            @NonNull GlobalPublicParameter gpp,
-            @NonNull TwoFactorKey.Private masterKey) {
-
-        Element publicKey = gpp.getG().getImmutable().powZn(masterKey.getKey());
-        return new AsymmetricElementKey.Public(publicKey, masterKey.getVersion());
     }
 }

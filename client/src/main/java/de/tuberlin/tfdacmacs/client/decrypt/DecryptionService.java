@@ -39,7 +39,7 @@ public class DecryptionService {
         String fileId = cipherText.getFileId();
         EncryptedFile encryptedFile = decryptionClient.getFile(fileId);
 
-        Optional<TwoFactorKey.Public> twoFactorAuthenticationKey = Optional.empty();
+        Optional<TwoFactorKey.Secret> twoFactorAuthenticationKey = Optional.empty();
         if(cipherText.isTwoFactorSecured()) {
             twoFactorAuthenticationKey = twoFactorAuthenticationService
                     .findPublicTwoFactorAuthentication(cipherText.getOwnerId().getId())

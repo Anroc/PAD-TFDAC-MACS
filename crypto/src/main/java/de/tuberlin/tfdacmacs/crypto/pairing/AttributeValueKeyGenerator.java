@@ -127,7 +127,7 @@ public class AttributeValueKeyGenerator {
         return new CipherTextAttributeUpdateKey(
                 cuk,
                 newAttributeValueKey.getAttributeValueId(),
-                Optional.ofNullable(twoFactorPublicKey).map(tf -> new VersionedID(tf.getUserId(), tf.getVersion())).orElse(null),
+                Optional.ofNullable(twoFactorPublicKey).map(tf -> new VersionedID(cipherText.getOwnerId().getId(), tf.getVersion())).orElse(null),
                 newAttributeValueKey.getPublicKey(),
                 revokedAttributeValueKey.getVersion()
         );

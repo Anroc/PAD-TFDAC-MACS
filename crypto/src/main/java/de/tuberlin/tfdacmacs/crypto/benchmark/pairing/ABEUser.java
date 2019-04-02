@@ -7,6 +7,7 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,11 +16,10 @@ import java.util.Set;
 public class ABEUser extends User {
 
     private Set<UserAttributeSecretComponent> attributes;
+    private Map<String, TwoFactorKey.Secret> tfPublics = new HashMap<>();
+
     private TwoFactorKey twoFactorKey;
-
-    private Map<String, TwoFactorKey.Public> tfPublics;
-
-    private boolean useTowFactorKey;
+    private boolean useTowFactorKey = false;
 
     public ABEUser(String id, Set<UserAttributeSecretComponent> attributes) {
         super(id);
@@ -34,7 +34,7 @@ public class ABEUser extends User {
         }
     }
 
-    public TwoFactorKey.Public getTwoFactorPublicKey(String ownerId) {
+    public TwoFactorKey.Secret getTwoFactorPublicKey(String ownerId) {
         if(ownerId == null || ! useTowFactorKey) {
             return null;
         }

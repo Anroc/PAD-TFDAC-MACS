@@ -1,7 +1,6 @@
 package de.tuberlin.tfdacmacs.crypto.benchmark.rsa;
 
 import de.tuberlin.tfdacmacs.crypto.benchmark.Group;
-import de.tuberlin.tfdacmacs.crypto.benchmark.utils.SetUtils;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import de.tuberlin.tfdacmacs.crypto.rsa.StringSymmetricCryptEngine;
 
@@ -9,6 +8,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ public class RSAGroup extends Group<RSAUser, RSACipherText> {
     }
 
     @Override
-    protected RSACipherText doEncrypt(byte[] content, Set<RSAUser> members, RSAUser asMember) {
+    protected RSACipherText doEncrypt(byte[] content, List<RSAUser> members, RSAUser asMember) {
         Key symmetricCipherKey = symmetricCryptEngine.getSymmetricCipherKey();
 
         return new RSACipherText(
@@ -60,8 +60,8 @@ public class RSAGroup extends Group<RSAUser, RSACipherText> {
     }
 
     @Override
-    protected void doJoin(RSAUser newMember, Set<RSAUser> existingMembers, Set<RSACipherText> cipherTexts) {
-        RSAUser existingUser = SetUtils.first(existingMembers);
+    protected void doJoin(RSAUser newMember, List<RSAUser> existingMembers, Set<RSACipherText> cipherTexts) {
+        RSAUser existingUser = existingMembers.get(0);
         for (RSACipherText cipherText : cipherTexts) {
             EncryptedFile encryptedFile = cipherText.getEncryptedFile().get(existingUser.getId());
             try {
@@ -75,7 +75,7 @@ public class RSAGroup extends Group<RSAUser, RSACipherText> {
     }
 
     @Override
-    protected void doLeave(RSAUser leavingMember, Set<RSAUser> existingMembers, Set<RSACipherText> cipherTexts) {
+    protected void doLeave(RSAUser leavingMember, List<RSAUser> existingMembers, Set<RSACipherText> cipherTexts) {
         cipherTexts.stream()
                 .forEach(ct -> ct.getEncryptedFile().remove(leavingMember.getId()));
     }

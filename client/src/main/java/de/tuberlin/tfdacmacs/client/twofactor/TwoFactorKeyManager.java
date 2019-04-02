@@ -39,18 +39,16 @@ public class TwoFactorKeyManager {
     }
 
     private void update2FAPublicKey(TwoFactorKey twoFactorKey) {
-        twoFactorClient.updateUserForTwoFactorPublicKey(
-                twoFactorKeyGenerator.generatePublicKey(gppService.getGPP(), twoFactorKey.getPrivateKey())
-        );
+        twoFactorClient.updateUserForTwoFactorPublicKey(twoFactorKey.getPublicKey());
     }
 
     public String generatePublicKeyForUser(@NonNull TwoFactorKey twoFactorKey, @NonNull String userId) {
         twoFactorKey = twoFactorKeyGenerator
                 .generatePublicKeyForUser(gppService.getGPP(), twoFactorKey, userId);
 
-        TwoFactorKey.Public publicKeyOfUser = twoFactorKey.getPublicKeyOfUser(userId);
+        TwoFactorKey.Secret secretKeyOfUser = twoFactorKey.getSecretKeyOfUser(userId);
 
-        return twoFactorClient.uploadTwoFactorKey(publicKeyOfUser);
+        return twoFactorClient.uploadTwoFactorKey(secretKeyOfUser);
     }
 
     public TwoFactorAuthentication update(
@@ -59,7 +57,7 @@ public class TwoFactorKeyManager {
         TwoFactorKey.Private revokedMasterKey = twoFactorAuthentication.getTwoFactorKey().getPrivateKey();
 
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNext(gppService.getGPP(), twoFactorAuthentication.getTwoFactorKey());
-        twoFactorKey.getPublicKeys().putAll(twoFactorAuthentication.getTwoFactorKey().getPublicKeys());
+        twoFactorKey.getSecrets().putAll(twoFactorAuthentication.getTwoFactorKey().getSecrets());
         twoFactorAuthentication.setTwoFactorKey(twoFactorKey);
 
         List<TwoFactorUpdateKey> user2FAUpdateKeys =
@@ -78,8 +76,8 @@ public class TwoFactorKeyManager {
     private TwoFactorAuthentication calculateLocalUpdate(TwoFactorAuthentication twoFactorAuthentication,
             List<TwoFactorUpdateKey> user2FAUpdateKeys) {
         user2FAUpdateKeys.forEach(twoFactorUpdateKey -> {
-                    TwoFactorKey.Public tfUpdated = twoFactorAuthentication.getTwoFactorKey()
-                            .getPublicKeyOfUser(twoFactorUpdateKey.getUserId()).update(twoFactorUpdateKey);
+                    TwoFactorKey.Secret tfUpdated = twoFactorAuthentication.getTwoFactorKey()
+                            .getSecretKeyOfUser(twoFactorUpdateKey.getUserId()).update(twoFactorUpdateKey);
                     twoFactorAuthentication.getTwoFactorKey().putPublicKey(tfUpdated.getUserId(), tfUpdated);
                 }
         );
@@ -88,7 +86,7 @@ public class TwoFactorKeyManager {
     }
 
     private List<TwoFactorUpdateKey> generateUserUpdateKeys(TwoFactorAuthentication twoFactorAuthentication, TwoFactorKey.Private revokedMasterKey) {
-        return twoFactorAuthentication.getTwoFactorKey().getPublicKeys().keySet()
+        return twoFactorAuthentication.getTwoFactorKey().getSecrets().keySet()
                 .stream()
                 .map(userId -> update(revokedMasterKey, twoFactorAuthentication.getTwoFactorKey().getPrivateKey(), userId))
                 .collect(Collectors.toList());

@@ -80,7 +80,6 @@ public class CipherTextClient {
                             }
 
                             return new TwoFactorKey.Public(
-                                    userResponse.getId(),
                                     ElementConverter.convert(twoFactorPublicKey.getTwoFactorAuthenticationPublicKey(), getG1()),
                                     twoFactorPublicKey.getVersion());
                         }));

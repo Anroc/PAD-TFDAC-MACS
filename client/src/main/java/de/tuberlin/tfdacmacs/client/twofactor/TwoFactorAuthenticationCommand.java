@@ -30,7 +30,7 @@ public class TwoFactorAuthenticationCommand {
 
     private void printTrustedUsers(TwoFactorAuthentication twoFactorAuthentication) {
         standardStreams.out("UserIds:");
-        twoFactorAuthentication.getTwoFactorKey().getPublicKeys().keySet().forEach(standardStreams::out);
+        twoFactorAuthentication.getTwoFactorKey().getSecrets().keySet().forEach(standardStreams::out);
     }
 
     @ShellMethod(value = "Distrust users", key = "2fa distrust")
@@ -56,10 +56,10 @@ public class TwoFactorAuthenticationCommand {
             standardStreams.out("Two-Factor issued by you to users:");
             twoFactorAuthenticationService.findTwoFactorAuthentication()
                     .map(TwoFactorAuthentication::getTwoFactorKey)
-                    .map(TwoFactorKey::getPublicKeyValues)
+                    .map(TwoFactorKey::getSecretUserKeyValues)
                     .map(Set::stream)
                     .orElseGet(Stream::empty)
-                    .map(TwoFactorKey.Public::getUserId)
+                    .map(TwoFactorKey.Secret::getUserId)
                     .forEach(standardStreams::out);
         }
 

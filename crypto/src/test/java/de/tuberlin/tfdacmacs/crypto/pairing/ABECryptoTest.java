@@ -168,7 +168,7 @@ public class ABECryptoTest extends UnitTestSuite {
     public void ciphertext_2fa_update_passes() {
         String ownerId = UUID.randomUUID().toString();
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gpp, userId);
-        TwoFactorKey.Public user2FAKey = twoFactorKey.getPublicKeyOfUser(userId);
+        TwoFactorKey.Secret user2FAKey = twoFactorKey.getSecretKeyOfUser(userId);
 
         // encrypt
         CipherTextDescription cipherText = abeEncryptor.encrypt(andAccessPolicy, gpp, new DataOwner(ownerId, twoFactorKey.getPrivateKey()), null);
@@ -180,7 +180,7 @@ public class ABECryptoTest extends UnitTestSuite {
         CipherText2FAUpdateKey cipherText2FAUpdateKey = twoFactorKeyGenerator.generateCipherTextUpdateKey(twoFactorKey.getPrivateKey(), newTwoFactorKey.getPrivateKey(), attributeKeys.getPublicKey(), ownerId);
 
         // update components
-        TwoFactorKey.Public newUser2FAKey = user2FAKey.update(twoFactorUpdateKey);
+        TwoFactorKey.Secret newUser2FAKey = user2FAKey.update(twoFactorUpdateKey);
         CipherText updatedCipherText = abeEncryptor
                 .update(gpp, cipherText, andAccessPolicy, Sets.newLinkedHashSet(cipherText2FAUpdateKey));
 
@@ -191,7 +191,7 @@ public class ABECryptoTest extends UnitTestSuite {
                 new UserAttributeSecretComponent(userSecretAttributeValueKey, attributeKeys.getPublicKey(), attributeValueIdentifier)
         );
         assertThatExceptionOfType(VersionMismatchException.class).isThrownBy(
-                () -> abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getPublicKeyOfUser(userId))
+                () -> abeDecryptor.decrypt(updatedCipherText, gpp, userId, userAttributeSecretComponents, twoFactorKey.getSecretKeyOfUser(userId))
         );
 
         // assert update succeedes
