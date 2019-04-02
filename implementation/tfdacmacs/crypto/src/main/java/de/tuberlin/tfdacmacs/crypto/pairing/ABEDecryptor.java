@@ -24,14 +24,14 @@ public class ABEDecryptor extends ABECrypto {
 
     public Element decrypt(@NonNull CipherText cipherText, @NonNull GlobalPublicParameter gpp,
             @NonNull String userId, @NonNull Set<UserAttributeSecretComponent> secrets,
-            TwoFactorKey.Public twoFactorPublicKey) {
-        if(twoFactorPublicKey == null && cipherText.isTwoFactorSecured()) {
+            TwoFactorKey.Secret twoFactorSecretKey) {
+        if(twoFactorSecretKey == null && cipherText.isTwoFactorSecured()) {
             throw new TwoFactorContrainNotStatisfiedException(
                     "Cipher text is two-factor secured but no 2FA decryption key was given.");
         }
 
-        if(cipherText.isTwoFactorSecured() && twoFactorPublicKey.getVersion() != cipherText.getOwnerId().getVersion()) {
-            throw new VersionMismatchException(cipherText.getOwnerId(), twoFactorPublicKey);
+        if(cipherText.isTwoFactorSecured() && twoFactorSecretKey.getVersion() != cipherText.getOwnerId().getVersion()) {
+            throw new VersionMismatchException(cipherText.getOwnerId(), twoFactorSecretKey);
         }
 
         secrets = findSatisfingSubSet(cipherText, secrets, UserAttributeSecretComponent::getAttributeValueId);
@@ -54,10 +54,10 @@ public class ABEDecryptor extends ABECrypto {
 
         Element pairing2 = gpp.getPairing().pairing(cipherText.getC2(), sk);
 
-        if(twoFactorPublicKey == null) {
+        if(twoFactorSecretKey == null) {
             return upper.div(pairing2);
         } else {
-            Element pairing3 = gpp.getPairing().pairing(twoFactorPublicKey.getKey(), upk);
+            Element pairing3 = gpp.getPairing().pairing(twoFactorSecretKey.getKey(), upk);
             Element lower = pairing2.mul(pairing3);
             return upper.div(lower);
         }

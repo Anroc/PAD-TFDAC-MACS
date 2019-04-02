@@ -17,5 +17,5 @@ public class PublicTwoFactorAuthentication {
     @NotBlank
     private String userId;
     @NotNull
-    private TwoFactorKey.Public twoFactorKey;
+    private TwoFactorKey.Secret twoFactorKey;
 }

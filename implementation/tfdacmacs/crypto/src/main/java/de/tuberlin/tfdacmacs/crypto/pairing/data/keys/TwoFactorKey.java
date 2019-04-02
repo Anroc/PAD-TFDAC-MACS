@@ -16,22 +16,24 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
-    public TwoFactorKey(@NonNull Element privateKey, long version) {
+
+    public TwoFactorKey(@NonNull Element privateKey, @NonNull Element publicKey, long version) {
         super(privateKey, version);
+        this.pubKey = new SimpleElementKey(publicKey, version);
     }
 
     @JsonIgnore
-    public Set<TwoFactorKey.Public> getPublicKeyValues() {
-        return super.publicKeys.entrySet()
+    public Set<Secret> getSecretUserKeyValues() {
+        return super.secrets.entrySet()
                 .stream()
-                .map(entry -> new TwoFactorKey.Public(entry.getKey(), entry.getValue().getKey(), entry.getValue().getVersion()))
+                .map(entry -> new Secret(entry.getKey(), entry.getValue().getKey(), entry.getValue().getVersion()))
                 .collect(Collectors.toSet());
     }
 
     @JsonIgnore
-    public TwoFactorKey.Public getPublicKeyOfUser(@NonNull String userId) {
-        return Optional.ofNullable(super.publicKeys.get(userId))
-                .map(elementKey -> new TwoFactorKey.Public(userId, elementKey.getKey(), elementKey.getVersion()))
+    public Secret getSecretKeyOfUser(@NonNull String userId) {
+        return Optional.ofNullable(super.secrets.get(userId))
+                .map(elementKey -> new Secret(userId, elementKey.getKey(), elementKey.getVersion()))
                 .orElse(null);
     }
 
@@ -40,8 +42,21 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
         return new Private(getKey(), getVersion());
     }
 
+    @JsonIgnore
+    public TwoFactorKey.Public getPublicKey() {
+        return new Public(getPubKey().getKey(), getPubKey().getVersion());
+    }
+
+    @EqualsAndHashCode(callSuper = true)
     public static class Private extends AsymmetricElementKey.Private<TwoFactorKey> {
         public Private(@NonNull Element key, long version) {
+            super(key, version);
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    public static class Public extends AsymmetricElementKey.Public<TwoFactorKey> {
+        public Public(@NonNull Element key, long version) {
             super(key, version);
         }
     }
@@ -49,25 +64,25 @@ public class TwoFactorKey extends AsymmetricElementMultiKey<String> {
     @Data
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
-    public static class Public extends AsymmetricElementKey.Public<TwoFactorKey> {
+    public static class Secret extends AsymmetricElementKey.Public<TwoFactorKey> {
 
         @NotBlank
         private String userId;
 
-        public Public(@NonNull String userId, @NonNull Element key, long version) {
+        public Secret(@NonNull String userId, @NonNull Element key, long version) {
             super(key, version);
             this.userId = userId;
         }
 
-        public Public update(@NonNull TwoFactorUpdateKey twoFactorUpdateKey) {
+        public Secret update(@NonNull TwoFactorUpdateKey twoFactorUpdateKey) {
             twoFactorUpdateKey.checkApplicablilty(this);
             Element newPublicKey = getKey().duplicate().mul(twoFactorUpdateKey.getUpdateKey());
             return update(newPublicKey);
         }
 
         @Override
-        public Public clone() {
-            return new Public(getUserId(), getKey().duplicate(), getVersion());
+        public Secret clone() {
+            return new Secret(getUserId(), getKey().duplicate(), getVersion());
         }
     }
 }

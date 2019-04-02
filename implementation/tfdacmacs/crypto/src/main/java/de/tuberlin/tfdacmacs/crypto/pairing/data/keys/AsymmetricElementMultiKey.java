@@ -16,15 +16,17 @@ import java.util.Map;
 public abstract class AsymmetricElementMultiKey<T> extends ElementKey {
 
     @NotNull
-    protected Map<T, ElementKey> publicKeys;
+    protected Map<T, ElementKey> secrets;
+    @NotNull
+    protected ElementKey pubKey;
 
     public AsymmetricElementMultiKey(@NonNull Element privateKey, long version) {
         super(privateKey, version);
-        this.publicKeys = new HashMap<>();
+        this.secrets = new HashMap<>();
     }
 
     public AsymmetricElementMultiKey putPublicKey(@NonNull T id, @NonNull ElementKey publicKey) {
-        this.publicKeys.put(id, publicKey);
+        this.secrets.put(id, publicKey);
         return this;
     }
 }

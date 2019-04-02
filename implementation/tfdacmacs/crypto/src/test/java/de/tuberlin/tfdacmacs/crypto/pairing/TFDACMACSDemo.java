@@ -113,8 +113,8 @@ public class TFDACMACSDemo {
     }
 
     private byte[] decrypt(GlobalPublicParameter gpp, String uid, File file, CipherText cipherText,
-            Set<UserAttributeSecretComponent> userAttributeKeys, TwoFactorKey.Public twoFactorPublicKey) {
-        return pairingCryptEngine.decrypt(file.getData(), cipherText, gpp, uid, userAttributeKeys, twoFactorPublicKey);
+            Set<UserAttributeSecretComponent> userAttributeKeys, TwoFactorKey.Secret twoFactorSecretKey) {
+        return pairingCryptEngine.decrypt(file.getData(), cipherText, gpp, uid, userAttributeKeys, twoFactorSecretKey);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class TFDACMACSDemo {
 
         CipherText cipherText = findSatisfyingCipherText(dnfCipherText, userAttributeKeys);
 
-        byte[] recoveredMessage = decrypt(gpp, uid, dnfCipherText.getFile(), cipherText, userAttributeKeys, twoFactorKey.getPublicKeyOfUser(uid));
+        byte[] recoveredMessage = decrypt(gpp, uid, dnfCipherText.getFile(), cipherText, userAttributeKeys, twoFactorKey.getSecretKeyOfUser(uid));
         String recoveredStrMessage = new String(recoveredMessage);
 
         System.out.println(String.format("Original Message: \t%s", strMessage));

@@ -6,7 +6,6 @@ import de.tuberlin.tfdacmacs.crypto.benchmark.pairing.ABEGroup;
 import de.tuberlin.tfdacmacs.crypto.benchmark.pairing.ABEUser;
 import de.tuberlin.tfdacmacs.crypto.benchmark.rsa.RSAGroup;
 import de.tuberlin.tfdacmacs.crypto.benchmark.rsa.RSAUser;
-import de.tuberlin.tfdacmacs.crypto.benchmark.utils.SetUtils;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.DNFAccessPolicy;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
@@ -20,7 +19,6 @@ import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -63,7 +61,7 @@ public class Benchmark {
         protected Group setupGroup() {
             Group group = doSetupGroup();
             IntStream.range(0, getNumberOfCipherTexts()).forEach(
-                    (i) -> group.encrypt(("content_" + i).getBytes(), (User) SetUtils.first(group.getMembers()))
+                    (i) -> group.encrypt(("content_" + i).getBytes(), (User) group.getMembers().get(0))
             );
 
             return group;
@@ -114,12 +112,12 @@ public class Benchmark {
 
         @Override
         public BenchmarkResult benchmarkMemberJoin() {
-            return doRun(() -> group.join(SetUtils.first(rsaUserFactory.create(1))));
+            return doRun(() -> group.join(rsaUserFactory.create(1).get(0)));
         }
 
         @Override
         public BenchmarkResult benchmarkMemberLeave() {
-            return doRun(() -> group.leave(SetUtils.first(group.getMembers())));
+            return doRun(() -> group.leave(group.getMembers().get(0)));
         }
 
         @Override
@@ -129,11 +127,11 @@ public class Benchmark {
 
         @Override
         public Group doSetupGroup() {
-            Set<RSAUser> rsaUsers = rsaUserFactory.create(getNumberOfUsers());
+            List<RSAUser> rsaUsers = rsaUserFactory.create(getNumberOfUsers());
 
             this.group = new RSAGroup();
             this.group.setMembers(rsaUsers);
-            this.member = SetUtils.first(rsaUsers);
+            this.member = rsaUsers.get(0);
             return this.group;
         }
     }
@@ -147,6 +145,8 @@ public class Benchmark {
 
         private final AuthorityKey authorityKey;
         private final List<AttributeValueKey> attributesPerUser;
+
+        private final boolean use2FA;
 
         @Getter(onMethod = @__(@Override))
         private ABEGroup group = null;
@@ -162,7 +162,8 @@ public class Benchmark {
                 AttributeValueKeyProvider attributeValueKeyProvider,
                 AuthorityKeyProvider authorityKeyProvider,
                 AuthorityKey authorityKey,
-                List<AttributeValueKey> attributesPerUser) {
+                List<AttributeValueKey> attributesPerUser,
+                boolean use2FA) {
             super(numberOfRuns, numberOfUsers, numberOfCipherTexts);
             this.accessPolicyParser = new AccessPolicyParser(attributeValueKeyProvider, authorityKeyProvider);
             this.dnfAccessPolicy = accessPolicyParser.parse(policy);
@@ -172,6 +173,7 @@ public class Benchmark {
 
             this.authorityKey = authorityKey;
             this.attributesPerUser = attributesPerUser;
+            this.use2FA = use2FA;
         }
 
         @Override
@@ -186,7 +188,7 @@ public class Benchmark {
 
         @Override
         public BenchmarkResult benchmarkMemberLeave() {
-            return doRun(() -> group.leave(SetUtils.first(group.getMembers())));
+            return doRun(() -> group.leave(group.getMembers().get(0)));
         }
 
         @Override
@@ -195,11 +197,12 @@ public class Benchmark {
         }
 
         public Group doSetupGroup() {
-            Set<ABEUser> rsaUsers = abeUserFactory.create(getNumberOfUsers());
+            List<ABEUser> abeUsers = abeUserFactory.create(getNumberOfUsers());
 
             this.group = new ABEGroup(gpp, dnfAccessPolicy, attributesPerUser, authorityKey);
-            this.group.setMembers(rsaUsers);
-            member = SetUtils.first(rsaUsers);
+            this.group.setMembers(abeUsers);
+            member = abeUsers.get(0);
+            member.setUseTowFactorKey(true);
             return this.group;
         }
     }

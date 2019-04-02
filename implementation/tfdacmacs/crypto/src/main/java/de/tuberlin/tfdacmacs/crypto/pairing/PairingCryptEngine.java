@@ -71,9 +71,9 @@ public class PairingCryptEngine {
             @NonNull GlobalPublicParameter gpp,
             @NonNull String userId,
             @NonNull Set<UserAttributeSecretComponent> secrets,
-            TwoFactorKey.Public twoFactorPublicKey) {
+            TwoFactorKey.Secret twoFactorSecretKey) {
 
-        Element key = abeDecryptor.decrypt(cipherText, gpp, userId, secrets, twoFactorPublicKey);
+        Element key = abeDecryptor.decrypt(cipherText, gpp, userId, secrets, twoFactorSecretKey);
         return aesDecryptor.decrypt(encryptedContent, key);
     }
 
