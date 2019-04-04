@@ -112,6 +112,7 @@ public class TwoFactorAuthenticationCommandTest extends CommandTestSuite {
     public void distrust() {
         TwoFactorKey twoFactorKey = new TwoFactorKey(
                 randomElementZr(),
+                randomElementZr(),
                 0L
         );
         twoFactorKey.putPublicKey(email, new SimpleElementKey(randomElementG1(), 0L));
