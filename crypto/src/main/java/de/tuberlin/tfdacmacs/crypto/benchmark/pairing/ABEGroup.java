@@ -130,14 +130,6 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
                         .filter(uasc -> uasc.getAttributeValueId().equals(attributeToRevoke)).findAny().get();
 
                 userAttributeSecretComponent.getUserSecretAttributeKey().update(userAttributeValueUpdateKey);
-
-                if(newTwoFactorKey != null) {
-                    TwoFactorUpdateKey twoFactorUpdateKey = twoFactorKeyGenerator
-                            .generateUpdateKey(gpp, firstUser.getTwoFactorKey().getPrivateKey(),
-                                    newTwoFactorKey.getPrivateKey(), abeUser.getId());
-
-                    abeUser.getTfPublics().get(firstUser.getId()).update(twoFactorUpdateKey);
-                }
             }
 
             // ct update
@@ -152,30 +144,10 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
                                     attributeValueKeyNext,
                                     firstUser.isUseTowFactorKey() ? firstUser.getTwoFactorKey().getPublicKey() : null);
 
-                    AndAccessPolicy andAccessPolicy = new AndAccessPolicy(
-                            cipherText.getAccessPolicy()
-                            .stream()
-                            .map(accessPolicy -> new AttributePolicyElement(authorityKey.getPublicKey(), findAttributeValueKey(accessPolicy.getId()).getPublicKey()))
-                            .collect(Collectors.toSet())
-                    );
+                    AndAccessPolicy andAccessPolicy = getAndAccessPolicy(cipherText);
 
                     CipherText ctUpdated = pairingCryptEngine
                             .update(cipherText, andAccessPolicy, cipherTextAttributeUpdateKey, gpp);
-
-                    if(newTwoFactorKey != null) {
-                        Set<CipherText2FAUpdateKey> updateKeys = new HashSet<>();
-
-                        for(AttributePolicyElement element : andAccessPolicy.getAttributePolicyElements()) {
-                            updateKeys.add(twoFactorKeyGenerator.generateCipherTextUpdateKey(
-                                    firstUser.getTwoFactorKey().getPrivateKey(),
-                                    newTwoFactorKey.getPrivateKey(),
-                                    element.getAttributePublicKey(),
-                                    firstUser.getId()
-                            ));
-                        }
-
-                        ctUpdated = pairingCryptEngine.update(ctUpdated, andAccessPolicy, updateKeys, gpp);
-                    }
 
                     updatedCT.add(ctUpdated);
                 }
@@ -183,12 +155,61 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
                 updatedABECT.add(new ABECipherText(new DNFCipherText(updatedCT, abeCipherText.getCipherText().getFile())));
             }
 
+            setCipherTexts(updatedABECT);
+        }
+
+        if(newTwoFactorKey != null) {
+            Set<ABECipherText> updatedABECT = new HashSet<>();
+            for( ABECipherText abeCipherText : getCipherTexts()) {
+                List<CipherText> updatedCT = new ArrayList<>();
+                for (CipherText cipherText : abeCipherText.getCipherText().getCipherTexts()) {
+
+                    Set<CipherText2FAUpdateKey> updateKeys = new HashSet<>();
+
+                    AndAccessPolicy andAccessPolicy = getAndAccessPolicy(cipherText);
+
+                    for (AttributePolicyElement element : andAccessPolicy.getAttributePolicyElements()) {
+                        updateKeys.add(twoFactorKeyGenerator.generateCipherTextUpdateKey(
+                                firstUser.getTwoFactorKey().getPrivateKey(),
+                                newTwoFactorKey.getPrivateKey(),
+                                element.getAttributePublicKey(),
+                                firstUser.getId()
+                        ));
+                    }
+
+                    CipherText ctUpdated = pairingCryptEngine.update(cipherText, andAccessPolicy, updateKeys, gpp);
+                    updatedCT.add(ctUpdated);
+                }
+                updatedABECT
+                        .add(new ABECipherText(new DNFCipherText(updatedCT, abeCipherText.getCipherText().getFile())));
+            }
+            setCipherTexts(updatedABECT);
+
+            for ( ABEUser abeUser : existingMembers) {
+                TwoFactorUpdateKey twoFactorUpdateKey = twoFactorKeyGenerator.generateUpdateKey(
+                        gpp,
+                        firstUser.getTwoFactorKey().getPrivateKey(),
+                        newTwoFactorKey.getPrivateKey(),
+                        abeUser.getId()
+                );
+                abeUser.getTfPublics().get(firstUser.getId()).update(twoFactorUpdateKey);
+            }
+
             if(newTwoFactorKey != null) {
                 firstUser.setTwoFactorKey(newTwoFactorKey);
             }
 
-            setCipherTexts(updatedABECT);
         }
+    }
+
+    private AndAccessPolicy getAndAccessPolicy(CipherText cipherText) {
+        return new AndAccessPolicy(
+                cipherText.getAccessPolicy()
+                        .stream()
+                        .map(accessPolicy -> new AttributePolicyElement(authorityKey.getPublicKey(),
+                                findAttributeValueKey(accessPolicy.getId()).getPublicKey()))
+                        .collect(Collectors.toSet())
+        );
     }
 
     private AttributeValueKey findAttributeValueKey(String attributeValueId) {
