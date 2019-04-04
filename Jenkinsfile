@@ -12,6 +12,7 @@ node {
         parallel documentation: {
             stage('pdflatex & bibtex') {
                 dir (DOCUMENTATION_DIR) {
+                    sh('./clean.sh')
                     sh('./make.sh')
                 }
             }
