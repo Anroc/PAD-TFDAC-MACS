@@ -61,7 +61,8 @@ public class LeaveBenchmark extends UnitTestSuite {
                     .configure()
                     .benchmarkMemberLeave();
 
-            BenchmarkResult abeRun = Benchmark.abe()
+            Benchmark.ABEConfiguredBenchmark.ABEConfiguredBenchmarkBuilder abeConfiguredBenchmarkBuilder = Benchmark
+                    .abe()
                     .numberOfRuns(numberOfRuns)
                     .numberOfUsers(numUsers)
                     .numberOfCipherTexts(numCT)
@@ -70,16 +71,23 @@ public class LeaveBenchmark extends UnitTestSuite {
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityKey(setupWrapper.authorityKey())
+                    .authorityKey(setupWrapper.authorityKey());
+
+            BenchmarkResult abeRun = abeConfiguredBenchmarkBuilder
                     .configure()
                     .benchmarkMemberLeave();
 
-            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun);
+            BenchmarkResult abe2FaRun = abeConfiguredBenchmarkBuilder
+                    .use2FA(true)
+                    .configure()
+                    .benchmarkMemberLeave();
+
+            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun, abe2FaRun);
         }
     }
 
-    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
-        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
+    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun, BenchmarkResult abe2FaRun) {
+        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun, abe2FaRun);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numCt);
         String fileName = "./leave/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";
