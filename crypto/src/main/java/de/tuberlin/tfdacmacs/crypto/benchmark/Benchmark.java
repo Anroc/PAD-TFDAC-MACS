@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -172,7 +173,7 @@ public class Benchmark {
             this.gpp = gpp;
 
             this.authorityKey = authorityKey;
-            this.attributesPerUser = attributesPerUser;
+            this.attributesPerUser = new ArrayList<>(attributesPerUser);
             this.use2FA = use2FA;
         }
 
@@ -188,7 +189,8 @@ public class Benchmark {
 
         @Override
         public BenchmarkResult benchmarkMemberLeave() {
-            return doRun(() -> group.leave(group.getMembers().get(0)));
+            // first user must stay in group as the data owner
+            return doRun(() -> group.leave(group.getMembers().get(1)));
         }
 
         @Override
@@ -202,7 +204,7 @@ public class Benchmark {
             this.group = new ABEGroup(gpp, dnfAccessPolicy, attributesPerUser, authorityKey);
             this.group.setMembers(abeUsers);
             member = abeUsers.get(0);
-            member.setUseTowFactorKey(true);
+            member.setUseTowFactorKey(this.use2FA);
             return this.group;
         }
     }

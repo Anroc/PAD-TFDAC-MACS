@@ -58,7 +58,8 @@ public class JoinBenchmark extends UnitTestSuite {
                     .configure()
                     .benchmarkMemberJoin();
 
-            BenchmarkResult abeRun = Benchmark.abe()
+            Benchmark.ABEConfiguredBenchmark.ABEConfiguredBenchmarkBuilder abeConfiguredBenchmarkBuilder = Benchmark
+                    .abe()
                     .numberOfRuns(numberOfRuns)
                     .numberOfUsers(1)
                     .numberOfCipherTexts(numCT)
@@ -67,16 +68,24 @@ public class JoinBenchmark extends UnitTestSuite {
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityKey(setupWrapper.authorityKey())
+                    .authorityKey(setupWrapper.authorityKey());
+
+            BenchmarkResult abeRun = abeConfiguredBenchmarkBuilder
                     .configure()
                     .benchmarkMemberJoin();
 
-            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun);
+            BenchmarkResult abe2FaRun = abeConfiguredBenchmarkBuilder
+                    .use2FA(true)
+                    .configure()
+                    .benchmarkMemberJoin();
+
+
+            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun, abe2FaRun);
         }
     }
 
-    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
-        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
+    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun, BenchmarkResult abe2FaRun) {
+        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun, abe2FaRun);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numCt);
         String fileName = "./join/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";

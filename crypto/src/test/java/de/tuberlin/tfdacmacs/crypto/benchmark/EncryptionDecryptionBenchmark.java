@@ -64,27 +64,37 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
                     .preHeat(firstRun)
                     .benchmarkEncrypt();
 
-            BenchmarkResult abeRun = Benchmark.abe()
+            Benchmark.ABEConfiguredBenchmark.ABEConfiguredBenchmarkBuilder abeConfiguredBenchmarkBuilder = Benchmark
+                    .abe()
                     .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(userCount)
+                    .numberOfUsers(numUsers)
                     .gpp(gppTestFactory.create())
                     .attributesPerUser(setupWrapper.createdKeys())
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityKey(setupWrapper.authorityKey())
+                    .authorityKey(setupWrapper.authorityKey());
+
+            BenchmarkResult abeRun = abeConfiguredBenchmarkBuilder
                     .configure()
                     .preHeat(firstRun)
                     .benchmarkEncrypt();
 
-            printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun);
+            BenchmarkResult abeRun2Fa = abeConfiguredBenchmarkBuilder
+                    .use2FA(true)
+                    .configure()
+                    .benchmarkEncrypt();
+
+            printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun, abeRun2Fa);
 
             buffer += stepSize;
         }
     }
 
-    protected void printResults(int methodIndex, boolean firstRun, int numUsers, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
-        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
+    protected void printResults(int methodIndex, boolean firstRun, int numUsers, int numerOfAttributes,
+            BenchmarkResult rsaRun, BenchmarkResult abeRun,
+            BenchmarkResult abeRun2Fa) {
+        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun, abeRun2Fa);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numUsers);
         String fileName = "./" + getFileDir() + "/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";

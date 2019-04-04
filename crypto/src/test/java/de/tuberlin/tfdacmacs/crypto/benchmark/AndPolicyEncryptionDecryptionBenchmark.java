@@ -29,7 +29,8 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .configure()
                     .benchmarkEncrypt();
 
-            BenchmarkResult abeRun = Benchmark.abe()
+            Benchmark.ABEConfiguredBenchmark.ABEConfiguredBenchmarkBuilder abeConfiguredBenchmarkBuilder = Benchmark
+                    .abe()
                     .numberOfRuns(numberOfRuns)
                     .numberOfUsers(numUsers)
                     .gpp(gppTestFactory.create())
@@ -37,24 +38,18 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .policy(setupWrapper.policy())
                     .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
                     .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityKey(setupWrapper.authorityKey())
+                    .authorityKey(setupWrapper.authorityKey());
+
+            BenchmarkResult abeRun = abeConfiguredBenchmarkBuilder
                     .configure()
                     .benchmarkEncrypt();
 
-            BenchmarkResult abeRun2Fa = Benchmark.abe()
-                    .numberOfRuns(numberOfRuns)
-                    .numberOfUsers(numUsers)
-                    .gpp(gppTestFactory.create())
-                    .attributesPerUser(attributeValueKeys)
-                    .policy(setupWrapper.policy())
-                    .attributeValueKeyProvider(setupWrapper.attributeValueKeyProvider())
-                    .authorityKeyProvider(setupWrapper.authorityKeyProvider())
-                    .authorityKey(setupWrapper.authorityKey())
+            BenchmarkResult abeRun2Fa = abeConfiguredBenchmarkBuilder
                     .use2FA(true)
                     .configure()
                     .benchmarkEncrypt();
 
-            printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
+            printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun, abeRun2Fa);
         }
     }
 
