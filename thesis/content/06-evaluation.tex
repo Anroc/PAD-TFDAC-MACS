@@ -1,6 +1,6 @@
 \chapter{Evaluation}
 
-The main problem of the current implementation in Bdrive is the scalability of the file keys. For each new device, a new file key needs to be created and maintained. The proposed prototype servers as the proof of concept that such a distributed secure system can exist that fit all the requirements of section \req{sec:requirements} and scale better than the current system implemented in Bdrive regarding the number of file keys. 
+The main issue of the current implementation in Bdrive is the poor scalability of the number of file keys. For each new device, a new file key needs to be created and maintained. The proposed prototype serves as the proof-of-concept that such a distributed, secure system can exist which fits all the requirements of section \req{sec:requirements} and scales better than the current system implemented in Bdrive. 
 
 To stress this last point, different benchmarks will be conducted to compare the proposed prototype to a similar environment such as Bdrive. The goal of this section will be to show that the assumption following assumption holds true:
 
@@ -149,21 +149,3 @@ The assumption is simply stated that \name can not scale better then the RSA-bas
 Figure \ref{fig:member-leave} shows the exact expected behavior. For already one cipher text the gab between the different number of attributes and the RSA-based approach is crealy notable. More attributes means here that a user was revoked that owned multible attribute, which each need to be revoked by itself. 
 
 In a real world system the cipher text update and the user secret key update would happen on the server and client device side. Further it could also happen in parallel to speed up this process. Still it holds true, that \name scales definilty much worse then the RSA-based approach.
-
-\section{Future adaptations}
-
-\todo{
-* Data owner Id can relate to the selected two factor key. 
-* This would enable us to have multible keys 2FA keys per user. each securing an own CT. 
-* make ownerId -> 2FA id 
-
-* Handle attributes on device level and not on user level 
-}
-
-\section{Conclusion}
-\begin{figure}[!t]
-\centering
-    \includegraphics[width=1.0\linewidth]{img/share_distribution_bdirve.png}
-    \caption{The distribution of shared folders per users and their aggregated devices.}
-    \label{fig:evaluation-share-distribution}
-\end{figure}
