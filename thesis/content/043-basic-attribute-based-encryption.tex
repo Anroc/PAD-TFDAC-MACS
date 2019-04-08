@@ -4,19 +4,11 @@ In the following sections a deeper inside into the different ABE schemes will be
 A suitable candidate in the field of ABE is a scheme that satisfies the requirements stated in section \ref{sec:requirements}. The requirements are a super set of thous defined in \cite{lee2013survey}. For the basic \ac{ABE} schemes, due to their limited applicability only the requirements \req{C1}, \req{C3}, \req{C5} - \req{C8} and optional requirements \req{O1} and \req{O2} are taken into account.
 The general requirements \req{B1} and \req{B2} will be evaluated by the practical performance and scalability analysis. 
 
-Some requirements are left out since not all requirements are directly applicable to all ABE schemes. A suitable subset of requirements is mandatory to conduct a reasonable comparison of the different schemes. The outcome of this section will give a good intention in which direction this analysis will continue. 
+Some requirements are left out since not all requirements are directly applicable to all ABE schemes. A suitable subset of requirements is mandatory to conduct a reasonable comparison of the different schemes. The outcome of this section will give a good intuition in which direction this analysis will continue. 
 
-\subsection{Collusion Resistance (C2 Requirement)}
-\textit{Collusion resistance} in the main requirement of each ABE scheme. Formally it describes that no two entities are able to combine thier attributes to achieve a higher level of decryption power. To clarify the importance of collusion resistance a very basic attribute based encryption scheme is constructed. Assume a distributed crypto-system based on \ac{RSA}. The role of the \ac{AA} is to bind attributes to \ac{RSA} public-private key pairs. The attribute "student" gets bound to $K_{PR(s)}$ for the private key and $K_{PU(s)}$ for the public key. Attribute "works at TU Berlin" gets bound to the key $K_{PK_PR(tu)}$ and $K_{PU(tu)}$ respectively. Now, the very first ABE scheme is created. The AA can pin the public keys of each attributes to its public billboard so that every entity in the system can use the public attribute keys for encryption. Each user who is currently a student receives a copy of the private key $K_{PR(s)}$ and each user who is currently working at TU Berlin receives a copy of $K_{PR(tu)}$. 
 
-A user, lets call her for historical reason Alice, wants to share content with all students that are also working at TU Berlin. With our basic scheme Alice is able to use \textit{layered encryption}\footnote{Layered encryption: encrypting a plain text with multiple keys, forcing the decryptor to own all relevant keys} to create an \textit{AND}-policy for her cipher text. She encrypts the plain text $p$ with both public attribute keys $c = K_{PU(s)}(K_{PU(tu)}(P))$ and publishes the ciphertext $c$ to a public CSP so that everyone can download it. Students that are working at TU Berlin owning both private keys can decipher the ciphertext by applying both private keys in reverse order $K_{PR(tu)(K_{PR{s}}(c)}$.
-
-The attentive reader will have notice a crucial security leak in this scheme. This \ac{ABE} scheme is not collusion resistant. In fact, collusion resistance is a core requirement of any ABE scheme. On paper it is defined as the impossibility of any two attribute holder to combine their attributes to achieve a higher level of encryption. Lets assume that Bob is a student and Eve is working at \ac{TU}-Berlin. Both users received their private key. Now they can simply exchange their attribute keys so that they are both able to decipher the ciphertext even if they separately do not own both attributes.  
-
-Usually collusion resistance is ensured by issuing each user a private key that is blinded by a random value. This random value will vanish on decryption. However, if two users collude they will mix their blinded values resulting in a plaintext that is still blinded by some unknown value. To ensure collusion resistance pairings are commonly used where a user specific id (\ac{UID}) is generated and bound to the exponent of the user's attribute private key. The decryption method will be designed in that way that the blinding of the attribute private key will vanish. 
-
-\subsection{Boolean Access Formula}
-To evaluate if a policy matches given attributes an \textit{Access Tree} or \textit{Linear Secret Sharing Matrix} (\ac{LSSS}) is used. While both representations represent the same boolean formula a \ac{LSSS} is often more efficient. For a better explanation the model of an access tree will be used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} threshold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshold gates meaning all children need to satisfy the condition. This approach is called a monotonic access structure and often referrers to \textit{Threshold Security} or \textit{Threshold Access Structure}. 
+%\subsection{Boolean Access Formula}
+%To evaluate if a policy matches given attributes an \textit{Access Tree} or \textit{Linear Secret Sharing Matrix} (\ac{LSSS}) is used. While both representations represent the same boolean formula a \ac{LSSS} is often more efficient. For a better explanation the model of an access tree will be used. For each node of this tree it is evaluated whether the children satisfy a certain condition. This might be implemented as \textit{OR} or \textit{AND} threshold gates. While \textit{OR} can be expressed as $1$-out-of-$n$ children need to satisfy the condition, \textit{AND} conditions are $n$-out-of-$n$ threshold gates meaning all children need to satisfy the condition. This approach is called a monotonic access structure and often referrers to \textit{Threshold Security} or \textit{Threshold Access Structure}. 
 
 \subsection{Key-Policy Attribute-Based Encryption (\ac{KP-ABE})}
 In \textit{Key-Policy Attribute-Based Encryption} (\ac{KP-ABE}) \cite{goyal2006attribute}, is a \ac{ABE} technique that associates ciphertexts with attributes that fulfill a policy embedded in the private key assigned to a user. 
@@ -31,7 +23,7 @@ The certainly very specific use case of \ac{KP-ABE} probably led to the circumst
 \subsection{Cipher-text Policy Attribute-Based Encryption (\ac{CP-ABE})}
 In contrast to KP-ABE stands \textit{Cipher-Text Policy Attribute-Based Encryption} (\ac{CP-ABE}) \cite{bethencourt2007ciphertext}. \ac{CP-ABE} assigns ciphertexts with a policy and user keys with attributes. This enables \ac{CP-ABE} to be much more flexible and verbose in comparison to \ac{KP-ABE}. The big advantage (similar to \ac{KP-ABE}) is that the need for a central authorization server is obsolete. Each ciphertext could simply be accessed by every user and only thous who have the right attribute set present are able to decipher the ciphertext. 
 
-The lack of revocation (\req{C8}) in the basic scheme (\cite{bethencourt2007ciphertext}), the need for a large attribute and user universe was huge (\req{C5}). Revocation means that a system manager could revoke attributes from users or even the user himself - in modern company settings an required feature to ensure forward secrecy. Large attribute universe, on the other hand, describes that the number of attributes that can be distributed by the \ac{AA} is so large that it is unlikely that a system will run out of attributes to issue. 
+The lack of revocation (\req{C8}) in the basic scheme  	te{bethencourt2007ciphertext}), the need for a large attribute and user universe was huge (\req{C5}). Revocation means that a system manager could revoke attributes from users or even the user himself - in modern company settings an required feature to ensure forward secrecy. Large attribute universe, on the other hand, describes that the number of attributes that can be distributed by the \ac{AA} is so large that it is unlikely that a system will run out of attributes to issue. 
 
 The first proposal of a revocation scheme in \ac{CP-ABE} was in 2010 \cite{liang2010ciphertext}. This scheme used a similar approach like \ac{LKH} to make the revocation process efficient. In 2016 Lui \textit{et. al} \cite{liu2016practical} proposed a revocable \ac{ABE} scheme that supports traitor tracing and large attribute universe. This paper was implemented to be compared to the other schemes.
 
@@ -54,37 +46,53 @@ To ensure system wide collusion resistance each user usually gets a unique user 
 A suitable candidate to compare \ac{MA-ABE} to the previous introduced schemes is \textit{Hierarchical Attribute-Based Encryption} (\ac{HABE}, section \ref{sec:HABE}). In short \ac{HABE} is structured around the idea of decryption power delegation. The structure can be imaged like the domain name system. At top level there is the root master administrating the whole system. He can delegate power to sub entities in form of attribute issuing and user registration. This sub entities can again forward a subset of their power to their children. For a complete explanation see \ref{sec:HABE}. An practical approach to implement HABE was given by Wang, Liu and Wu 2010 \cite{Wang:2010:HAE:1866307.1866414} which will also be implemented by this work and represent \ac{MA-ABE} in the following comparison. 
 
 \subsection{Comparison}
-To implement and compare the selected representatives of the different ABE sub topics the charm framework\footnote{\url{http://charm-crypto.io/}} is chosen. Here already implementations for the \ac{KP-ABE} scheme \cite{lewko2010revocation} and for non-monotonic \ac{CP-ABE} \cite{10.1007/978-3-642-54631-0_16} can be found. The other two schemes such as \ac{CP-ABE} \cite{liu2016practical} and HABE \cite{wang2011hierarchical} were implemented  by this work\footnote{\url{https://github.com/Anroc/charm}}. 
+To implement and compare the selected representatives of the different ABE sub topics the charm framework\footnote{\url{http://charm-crypto.io/}} is chosen. The charm framework is a collection of cartographic prototype algorithm and benchmarks. It is specifically designed to rapidly implement any cartographic algorithm. Developers are offered a wide range of mathematical settings which also include bilinear and non-bilinear Elliptic Curve groups. 
+
+Based on similar implementations of single authority ABE schemes such as \ac{KP-ABE} scheme \cite{lewko2010revocation} and non-monotonic \ac{CP-ABE} \cite{10.1007/978-3-642-54631-0_16}, the schemes \ac{CP-ABE} \cite{liu2016practical} and HABE \cite{wang2011hierarchical} were implemented  by this work\footnote{\url{https://github.com/Anroc/charm}}. 
+
+\subsubsection{Implementation of the CP-ABE scheme}
+For the implementation of the CP-ABE scheme the paper “Practical attribute-based encryption: traitor tracing, revocation and large universe” \cite{liu2016practical} (\ac{TR-ABE}) was chosen. Further a reference implementation “Traceable and Revocable Attribute-based Encryption in Java”\footnote{\url{https://github.com/TU-Berlin-SNET/jTR-ABE}} was given. The goal was to translate this implementation into the charm framework to make it comparable with the other schemes. 
+
+Since TR-ABE uses a LSSS matrix to express its access policies which was not given by the charm framework, it was implemented with the help of the paper \cite{liu2010efficient}. The \textit{Lewko-Waters Algorithm} was implemented which translate an access tree to a LSSS matrix. It must be noted that this algorithm is not optimal regarding space efficiency. 
+
+\subsubsection{Implementation of H-CP-ABE}
+The theoretical work that was used as a baseline to implement the hirachical CP-ABE candidate is the paper “Hierarchical attribute-based encryption and scalable user revocation for sharing data in cloud servers” \cite{wang2011hierarchical}. In that paper policies need to be present in DNF-access formula. \todo{extend}
 
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 							| l 				| l 						| l }
 											& \thead{Scheme}		& \thead{Security Scheme}		& \thead{Expression of \\ access policy}	\\
+\hline
 \textbf{LSW 08}	\cite{lewko2010revocation}	& \ac{KP-ABE} 		& Biliniear maps			& \ac{LSSS}							\\
+\hline
 \textbf{YAHK 14} 
 \cite{10.1007/978-3-642-54631-0_16}			& Non-Monotone \ac{CP-ABE} & Binilnear maps 	& \ac{LSSS} 	 					\\
+\hline
 \textbf{LW 14} \cite{liu2016practical} 		& \ac{CP-ABE} 		& Binilnear maps 			& \ac{LSSS} 						\\
+\hline
 \textbf{WLWG 11} 
 \cite{Wang:2010:HAE:1866307.1866414}		& Hirachical \ac{CP-ABE} & Binilnear maps 		& \ac{DNF}							\\
+\hline
 
 \end{tabular}
-\caption{Scheme description. }
+\caption{Scheme descriptions.}
 \label{tab:comparison_baic_abe_overview}
 \end{table*}
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 	| l					| l 				| l 				| l}
 					& \textbf{LSW 08} \cite{lewko2010revocation}	& \textbf{YAHK 14} \cite{10.1007/978-3-642-54631-0_16} & \textbf{LW 14} \cite{liu2016practical} & \textbf{WLWG 11} \cite{Wang:2010:HAE:1866307.1866414} 	\\
-\req{C1}			& Yes				& Yes 				& Yes 				& Yes 				\\
-\req{C2}			& No				& No 				& No 				& Yes 				\\ 
-\req{C3}			& No				& No 				& No 				& No 				\\ 
-\req{C4}			& No				& No 				& No 				& No 				\\ 
-\req{C5}			& Yes				& Yes 				& Yes 				& Yes 				\\ 
-\req{C6}			& - 				& - 				& -					& Yes				\\
-\req{C7}			& -					& - 				& - 				& No 				\\
-\req{C8}			& Yes				& Yes				& Yes				& Yes				\\
-\req{O1}			& No 				& No 				& Yes 				& No 				\\
-\req{O2}			& Yes+ 				& Yes+				& Yes				& Yes-				\\
+\hline
+\req{C1}			& Yes				& Yes 				& Yes 				& Yes 				\\ \hline
+\req{C2}			& No				& No 				& No 				& Yes 				\\ \hline 
+\req{C3}			& No				& No 				& No 				& No 				\\ \hline 
+\req{C4}			& No				& No 				& No 				& No 				\\ \hline 
+\req{C5}			& Yes				& Yes 				& Yes 				& Yes 				\\ \hline 
+\req{C6}			& - 				& - 				& -					& Yes				\\ \hline
+\req{C7}			& -					& - 				& - 				& No 				\\ \hline
+\req{C8}			& Yes				& Yes				& Yes				& Yes				\\ \hline
+\req{O1}			& No 				& No 				& Yes 				& No 				\\ \hline
+\req{O2}			& Yes+ 				& Yes+				& Yes				& Yes-				\\ \hline
 \end{tabular}
 \caption{}
 \label{tab:basic_abe_comparisons}
@@ -107,9 +115,9 @@ Lets have a look at \req{O2}. LSW08 and YAHK14 both supports fine grant access c
     \label{fig:basic_abe_comparison}
 \end{figure*}
 
-The  benchmark show in figure \ref{fig:basic_abe_comparison} is executed with a constant size message $m \in G_T$ on a Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz with 16 GB RAM. For the setup was executed 30 times. Here we can see how long the time varies to find suitable curve parameter to initialize the pairing. The other runs are executed with increasing number of attributes. The policy that is used to create the ciphertexts and the user keys in the case of KP-ABE is defined as $\bigwedge\limits_{a \in A}^a a$ where $A$ defines the set of attributes. 
+The  benchmark show in Figure \ref{fig:basic_abe_comparison} is executed with a constant size message $m \in G_T$ on a Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz with 16 GB RAM. For the setup was executed 30 times. Here we can see how long the time varies to find suitable curve parameter to initialize the pairing. The other runs are executed with increasing number of attributes. The policy that is used to create the ciphertexts and the user keys in the case of KP-ABE is defined as $\bigwedge\limits_{a \in A}^a a$ where $A$ defines the set of attributes. 
 
-Notable about the comparison in figure \ref{fig:basic_abe_comparison} is that while \ac{KP-ABE} (LSW08) was expected to have the biggest overhead in key generation compared to the \ac{CP-ABE} schemes. This turned out to be not true. It seems more like the time complexity and runtime of the different algorithms surly depends on the design of the scheme. Here we can say that each of the schemes have a linear overhead in runtime. While a constant runtime is only achievable by the HABE scheme the other schemes show a linear time complexity. The HABE scheme in general shows the best overall performance. 
+Notable about the comparison in Figure \ref{fig:basic_abe_comparison} is that while \ac{KP-ABE} (LSW08) was expected to have the biggest overhead in key generation compared to the \ac{CP-ABE} schemes. This turned out to be not true. It seems more like the time complexity and runtime of the different algorithms surly depends on the design of the scheme. Here we can say that each of the schemes have a linear overhead in runtime. While a constant runtime is only achievable by the HABE scheme the other schemes show a linear time complexity. The HABE scheme in general shows the best overall performance. 
 % But it must also be noticed that we specifically excluded attribute authority key generation. 
 
 Due the great performance and the coverage of the most of the requirements of the hierarchical attribute based encryption technique, the field of multi-authority attribute-based encryption will be evaluated in more depth. Regardless of the great scalability of the \ac{HABE} it comes with a non negotiable disadvantage. The root master and the top level domain master have both global decryption power. For each user regardless of the company affiliation the administrator of the system will always be able to decipher ciphertexts of each users. This would break end-to-end encryption. So clearly we would favor solutions that support different attribute authorities so that each company can administer their own domain separately from each other, but it is also desireable that the root, while being able to bootstrap new attribute authorities, is not able to decipher any ciphertext. 

@@ -28,7 +28,7 @@ The lack of adding new attributes and the missing revocation scheme makes Chases
 
 \textit{Hierarchical Attribute-Based Encryption} (\ac{HABE}) is based of the idea of key and decryption power delegation. If a private key exist that have a certain access power, it is possible for the key holder to delegate a subset of his access power to a new instance. By nature follows a hierarchical structure where each user could administrate an own subdomain. Many use cases for cloud computing as well as cloud storage system emerged \cite{Wang:2010:HAE:1866307.1866414}. While some works also take revocation into design a crucial requirement is still missing:  The domain master has always global decryption power. 
 
-As displayed in figure \ref{fig:habe}, which is based on the approach by Wang \textit{et. al.} \cite{wang2011hierarchical}, the root master summarized the global decryption power of the system and can set up new domain masters (attribute authorities). They on the other hand can delegate a subset of their decryption power to a sub domain master. Each domain master can administer users and attributes.
+As displayed in Figure \ref{fig:habe}, which is based on the approach by Wang \textit{et. al.} \cite{wang2011hierarchical}, the root master summarized the global decryption power of the system and can set up new domain masters (attribute authorities). They on the other hand can delegate a subset of their decryption power to a sub domain master. Each domain master can administer users and attributes.
 
 "Hierarchical Attribute-based Encryption for Fine-grained Access Control in Cloud Storage Services" \cite{Wang:2010:HAE:1866307.1866414} formalized this approach using \ac{CP-ABE}, which was later extended in "Hierarchical attribute-based encryption and scalable user revocation for sharing data in cloud servers" \cite{wang2011hierarchical}. While this implementation serves with a revocation scheme it depends on an access policy in disjunctive normal form (\ac{DNF}). Any boolean formula can be transferred into DNF but sometimes this might enforce negation. Since Wang \textit{et. al.} \cite{wang2011hierarchical} did not provide any negation mechanism, this ABE scheme is limited in expressivenss.
 
@@ -53,7 +53,7 @@ DAC-MACS also features a large attribute universe, adding \ac{AA}s on the runnin
 
 In contrast to Chases scheme, DAC-MACS eliminates the need for the global decryption power of the \ac{CA} by issuing $k$ ciphertexts: One per \ac{AA}. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new \ac{AA}s at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
 
-\ac{DAC-MACS} is not collusion resistance on attribute revocation under the active attack model. The scheme \ac{NEDAC-MACS} (New-Extended \ac{DAC-MACS}) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as \ac{MAACS} \cite{li2016secure} and \ac{TF-DAC-MACS} (Two-Factor \ac{DAC-MACS})\cite{li2017two}. 
+\ac{DAC-MACS} is not collusion resistance on attribute revocation under the active attack model. The scheme \ac{NEDAC-MACS} (New-Extended \ac{DAC-MACS}) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as \ac{MAACS} \cite{li2016secure} and \ac{TF-DAC-MACS} (Two-Factor \ac{DAC-MACS} 	te{li2017two}. 
 
 All the \ac{DAC-MACS} schemes are structured in roughly the same way. They usually describe six different entities:
 
@@ -80,7 +80,7 @@ To compare the TF-DAC-MACS with the others we will implement TF-DAC-MACS from sc
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 					| l 									| l 									| l 					| l}
-									& \thead{LTXWC 16 \cite{li2017two}\\(TF-DAC-MACS)} & \thead{YJ 14 \cite{yang2013dac}\\(DAC-MACS)} & \thead{LW 14\cite{wang2011hierarchical} \\ (HABE)}	& \thead{CD 16 \cite{cui2016revocable}\\(DABE)} \\
+									& \thead{LTXWC 16 \cite{li2017two}\\(TF-DAC-MACS)} & \thead{YJ 14 \cite{yang2013dac}\\(DAC-MACS)} & \thead{LW 14 \cite{wang2011hierarchical} \\ (HABE)}	& \thead{CD 16 \cite{cui2016revocable}\\(DABE)} \\
 \hline
 \thead{Scheme}						& \makecell{CP\\(DAC-MACS\\ without proxy \\ 
 									  decryption, 
@@ -99,17 +99,18 @@ To compare the TF-DAC-MACS with the others we will implement TF-DAC-MACS from sc
 \begin{table*}[!ht]
 \centering
 \begin{tabular}{l 	| l										| l 									| l 					| l}
-					& \thead{LTXWC 16\\(TF-DAC-MACS)\cite{li2017two}} & \thead{YJ 14\\(DAC-MACS)\cite{yang2013dac}} & \thead{LW 14\\ (HABE)\cite{wang2011hierarchical}}	& \thead{CD 16\\(DABE)}\cite{cui2016revocable} \\
-\req{C1}			& Yes									& No 									& Yes 					& Yes 						\\
-\req{C2}			& Yes									& Yes 									& Yes 					& Yes 						\\ 
-\req{C3}			& Yes									& Yes 									& No 					& Yes 						\\ 
-\req{C4}			& Yes									& Yes 									& No 					& Yes 						\\ 
-\req{C5}			& Yes									& Yes 									& Yes 					& Yes 						\\ 
-\req{C6}			& Yes 									& Yes 									& Yes					& Yes						\\
-\req{C7}			& Yes									& Yes 									& No 					& Yes 						\\
-\req{C8}			& Yes									& Yes									& Yes					& Yes-						\\
-\req{O1}			& No 									& No 									& No 					& No 						\\
-\req{O2}			& No 									& Yes									& Yes					& Yes						\\
+					& \thead{LTXWC 16\\(TF-DAC-MACS \cite{li2017two}} & \thead{YJ 14\\(DAC-MACS \cite{yang2013dac}} & \thead{LW 14\\ (HABE \cite{wang2011hierarchical}}	& \thead{CD 16\\(DABE) \cite{cui2016revocable}} \\
+\hline
+\req{C1}			& Yes									& No 									& Yes 					& Yes 						\\ \hline
+\req{C2}			& Yes									& Yes 									& Yes 					& Yes 						\\ \hline 
+\req{C3}			& Yes									& Yes 									& No 					& Yes 						\\ \hline 
+\req{C4}			& Yes									& Yes 									& No 					& Yes 						\\ \hline 
+\req{C5}			& Yes									& Yes 									& Yes 					& Yes 						\\ \hline 
+\req{C6}			& Yes 									& Yes 									& Yes					& Yes						\\ \hline
+\req{C7}			& Yes									& Yes 									& No 					& Yes 						\\ \hline
+\req{C8}			& Yes									& Yes									& Yes					& Yes-						\\ \hline
+\req{O1}			& No 									& No 									& No 					& No 						\\ \hline
+\req{O2}			& No 									& Yes									& Yes					& Yes						\\ \hline
 \end{tabular}
 \caption{Requirements comparison of the implemented schemes}
 \label{tab:ma_abe_comparisons}

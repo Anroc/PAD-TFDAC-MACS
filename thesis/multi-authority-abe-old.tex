@@ -1,0 +1,168 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.4 (15/5/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twocolumn]{article}
+
+\usepackage{blindtext} % Package to generate dummy text throughout this template 
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.0} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+
+\usepackage[english]{babel} % Language hyphenation and typographical rules
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage[titletoc,toc,title]{appendix}
+\usepackage{makecell}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadalign{bl}
+\renewcommand\cellalign{cl}
+
+\usepackage{enumitem} % Customized lists
+\setlist[itemize]{noitemsep} % Make itemize lists more compact
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Practical MA-ABE for Secure Cloud Storage Systems $\bullet$ August 2018 $\bullet$ Vol. I, No. 2} % Custom header text
+\fancyfoot[EL]{\thepage} % Custom footer text
+
+\usepackage{titling} % Customizing the title section
+
+\usepackage{hyperref} % For hyperlinks in the PDF
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage[textsize=footnotesize]{todonotes} % for todo notes
+\usepackage{acro}
+\acsetup{first-style=short}
+
+% define new command for \req (bold and italic)
+\newcommand{\req}[1]{\textbf{\textit{#1}}}
+
+% use \todo[inline] per default
+\let\originaltodo\todo
+\renewcommand{\todo}{\originaltodo[inline]}
+
+\newcommand{\question}[1]{\originaltodo[color=green, inline]{#1}}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\setlength{\droptitle}{-5\baselineskip} % Move the title up
+
+\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+\posttitle{\end{center}} % Article title closing formatting
+\title{Practical Multi-Authority Attribute-Based Encryption Scheme for Secure Cloud Storage Systems } % Article title
+\author{%
+\textsc{Marvin Petzolt}\\[1ex] % Your name
+\normalsize TU Berlin \\ % Your institution
+\normalsize \href{mailto:marvin.petzolt@protonmail.com}{marvin.petzolt@protonmail.com} % Your email address
+%\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
+%\textsc{Jane Smith}\thanks{Corresponding author} \\[1ex] % Second author's name
+%\normalsize University of Utah \\ % Second author's institution
+%\normalsize \href{mailto:jane@smith.com}{jane@smith.com} % Second author's email address
+}
+\date{\today} % Leave empty to omit a date
+\renewcommand{\maketitlehookd}{%
+\begin{abstract}
+
+\end{abstract}
+}
+
+%----------------------------------------------------------------------------------------
+\input{./content/acronym/list-of-acronym}
+
+\begin{document}
+
+% Print the title
+\twocolumn[
+    \maketitle
+]
+
+\twocolumn[
+	\setcounter{tocdepth}{2}
+    \tableofcontents
+]
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+% Introduction / Background  / Problem description
+\input{./content/01-introduction}
+
+% Related overview schemes and cloud storage evaluation
+\input{./content/02-related-work}
+
+% Requirements
+\input{./content/03-requirements}
+
+% Concept
+\input{./content/04-concept}
+
+% Implementation
+\input{./content/05-implementation}
+
+% Evaluation
+\input{./content/06-evaluation}
+
+% Conclusion
+\input{./content/07-conclusion}
+\clearpage
+
+% List of Acronyms
+\printacronyms
+\clearpage
+
+% Bibliography
+\clearpage
+\bibliography{multi-authority-abe} 
+\bibliographystyle{ieeetr}
+
+% Appendix
+\clearpage
+\onecolumn
+\appendices
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
