@@ -45,6 +45,7 @@ Cui and Deng showed in \cite{cui2016revocable} that a DABE system with indirect 
 However, question remains if such a system would be practically applicable in the real world since each ciphertext need to be reuploaded and each attribute keys need to be redistributed in each time period. Until now no direct revocation DABE was developed.
 
 \subsection{Efficient Data Access Control For Multi-Authority Cloud Storage}
+\label{sec:dac-macs}
 The most explored field in \ac{MA-ABE} is the \textit{Efficient Data Access Control for Multi-Authority Cloud Storage Systems} (\ac{DAC-MACS}) family \cite{yang2013dac}). First introduced by Yang \textit{et. al.} 2013 it describes an efficient, revocable \ac{MA-ABE} scheme based on \ac{CP-ABE} which uses proxy encryption on decryption and reencryption to make the scheme more efficient. 
 
 Proxy de-/reencryption, as demonstrated in the litrature by \cite{yang2013dac}, \cite{wu2017security}, \cite{li2017two} and \cite{wang2011hierarchical}, is a technique where the a server helps the user on decryption to reduce the computationally intensive work. It is motivated by the fact that mobile devices often don't have much computing resources so the server helps the clients on decryption. The main idea is that the server does the preprocessing of the encrypted text given attribute keys by the user. Impotent to note is that the server will have no knowledge about the plain text since the preprocessed cipher text is still encrypted with the users public key.
@@ -53,23 +54,7 @@ DAC-MACS also features a large attribute universe, adding \ac{AA}s on the runnin
 
 In contrast to Chases scheme, DAC-MACS eliminates the need for the global decryption power of the \ac{CA} by issuing $k$ ciphertexts: One per \ac{AA}. \footnote{If the ciphertext does not require any attributes of an specific authority it does not have to create a ciphertext for this domain.} It does not require any coordination between authorities which enables to add new \ac{AA}s at runtime without recreating the user keys. This scheme also includes features for efficient revocation while it claims to maintain forward and backward secrecy.
 
-\ac{DAC-MACS} is not collusion resistance on attribute revocation under the active attack model. The scheme \ac{NEDAC-MACS} (New-Extended \ac{DAC-MACS}) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as \ac{MAACS} \cite{li2016secure} and \ac{TF-DAC-MACS} (Two-Factor \ac{DAC-MACS} 	te{li2017two}. 
-
-All the \ac{DAC-MACS} schemes are structured in roughly the same way. They usually describe six different entities:
-
-\begin{enumerate}
-	\item \textbf{Certificate/Central Authority (\ac{CA});} The purpose of the \ac{CA} is to issue user their global identifier (\ac{GID}). Further, it bootstraps the different \ac{AA}s. The \ac{CA} remains trusted but do not have any decryption power in the system. 
-	\item \textbf{Attribute Authority (\ac{AA});} An attribute authority administers its own domain. Here it issues attributes and their respective private key to the user. They only accept a user if his \ac{GID} is signed by the \ac{CA}. 
-	On revocation the AA will need to update the users secret keys as well as the ciphertext encrypted with the revoked attribute key. \ac{AA}s are assumed to be honest-but-curious.
-	\item \textbf{Server;} The purpose of the server is to help the user with proxy re- and decryption. If an \ac{AA} broadcasts a revocation of an attribute, the server downloads all related ciphertexts from the \ac{CSP} to update them with the new attribute. 
-	Further, the user may give the server his attribute private keys so that the server can precompute the ciphertext. The thread model for the server is honest-but-curious. Please note, that the \ac{CA} and the server are two separated entities that do not cooperate.
-	\item \textbf{Cloud Storage Provider (\ac{CSP});} The cloud storage provider are assumed to be untrusted but they still follow the protocol. That’s why they only receive encrypted data. They only purpose is to store the ciphertext and make them permanentally available. No authentication checks are needed.
-	\item \textbf{Users;} Users exist in two groups: Revoked and non-revoked. Non-revoked users try to collude with each other to get a higher level of decryption power. They download the files of the \ac{CSP} and try to decrypt them. Only if they attribute set matches the policy of the ciphertext they will be able to decrypt the file. 
-	Revoked users, on the other hand, try to still decipher ciphertext. In some cases they try to collude with non-revoked user to intercept the key update key to restore their decryption rights. 
-	User are in general untrusted.
-	\item \textbf{Data Owner;} The data owner are users who want to encrypt content with a specific access policy. To do so they use the public available public attribute keys pinned on the bulletin board of the respective \ac{AA}. Data owner do not have to know anything about the receiving user or user groups in the system. After encryption they update the encrypted content to the \ac{CSP}.
-\end{enumerate} 
-
+\ac{DAC-MACS} is not collusion resistance on attribute revocation under the active attack model. The scheme \ac{NEDAC-MACS} (New-Extended \ac{DAC-MACS}) shows and solves this vulnerability \cite{wu2017security}. Recent studies introduce a more efficient, scalable and secure approaches such as \ac{MAACS} \cite{li2016secure} and \ac{TF-DAC-MACS} (Two-Factor \ac{DAC-MACS} \cite{li2017two}. 
 For the comparison we will use the charm implementation of DAC-MACS \cite{yang2013dac}.
 
 \ac{TF-DAC-MACS} counts as the most advanced \ac{DAC-MACS} scheme providing non global decryption power, secure revocation channels and both backward and forward secrecy. In addition \ac{TF-DAC-MACS} introduces the two-factor authentication. Data owner can issue and revoke \textit{authentication keys} to and from other users. This adds an additional layer of security. In total \ac{TF-DAC-MACS} achieves still better performance then the other \ac{DAC-MACS} schemes providing constant decryption and encryption overhead. 

@@ -49,6 +49,7 @@ Further, the same number of messages containing the encrypted file key need to b
 To make the overhead more clear, lets assume a manager of a company with 50 employees who wants to create a company wide share. Each of the employees has at least two devices (say one web view client and a desktop client). To upload the latest presentation the device of the manager know has to create $50 * 2 = 100$ filekeys to upload, $100-1$ messages, containing encrypted file key for each device, to distribute and $100$ encryptions to make. Even worst for each new presentation upload another $100$ filekeys need to be maintained. In a large scale company this overhead becomes unmaintainable when the number of $10.000$ filekeys are exceeded. \footnote{Running 'openssl speed rsa1024' on an Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz takes on average 0.000113s for encryption. Multiplied by 10.000 the second mark is reached.} With increasing computing power this problem can be compensated but not prevented.
 
 \section{Attribute-Based encryption}
+\label{sec:attribute-based-encryption}
 \textit{Attribute-Based Encryption} (\ac{ABE}) defines users over attributes and attribute keys rather then its individual public key. Since users are not unique among their attribute set it is possible to reduce the number of needed keys of a share to the number of attributes necessary to describe the group completely. 
 
 In the previous example the manager would only need to encrypted the presentation one time: With the public key of the attribute “working in company”. In this participial use case only $1$ encryption is done, $1$ message is distributed using multi-cast to transmit same encrypted file to all clients, and $1$ file key is created. 
@@ -61,8 +62,49 @@ With ABE comes the advantage of defining access policies for cipher texts. This 
 
 ABE scales with the number of attributes contained in a cipher text. As long as a group can be described with less attributes then there are members in this group, a better performance of ABE compared to the current scheme in Bdrive can be achieved. 
 
+ABE comes in many different favors. The most important for this work are Single-Authority Attribute-Based Encryption (normal \ac{ABE}) and Multi-Authority Attribute-Based Encryption (\ac{MA-ABE}). 
+For the single authority use case three entities are defined:
+
+\begin{enumerate}
+	\item \textbf{Attribute Authority (\ac{AA});} An attribute authority issues user their unique identifier (\ac{UID}), attributes and their respective attribute secret keys. 
+	On revocation the AA will need to update the users secret keys as well as the ciphertext encrypted with the revoked attribute key. 
+	Since an AA always generates the private attribute key to derivate a new user specific secret key it has global decryption power. That’s why the single-authority use case the AA is assumed to be an trusted entity. 
+	\item \textbf{Cloud Storage Provider (\ac{CSP});} The cloud storage provider are assumed to be untrusted but they still follow the protocol. That’s why they only receive encrypted data. They only purpose is to store the ciphertext and make them permanently available. Since the authorization to each ciphertext is directly embedded into the cipher-text access policy, the download of the encrypted file does not need any authentication checks.
+	\item \textbf{Users/Data Owners;} Users exist in two groups: Revoked and non-revoked. Non-revoked users try to collude with each other to get a higher level of decryption power. They download the files of the \ac{CSP} and try to decrypt them. Only if they attribute set matches the policy of the ciphertext they will be able to decrypt the file. 
+	Revoked users, on the other hand, try to still decipher ciphertext. In some cases they try to collude with non-revoked user to intercept the key update key to restore their decryption rights. 
+	User are in general untrusted.
+
+	Users (some schemes differentiate between decrypting users and encrypting data owners) want to encrypt content with a specific access policy. To do so they use the public available public attribute keys pinned on the bulletin board of the \ac{AA}. They do not have to know anything about the receiving user or user groups in the system. After encryption they update the encrypted content to the \ac{CSP}.
+\end{enumerate} 
+
+MA-ABE states the following adaptation and additions:
+
+\begin{enumerate}
+	\item \textbf{Attribute Authority (\ac{AA});} In the system of MA-ABE there are multiple AAs. Each administrating their own domain. AAs are usually assumed to be honest-but curios. They distrust each other and try to decrypt files of other domains. A big goal for MA-ABE is to achieve inter-authority communication so that cipher-texts can ce encrypted using different attributes of different domains. An AA still bootstraps its users, but can also issue external users attributes.
+	\item \textbf{Certificate/Central Authority (\ac{CA});} The purpose of the \ac{CA} is to issue user their global identifier (\ac{GID}). This GID is unique among the whole user universe and identify a user uniquely against each AA. Further, it bootstraps the different \ac{AA}s. The \ac{CA} usually remains trusted but. In many MA-ABE schemes the CA has global decryption power. The CA can also act as an \textit{Certificate Authority} to make users as valid participants in the system. If central authority and certificate authority have different trust levels, they are modeled as different entities.
+	\item \textbf{Server;} Some schemes additional introduce a server. Its task is it to help user with proxy re- and decryption. If an \ac{AA} broadcasts a revocation of an attribute, the server downloads all related ciphertexts from the \ac{CSP} to update them with the new attribute. 
+	The thread model for the server is honest-but-curious or even untrusted. Please note, that the \ac{CA} and the server are two separated entities that do not cooperate.
+\end{enumerate} 
+
+Users and CSP remain unchanged in the MA-ABE case.
+
+\section{Thread Model}
+\label{sec:thread-model}
+MA-ABE describes six entities which will have different trust levels in the design. In the following the certificate authority and central authority, as well as the user and data owners are merged. For the goal of this work the thread model and different trust level of the entities are defined as:
+
+\begin{itemize}
+	\item The \textbf{Central Authority} is assumed to try to break into the client communication. It might provide false information or wrong states to trick any identity to provide sensitive content. However, the central authority will cooperate and will only deviate from the protocol if some advantage could be gained. Simply denying the cooperation - and so disrupting the service - does not belong to the goals of the central service. The central service does not cooperate with other malicious entities. 
+	\item Each \textbf{Attribute Authority}’s goal is to access and eve drop content that is encrypted with attributes outside if its domain. This distrust can be leveraged by a trust relation ship, where two attribute authorities can explicitly agree to trust each other. This mutual trust relation indicates that an trusted attribute authority is assumed to provide only truthfully information to the other trusted authority. Again it is assumed that an attribute authority does not cooperate with other malicious entities and that it will follow the protocol.
+	\item \textbf{Cloud Storage Provider} are simply assumed to be honest-but-curious. They follow the protocol by try to decrypt content if possible. A cloud storage provider is separated from the other system and does not cooperate with any other malicious entity.  
+	\item \textbf{Users} are untrusted. They try to collude with each other to achieve a higher level of decryption power. That means that they will exchange private attribute and two factor keys (see Section \ref{sec:dac-macs}). However, it is assumed that they will not sell a decryption black box so that other external, unauthorized or revoked users use the black box to access sensitive content. 
+\end{itemize}
+
+This thread model was adapted from that in TF-DAC-MACS \cite{li2017two}. Here the central authority and certificate authority are also semi-trusted. This is compensated by leveraging the trust level of the attribute authorities by introducing the trust-relationship. In TF-DAC-MACS a lot of trust is rooted in the certificate which was issued by the trusted certificate authority. In a real life system the trust of the certificate authority needs to be deescalated, since it is usually controlled by the same entity as the central authority or at least act on its behave. To do so, for each certificate validation a second channel needs to be established: One to the issuer and one to the subject of the certificate, asking both for the validity of the certificate. 
+
 \section{Requirements}
 \label{sec:requirements}
+Based on the previous introduced entities in ABE \ref{sec:attribute-based-encryption}, the thread model \ref{sec:thread-model} and the security requirements of a secure-cloud storage system the following requirements can be extracted.
+
 The general (\req{B}) requirements of this thesis will be summarized by two major points: 
 
 \begin{itemize}
