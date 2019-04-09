@@ -71,7 +71,7 @@ headsepline, % Uncomment to get a line under the header
 
 \newcommand{\question}[1]{\originaltodo[color=green, inline]{#1}}
 
-\newcommand{\name}{PAD-TF-DAC-MACS }
+\newcommand{\name}{\ac{PAD-TF-DAC-MACS} }
 \newcommand{\fullname}{Practically Applied Distributed Two-Factor authentication Data Access Controll for Multi-Authority Cloud Storage systems}
 
 
@@ -272,7 +272,12 @@ Commonly a group of users want to share a ciphertext, they need to agree on a sh
 %	THESIS CONTENT - APPENDICES
 %----------------------------------------------------------------------------------------
 
-\appendices % Cue to tell LaTeX that the following "chapters" are Appendices
+%\appendices % Cue to tell LaTeX that the following "chapters" are Appendices
+
+\chapter*{Acronyms}
+\addcontentsline{toc}{chapter}{Acronyms}
+\printacronyms[heading=none]
+
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
