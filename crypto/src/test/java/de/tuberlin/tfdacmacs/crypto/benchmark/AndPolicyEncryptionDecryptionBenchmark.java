@@ -44,12 +44,7 @@ public class AndPolicyEncryptionDecryptionBenchmark extends EncryptionDecryption
                     .configure()
                     .benchmarkEncrypt();
 
-            BenchmarkResult abeRun2Fa = abeConfiguredBenchmarkBuilder
-                    .use2FA(true)
-                    .configure()
-                    .benchmarkEncrypt();
-
-            printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun, abeRun2Fa);
+            printResults(2, firstRun, numUsers, setupWrapper.createdKeys().size(), rsaRun, abeRun);
         }
     }
 
