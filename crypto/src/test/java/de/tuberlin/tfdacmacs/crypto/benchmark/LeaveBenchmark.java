@@ -77,17 +77,12 @@ public class LeaveBenchmark extends UnitTestSuite {
                     .configure()
                     .benchmarkMemberLeave();
 
-            BenchmarkResult abe2FaRun = abeConfiguredBenchmarkBuilder
-                    .use2FA(true)
-                    .configure()
-                    .benchmarkMemberLeave();
-
-            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun, abe2FaRun);
+            printResults(3, firstRun, numCT, numAttributes, rsaRun, abeRun);
         }
     }
 
-    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun, BenchmarkResult abe2FaRun) {
-        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun, abe2FaRun);
+    protected void printResults(int methodIndex, boolean firstRun, int numCt, int numerOfAttributes, BenchmarkResult rsaRun, BenchmarkResult abeRun) {
+        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numCt);
         String fileName = "./leave/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";

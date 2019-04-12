@@ -80,21 +80,15 @@ public abstract class EncryptionDecryptionBenchmark extends UnitTestSuite {
                     .preHeat(firstRun)
                     .benchmarkEncrypt();
 
-            BenchmarkResult abeRun2Fa = abeConfiguredBenchmarkBuilder
-                    .use2FA(true)
-                    .configure()
-                    .benchmarkEncrypt();
-
-            printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun, abeRun2Fa);
+            printResults(3, firstRun, userCount, setupWrapper.createdKeys().size(), rsaRun, abeRun);
 
             buffer += stepSize;
         }
     }
 
     protected void printResults(int methodIndex, boolean firstRun, int numUsers, int numerOfAttributes,
-            BenchmarkResult rsaRun, BenchmarkResult abeRun,
-            BenchmarkResult abeRun2Fa) {
-        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun, abeRun2Fa);
+            BenchmarkResult rsaRun, BenchmarkResult abeRun) {
+        BenchmarkCombinedResult benchmarkCombinedResult = new BenchmarkCombinedResult(rsaRun, abeRun);
         benchmarkCombinedResult.setUnit(ChronoUnit.MILLIS);
         benchmarkCombinedResult.prittyPrintStatistics(numUsers);
         String fileName = "./" + getFileDir() + "/" + Thread.currentThread().getStackTrace()[methodIndex].getMethodName() + ".csv";
