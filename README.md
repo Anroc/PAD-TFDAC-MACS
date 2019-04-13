@@ -1,4 +1,4 @@
-# PAD-TF-DAC-MACS demo
+# PAD-TFDAC-MACS demo
 
 The full demo can be found [here](./crypto/src/test/java/de/tuberlin/tfdacmacs/crypto/pairing/TFDACMACSDemo.java).
 
