@@ -21,6 +21,7 @@ public class SetupBenchmark extends UnitTestSuite {
     private static final String USER_ID = "random@example.de";
 
     private static final double[][] runs = new double[6][50];
+    private static final String FILE_NAME = "./setup/setup.csv";
 
     @Before
     public void setup() {
@@ -29,7 +30,7 @@ public class SetupBenchmark extends UnitTestSuite {
 
     @AfterClass
     public static void print() {
-        CSVPrinter.writeCSV("setup.csv", "\"GPP Setup\","
+        CSVPrinter.writeCSV(FILE_NAME, "\"GPP Setup\","
                 + "\"Authority Setup\","
                 + "\"Attribute Setup\","
                 + "\"User Secret Attribute\nKey Generation\","
@@ -44,7 +45,7 @@ public class SetupBenchmark extends UnitTestSuite {
                 runs[4][i] + "," +
                 runs[5][i];
 
-            CSVPrinter.writeCSV("setup.csv", line, true);
+            CSVPrinter.writeCSV(FILE_NAME, line, true);
         }
     }
 
