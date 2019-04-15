@@ -95,7 +95,7 @@ public class ABEGroup extends Group<ABEUser, ABECipherText> {
         ABEUser abeUser = existingMembers.get(0);
         if(abeUser.isUseTowFactorKey()) {
             TwoFactorKey twoFactorKey = twoFactorKeyGenerator
-                    .generatePublicKeyForUser(gpp, abeUser.getTwoFactorKey(), newMember.getId());
+                    .generateSecretKeyForUser(gpp, abeUser.getTwoFactorKey(), newMember.getId());
             newMember.getTfPublics().put(abeUser.getId(), twoFactorKey.getSecretKeyOfUser(newMember.getId()));
         }
 

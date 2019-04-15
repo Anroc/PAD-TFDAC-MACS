@@ -44,7 +44,7 @@ public class TwoFactorKeyManager {
 
     public String generatePublicKeyForUser(@NonNull TwoFactorKey twoFactorKey, @NonNull String userId) {
         twoFactorKey = twoFactorKeyGenerator
-                .generatePublicKeyForUser(gppService.getGPP(), twoFactorKey, userId);
+                .generateSecretKeyForUser(gppService.getGPP(), twoFactorKey, userId);
 
         TwoFactorKey.Secret secretKeyOfUser = twoFactorKey.getSecretKeyOfUser(userId);
 

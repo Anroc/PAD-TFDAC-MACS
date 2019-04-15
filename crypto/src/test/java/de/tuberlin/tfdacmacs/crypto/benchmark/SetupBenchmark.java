@@ -12,7 +12,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Supplier;
+import static de.tuberlin.tfdacmacs.crypto.benchmark.MeasureSuite.NUM_RUNS;
+import static de.tuberlin.tfdacmacs.crypto.benchmark.MeasureSuite.measure;
 
 public class SetupBenchmark extends UnitTestSuite {
 
@@ -20,7 +21,7 @@ public class SetupBenchmark extends UnitTestSuite {
     private static final String ATTRIBUTE_VALUE_ID = "aa.tu-berlin.de.role:student";
     private static final String USER_ID = "random@example.de";
 
-    private static final double[][] runs = new double[6][50];
+    private static final double[][] runs = new double[6][NUM_RUNS];
     private static final String FILE_NAME = "./setup/setup.csv";
 
     @Before
@@ -36,7 +37,7 @@ public class SetupBenchmark extends UnitTestSuite {
                 + "\"User Secret Attribute\nKey Generation\","
                 + "\"Two-Factor\nKey Generation\","
                 + "\"Two-Factor\nSecret Key Generation\"", false);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < NUM_RUNS; i++) {
             String line =
                 runs[0][i] + "," +
                 runs[1][i] + "," +
@@ -58,52 +59,35 @@ public class SetupBenchmark extends UnitTestSuite {
 
     @Test
     public void benchmarkGPPInit() {
-        measure(0, this::gpp);
+        measure(runs,0, this::gpp);
     }
 
     @Test
     public void benchmarkAuthoritySetup() {
-        measure(1, () -> authorityKeyGenerator.generate(gpp));
+        measure(runs,1, () -> authorityKeyGenerator.generate(gpp));
     }
 
     @Test
     public void benchmarkAttributeSetup() {
-        measure(2, () -> attributeValueKeyGenerator.generateNew(gpp, ATTRIBUTE_VALUE_ID));
+        measure(runs, 2, () -> attributeValueKeyGenerator.generateNew(gpp, ATTRIBUTE_VALUE_ID));
     }
 
     @Test
     public void benchmarkSecretAttributeSetup() {
         AuthorityKey authorityKey = authorityKeyGenerator.generate(gpp);
         AttributeValueKey attributeValueKey = attributeValueKeyGenerator.generateNew(gpp, ATTRIBUTE_VALUE_ID);
-        measure(3, () -> attributeValueKeyGenerator.generateUserKey(gpp, USER_ID, authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey()));
+        measure(runs, 3, () -> attributeValueKeyGenerator.generateUserKey(gpp, USER_ID, authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey()));
     }
 
     @Test
     public void benchmark2FAKeySetup() {
-        measure(4, () -> twoFactorKeyGenerator.generateNew(gpp));
+        measure(runs,4, () -> twoFactorKeyGenerator.generateNew(gpp));
     }
 
     @Test
     public void benchmark2FAUserSecretKeySetup() {
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gpp);
-        measure(5, () -> twoFactorKeyGenerator.generatePublicKeyForUser(gpp, twoFactorKey, USER_ID));
-    }
-
-    /**
-     * We are using a supplier here so that the computation does not get optimized by the JVM.
-     * @param processor
-     */
-    private void measure(int run, Supplier<?> processor) {
-        for (int i = 0; i < 50; i++) {
-            runs[run][i] = (double) measureRun(processor) / 1000000.0;
-            System.out.println(run + ":" + runs[run][i]);
-        }
-    }
-
-    private long measureRun(Supplier<?> processor) {
-        long start = System.nanoTime();
-        processor.get();
-        return System.nanoTime() - start;
+        measure(runs,5, () -> twoFactorKeyGenerator.generateSecretKeyForUser(gpp, twoFactorKey, USER_ID));
     }
 
 }
