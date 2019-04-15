@@ -195,7 +195,7 @@ public class TFDACMACSDemo {
         addUserAttributeSecretComponent(aidStudent, studentAttributeValueKey, studentUserAttributeValueKey, userAttributeKeys);
         addUserAttributeSecretComponent(aidFaculty, faculty4attributeValueKey, facultyUserAttributeValueKey, userAttributeKeys);
 
-        twoFactorKey = twoFactorKeyGenerator.generatePublicKeyForUser(gpp, twoFactorKey, uid);
+        twoFactorKey = twoFactorKeyGenerator.generateSecretKeyForUser(gpp, twoFactorKey, uid);
 
         CipherText cipherText = findSatisfyingCipherText(dnfCipherText, userAttributeKeys);
 

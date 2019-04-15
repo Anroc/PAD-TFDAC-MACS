@@ -33,12 +33,12 @@ public class TwoFactorKeyGenerator {
         Element g_alpha = globalPublicParameter.getG().getImmutable().powZn(alpha.duplicate());
         TwoFactorKey twoFactorKey = new TwoFactorKey(alpha, g_alpha, version);
 
-        Arrays.stream(uids).forEach(uid -> generatePublicKeyForUser(globalPublicParameter, twoFactorKey, uid));
+        Arrays.stream(uids).forEach(uid -> generateSecretKeyForUser(globalPublicParameter, twoFactorKey, uid));
 
         return twoFactorKey;
     }
 
-    public TwoFactorKey generatePublicKeyForUser(@NonNull GlobalPublicParameter globalPublicParameter,
+    public TwoFactorKey generateSecretKeyForUser(@NonNull GlobalPublicParameter globalPublicParameter,
             @NonNull TwoFactorKey twoFactorKey, @NonNull String uid) {
         Element twoFAKey = hashGenerator.g1Hash(globalPublicParameter, uid).powZn(twoFactorKey.getPrivateKey().getKey());
         twoFactorKey.putPublicKey(uid, new SimpleElementKey(twoFAKey, twoFactorKey.getVersion()));
