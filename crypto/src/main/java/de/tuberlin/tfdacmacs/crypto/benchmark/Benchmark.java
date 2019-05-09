@@ -40,7 +40,7 @@ public class Benchmark {
         private final int numberOfUsers;
         private final int numberOfCipherTexts;
 
-        private final byte[] content = "Sample Text that need to be encrypted.".getBytes();
+        private final byte[] content = "Sample text that needs to be encrypted.".getBytes();
 
         public abstract BenchmarkResult benchmarkEncrypt();
         public abstract BenchmarkResult benchmarkMemberJoin();

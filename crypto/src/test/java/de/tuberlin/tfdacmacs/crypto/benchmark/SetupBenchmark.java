@@ -6,6 +6,8 @@ import de.tuberlin.tfdacmacs.crypto.pairing.data.GlobalPublicParameter;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AttributeValueKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.AuthorityKey;
 import de.tuberlin.tfdacmacs.crypto.pairing.data.keys.TwoFactorKey;
+import de.tuberlin.tfdacmacs.crypto.rsa.AsymmetricCryptEngine;
+import de.tuberlin.tfdacmacs.crypto.rsa.StringAsymmetricCryptEngine;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import org.junit.AfterClass;
@@ -21,7 +23,7 @@ public class SetupBenchmark extends UnitTestSuite {
     private static final String ATTRIBUTE_VALUE_ID = "aa.tu-berlin.de.role:student";
     private static final String USER_ID = "random@example.de";
 
-    private static final double[][] runs = new double[6][NUM_RUNS];
+    private static final double[][] runs = new double[7][NUM_RUNS];
     private static final String FILE_NAME = "./setup/setup.csv";
 
     @Before
@@ -36,15 +38,17 @@ public class SetupBenchmark extends UnitTestSuite {
                 + "\"Attribute Setup\","
                 + "\"User Secret Attribute\nKey Generation\","
                 + "\"Two-Factor\nKey Generation\","
-                + "\"Two-Factor\nSecret Key Generation\"", false);
+                + "\"Two-Factor\nSecret Key\nGeneration\""
+                + "\"RSA Key-Pair\nGeneration\"", false);
         for (int i = 0; i < NUM_RUNS; i++) {
             String line =
-                runs[0][i] + "," +
-                runs[1][i] + "," +
-                runs[2][i] + "," +
-                runs[3][i] + "," +
-                runs[4][i] + "," +
-                runs[5][i];
+                        runs[0][i] + "," +
+                        runs[1][i] + "," +
+                        runs[2][i] + "," +
+                        runs[3][i] + "," +
+                        runs[4][i] + "," +
+                        runs[5][i] + "," +
+                        runs[6][i];
 
             CSVPrinter.writeCSV(FILE_NAME, line, true);
         }
@@ -88,6 +92,12 @@ public class SetupBenchmark extends UnitTestSuite {
     public void benchmark2FAUserSecretKeySetup() {
         TwoFactorKey twoFactorKey = twoFactorKeyGenerator.generateNew(gpp);
         measure(runs,5, () -> twoFactorKeyGenerator.generateSecretKeyForUser(gpp, twoFactorKey, USER_ID));
+    }
+
+    @Test
+    public void benchmarkRSA1024KeyPairGeneration() {
+        AsymmetricCryptEngine cryptEngine = new StringAsymmetricCryptEngine(1024);
+        measure(runs, 6, () -> cryptEngine.generateKeyPair());
     }
 
 }
