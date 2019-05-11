@@ -38,7 +38,7 @@ public class SetupBenchmark extends UnitTestSuite {
                 + "\"Attribute Setup\","
                 + "\"User Secret Attribute\nKey Generation\","
                 + "\"Two-Factor\nKey Generation\","
-                + "\"Two-Factor\nSecret Key\nGeneration\""
+                + "\"Two-Factor\nSecret Key\nGeneration\","
                 + "\"RSA Key-Pair\nGeneration\"", false);
         for (int i = 0; i < NUM_RUNS; i++) {
             String line =
