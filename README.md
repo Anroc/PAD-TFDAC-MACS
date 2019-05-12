@@ -1,13 +1,25 @@
-# PAD-TFDAC-MACS demo
+# PAD-TFDAC-MACS
 
 The full demo can be found [here](./crypto/src/test/java/de/tuberlin/tfdacmacs/crypto/pairing/TFDACMACSDemo.java).
 
-## Initialize the dependencies
+## Running The Prototype
 
-To initialize the dependencies we need to setup the ABE en- and decryptor. This clases implement the code for TF-DAC-MACS encryption and
-decryption. To encrypt an arbitrary string message using ABE we first habe to generate a encryption key using the ABEEncryptor and then using this key to encrypt the message using AES. For that the AES en- and decryptor are used. 
+Dependencies:
 
-The classes `StringSymmetricCryptEngine` and `HashGenerator` are just interface classes to bouncy castels AES encryption and SHA-256 hashes. Further, the `HashGenerator` provides a method to hash an element into the field *G1*. 
+1. Docker
+2. gradle 4.4 or higher
+3. Java 1.8 or higher
+
+The best way to get started is by following the demo steps. 
+
+## Demo
+
+### Initializing The Dependencies
+
+To initialize the dependencies we need to setup the ABE en- and decryptor. These classes implement the code for PAD-TFDAC-MACS encryption and
+decryption. To encrypt an arbitrary string message using ABE we first have to generate an encryption key using the ABEEncryptor and then use this key to encrypt the message using AES. For that, the AES en- and decryptor are used. 
+
+The classes `StringSymmetricCryptEngine` and `HashGenerator` are just interface classes to bouncy castle's AES encryption and SHA-256 hashes. Further, the `HashGenerator` provides a method to hash an element into the field *G1*. 
 
 ```java
     // basic dependencies
@@ -21,7 +33,7 @@ The classes `StringSymmetricCryptEngine` and `HashGenerator` are just interface 
     private final ABEDecryptor abeDecryptor = new ABEDecryptor(hashGenerator);
 ```
 
-## Initialize the PairingCryptEngine
+### Initialize The PairingCryptEngine
 
 ```java
     private final PairingCryptEngine pairingCryptEngine = new PairingCryptEngine(
@@ -34,9 +46,9 @@ The classes `StringSymmetricCryptEngine` and `HashGenerator` are just interface 
 
 All dependencies can also be autowired using the spring context. 
 
-## Global Setup
+### Global Setup
 
-We frist need to initialize the pairing and calcuate the public paramter. 
+We first need to initialize the pairing and calculate the public parameter. 
 
 ```java
     PairingGenerator pairingGenerator = new PairingGenerator();
@@ -47,7 +59,7 @@ We frist need to initialize the pairing and calcuate the public paramter.
             pairing, pairingParameters, pairing.getG1().newRandomElement().getImmutable(), null);
 ```
 
-## Authority Setup and register an Attribute
+### Authority Setup And Register An Attribute
 
 To setup a new authority we need to generate a new public/private key pair for this authority. 
 
@@ -56,31 +68,30 @@ To setup a new authority we need to generate a new public/private key pair for t
     AuthorityKey authorityKey = authorityKeyGenerator.generate(gpp);
 ```
 
-In the next setup we register a new attribute with the identifier `aa.tu-berlin.de.role:Student`.
+In the next step, we register a new attribute with the identifier `aa.tu-berlin.de.role:Student`.
 
 ```java
     AttributeValueKeyGenerator attributeValueKeyGenerator = new AttributeValueKeyGenerator(hashGenerator);
     AttributeValuekey attributeValuekey = attributeValueKeyGenerator.generateNew(gpp, "aa.tu-berlin.de.role:Student");
 ```
 
-## Register User
+### Register User
 
-In the next setup we register a new user. This user will be registered in the TU-Berlin domain and get the newly
+Let's register a new user. This user will be registered in the TU-Berlin domain and get the newly
 created attribute assigned. 
 
 ```java
     UserAttributeValueKey userAttributeValueKey = attributeValueKeyGenerator.generateUserKey(gpp, "genesisUser@tu-berlin.de", authorityKey.getPrivateKey(), attributeValueKey.getPrivateKey());
 ```
 
-## Encrypt
+### Encrypt
 
-To encrypt for a user we first ned to create a policy for this cipher text. 
-The `AccessPolicyParser` requires two dependencencies: The `AttributeValueKeyProvider` interface implementaiton 
-and the `AuthorityKeyPorivder` implementation. An application can implement thouse interfaces to retrieve the 
-desired attribute-value-keys or authority-keys. An appropiate exception should be thrown if they could not be found
+To encrypt for a user we first need to create a policy for this ciphertext. 
+The `AccessPolicyParser` requires two dependencies: The `AttributeValueKeyProvider` interface implementation 
+and the `AuthorityKeyPorivder` implementation. An application can implement these interfaces to retrieve the desired attribute-value-keys or authority-keys. An appropriate exception should be thrown if these keys could not be found
 indicating, that the user specified a policy that relates to attributes/authorities that do not exist. 
 
-Further the `AccessPolicyParser` can parse any DNF formular. Meaning that the passed fomular should be present in 
+Further the `AccessPolicyParser` can parse any DNF formula. Meaning that the passed fomula should be present in 
 the form `'('(ATTR_ID (and ATTR_ID)*)')' (or ('(' ATTR_ID (and ATTR_ID)*) ')')*`. 
 
 ```java
@@ -90,24 +101,22 @@ the form `'('(ATTR_ID (and ATTR_ID)*)')' (or ('(' ATTR_ID (and ATTR_ID)*) ')')*`
         .parse("(aa.tu-berlin.de.role:Student)");
 ```
 
-Lets choose a plain text that we want to encrypt: "No, Eve please :(". 
+Let's choose a plain text that we want to encrypt: "No, Eve please :(". 
 
 ```java
     byte[] message = "No, Eve please :(".getBytes();
     DNFCipherText dnfCipherText = pairingCryptEngine.encrypt(message, dnfAccessPolicy, gpp, null);
 ```
 
-The `null` element here referres to the `DataOwner` object which we are currently not using. If we would do so we would also secure the cipher text with a two-factor authentication key. 
+The `null` argument refers to the `DataOwner` object which we are currently not using. If we would do so we would also secure the ciphertext with a two-factor authorization key. 
 
-The cipher text object now contains all needed cipher text components and also the encyrpted message.
+The ciphertext object now contains all needed ciphertext components and also the encrypted message.
 
-## Decrypt
+### Decrypt
 
 To decrypt the encrypted message we now use the `userAttributeValueSecretKey`. 
 
-Please note that we do not need to filter for the policy this user satisfies, since we only have one policy element in 
-our ciphertext. So we can simply use `dnfCipherText.getCipherTexts().get(0)`. In the complete example this is properly 
-implemented with the function `findSatisfyingCipherText(...)`. 
+Please note that we do not need to filter for the policy this user satisfies since we only have one policy element in our ciphertext. So we can simply use `dnfCipherText.getCipherTexts().get(0)`. In the complete example, this is properly implemented with the function `findSatisfyingCipherText(...)`. 
 
 ```java
     Set<UserAttributeSecretComponents> userAttributeKeys = new HashSet<>();
@@ -116,12 +125,12 @@ implemented with the function `findSatisfyingCipherText(...)`.
     byte[] recoveredMessage = pairingCryptEngine.decrypt(dnfCipherText.getFile().getData(), dnfCipherText.getCipherTexts().get(0), gpp, uid, userAttributeKeys, null);
 ```
 
-Finally we can convert the `byte[]` back to a `String` with `new String(recoveredMessage)`. 
+Finally, we can convert the `byte[]` back to a `String` with `new String(recoveredMessage)`. 
 
 
-## Encrypt using two factor authentication
+### Encrypt Using Two-Factor Authorization
 
-We need to add another dependency to enable two-factor authentication (2FA) and create a new identifier for the data owner. 
+We need to add another dependency to enable two-factor authorization (2FA) and create a new identifier for the data owner. 
 
 ```java
     String oid = "dataowner@tu-berlin.de";
@@ -137,9 +146,9 @@ We then can encrypt the plain text additionally with the data owner object.
 ```
 
 
-## Decrypt using two factor authentication
+### Decrypt Using Two-Factor Authorization
 
-Let's generate the user 2FA key for this cipher text and decipher this message using this key. 
+Let's generate the user 2FA key for this ciphertext and decipher this message using this key. 
 
 ```java
    twoFactorKey = twoFactorKeyGenerator.generatePublicKeyForUser(gpp, twoFactorKey, uid);

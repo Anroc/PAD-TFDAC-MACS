@@ -1,13 +1,17 @@
 # Installing jPBC native extension
 
+Please note that to run the PAD-TFDAC-MACS the native jPBC extension is not required. However, it does speed up computations in the magnitude of 15 ms - 25 ms per pairing operation.
+
 ## 1. Install PBC
 
 Download the [sources](https://crypto.stanford.edu/pbc/download.html) of the latest pbc release and
 follow the instructions in [here](https://crypto.stanford.edu/pbc/manual/ch01.html).
-Requirement for this installation is the existance of [GMP](https://gmplib.org/). 
+A requirement for this installation is the existence of [GMP](https://gmplib.org/). 
 Since GMP is quite old, it might be compiled manually.
 
 ## 2. Installing jPBC
+
+For the next steps a maven 3 must be installed.
 
 Download [jPBC](http://gas.dia.unisa.it/projects/jpbc/download.html)
 from [here](https://sourceforge.net/projects/jpbc/files/jpbc_2_0_0/). 
@@ -18,7 +22,7 @@ After the download finished access the directory via the terminal and type:
 mvn install -DskipTests
 ```
 
-If it fails remove the model android from the pom.xml.
+If it fails, remove the module `android` from the pom.xml.
 
 ## 3. Setting up native extension
 
@@ -44,20 +48,20 @@ You will find a shared library called `jpbc-pbc.so` in the `./build` or root dir
 In your project add the following dependencies:
 
 ```groovy
-	compile 'net.java.dev.jna:jna:5.1.0'
-	compile 'it.unisa.dia.gas:jpbc-pbc:2.0.0'
+    compile 'net.java.dev.jna:jna:5.1.0'
+    compile 'it.unisa.dia.gas:jpbc-pbc:2.0.0'
 ```
 
 You might also have to add:
 
 ```groovy
 repositories {
-	mavenCentral()
-	mavenLocal() // <--
+    mavenCentral()
+    mavenLocal() // <--
 }
 ```
 
-to make the manual installed libraries discoverable.
+to make the manually installed libraries discoverable.
 
 Finally, you have include the `libjbc-pbc.so` in your classpath. It can be done
 by copying the library to your project resource directory: 
