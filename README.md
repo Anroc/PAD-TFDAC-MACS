@@ -1,6 +1,8 @@
 # PAD-TFDAC-MACS
 
-The full demo can be found [here](./crypto/src/test/java/de/tuberlin/tfdacmacs/crypto/pairing/TFDACMACSDemo.java).
+A proof-of-concept implementation of PAD-TFDAC-MACS from the "[Practical Attribute-Based Encryption For Secure Cloud Storage Systems](./docs/practical-attribute-based-encryption-for-secure-cloud-storage-systems.pdf)." 
+
+**Attention:** Use at your own risk. The author is not providing any security or cryptographic guarantees. 
 
 ## Running The Prototype
 
@@ -13,6 +15,8 @@ Dependencies:
 The best way to get started is by following the demo steps. 
 
 ## Demo
+
+The full demo can be found [here](./crypto/src/test/java/de/tuberlin/tfdacmacs/crypto/pairing/TFDACMACSDemo.java).
 
 ### Initializing The Dependencies
 
